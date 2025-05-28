@@ -4,16 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="" />
+    <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/automation/generate_feedback_and_device_data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/automation/split_claims_dataset.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/data_dictionary.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 5
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "okv627"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:okv627/KardiaFlow.git",
+    "accountId": "019f5dd9-c375-4cac-827e-aea6ecd9d776"
+  }
+}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2xhUB6mTZfnKGSvGm3z2d7QkKhu" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -23,7 +44,11 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/KV-62/Desktop/KardiaFlow",
+    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "project.propVCSSupport.Mappings",
     "settings.editor.splitter.proportion": "0.17370892",
@@ -55,6 +80,7 @@
       <updated>1745522795901</updated>
       <workItem from="1745522797203" duration="6263000" />
       <workItem from="1748389664311" duration="16000" />
+      <workItem from="1748389681925" duration="5641000" />
     </task>
     <servers />
   </component>

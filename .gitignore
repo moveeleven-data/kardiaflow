@@ -1,0 +1,39 @@
+# Python + Notebooks
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints/
+
+# Environment
+.venv/
+env/
+*.egg-info/
+
+# IDE/System
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Data folders (raw, temporary, streaming)
+data/raw/
+data/streaming/
+data/tmp/
+
+# Secrets / Configs
+.env
+*.key
+*.pem
+token.txt
+.databrickscfg
+
+# Log and Report files
+*.log
+*.bak
+
+# Archive / Compressed
+*.zip
+*.tar
+*.tar.gz
+*.rar
