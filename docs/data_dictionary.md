@@ -82,3 +82,66 @@ Notes:
 - Can be used to simulate IoT stream ingestion
 - Aligns well with Spark Structured Streaming or MongoDB pipelines
 
+---
+
+### File: `patients.csv`
+
+| Field Name   | Type   | Description                                  |
+|--------------|--------|----------------------------------------------|
+| `ID`         | UUID   | Unique identifier for the patient            |
+| `BIRTHDATE`  | Date   | Patient's date of birth (YYYY-MM-DD)         |
+| `DEATHDATE`  | Date   | Date of death, if applicable                 |
+| `SSN`        | String | Synthetic Social Security Number             |
+| `DRIVERS`    | String | Synthetic Driver’s License ID                |
+| `PASSPORT`   | String | Synthetic Passport ID                        |
+| `PREFIX`     | String | Name prefix (e.g., Mr., Ms., Dr.)            |
+| `FIRST`      | String | First name                                   |
+| `LAST`       | String | Last name                                    |
+| `SUFFIX`     | String | Name suffix (e.g., Jr., Sr.)                 |
+| `MAIDEN`     | String | Maiden name                                  |
+| `MARITAL`    | String | Marital status (e.g., M, S, D, W)            |
+| `RACE`       | String | Patient’s race                               |
+| `ETHNICITY`  | String | Patient’s ethnicity                          |
+| `GENDER`     | String | Gender (M or F)                              |
+| `BIRTHPLACE` | String | City and state of birth                      |
+| `ADDRESS`    | String | Residential address                          |
+
+**Notes:**
+- Use `ID` as the primary key
+- Used as a lookup/join key in encounters and procedures
+
+---
+
+### File: `encounters.csv`
+
+| Field Name         | Type   | Description                                              |
+|--------------------|--------|----------------------------------------------------------|
+| `ID`               | UUID   | Unique identifier for the encounter                      |
+| `DATE`             | Date   | Date of the encounter (YYYY-MM-DD)                       |
+| `PATIENT`          | UUID   | Foreign key referencing the patient (`patients.ID`)      |
+| `CODE`             | String | Code for the type of encounter                           |
+| `DESCRIPTION`      | String | Human-readable description of the encounter type         |
+| `REASONCODE`       | String | Code for the reason the encounter occurred               |
+| `REASONDESCRIPTION`| String | Human-readable description for the reason                |
+
+**Notes:**
+- Encounters represent visits, checkups, emergency visits, etc.
+- Can be used to group procedures or feedback by visit context
+
+---
+
+### File: `procedures.csv`
+
+| Field Name         | Type   | Description                                                  |
+|--------------------|--------|--------------------------------------------------------------|
+| `DATE`             | Date   | Date the procedure was performed                             |
+| `PATIENT`          | UUID   | Foreign key referencing the patient (`patients.ID`)          |
+| `ENCOUNTER`        | UUID   | Foreign key referencing the encounter (`encounters.ID`)      |
+| `CODE`             | String | Procedure code (e.g., CPT or SNOMED style)                   |
+| `DESCRIPTION`      | String | Description of the procedure                                 |
+| `REASONCODE`       | String | Code for the reason the procedure was performed              |
+| `REASONDESCRIPTION`| String | Human-readable reason for the procedure                      |
+
+**Notes:**
+- Can be joined with `encounters` and `patients` for full context
+- Useful for filtering surgical vs diagnostic activity
