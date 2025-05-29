@@ -7,6 +7,12 @@ heterogeneous healthcare systems. The aim is to replicate the challenges of
 ingesting, transforming, validating, and securing sensitive healthcare data
 in a modern, cloud-native environment.
 
+### Architecture Overview
+
+This high-level diagram shows how structured and semi-structured healthcare data flows from ingestion to transformation, validation, and secure storage using Azure-native tools.
+
+![KardiaFlow Architecture](docs/kardiaflow_architecture.png)
+
 ### Data Sources
 
 - **EHR Data (Structured)** — from an on-prem Oracle or SQL Server instance:

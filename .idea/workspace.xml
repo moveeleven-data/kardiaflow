@@ -5,11 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/automation/test_mongodb_connection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/automation/test_postgres_connection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/data_dictionary.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/data_dictionary.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/generate_feedback_and_device_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/automation/data_helpers/generate_feedback_and_device_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/split_claims_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/automation/data_helpers/split_claims_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/test_mongodb_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/automation/db_checks/test_mongodb_connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/test_oracle_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/automation/db_checks/test_oracle_connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/test_postgres_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/automation/db_checks/test_postgres_connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/automation/test_sqlserver_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/automation/db_checks/test_sqlserver_connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/raw/.gitkeep" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +67,12 @@
       </console-settings>
     </option>
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation\data_helpers" />
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation\db_checks" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -80,7 +90,7 @@
       <updated>1745522795901</updated>
       <workItem from="1745522797203" duration="6263000" />
       <workItem from="1748389664311" duration="16000" />
-      <workItem from="1748389681925" duration="10527000" />
+      <workItem from="1748389681925" duration="12715000" />
     </task>
     <servers />
   </component>
