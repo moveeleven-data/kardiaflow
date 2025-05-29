@@ -1,4 +1,4 @@
-# KardiaFlow: Healthcare Data Engineering Portfolio Project
+# KardiaFlow: Azure-Based Healthcare Data Platform
 
 ## Scenario
 
