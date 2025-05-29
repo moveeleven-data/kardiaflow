@@ -63,7 +63,3 @@ This project simulates responsible healthcare data practices by incorporating:
 - **PHI identification and masking** for fields like name, birthdate, and medical record number
 - **Security best practices**, such as separation of secrets, encryption in transit, and audit logging
 - **Data governance artifacts**, including data lineage diagrams, update frequency, and ownership tracking
-
----
-
-Initial directory structure: mkdir -p {dags,data/{raw,streaming,curated},databases/{ddl,seeds},notebooks/{batch_etl,streaming},adf_pipelines,datagovernance/{architecture,validation,security},automation,docs,reports,tests/{great_expectations,manual_checks}} && touch {requirements.txt,.gitignore,docs/{README.md,lineage.md,validation_summary.md,orchestration_plan.md},reports/queries.sql}
