@@ -1,39 +1,78 @@
-# Python + Notebooks
+# -----------------------------
+# Python Bytecode & Notebooks
+# -----------------------------
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 *.ipynb_checkpoints/
 
-# Environment
+# -----------------------------
+# Virtual Environments
+# -----------------------------
 .venv/
+venv/
 env/
+ENV/
 *.egg-info/
 
-# IDE/System
+# -----------------------------
+# IDEs / Editor Configs
+# -----------------------------
 .vscode/
+.idea/
 .DS_Store
 *.swp
 *.swo
 
-# Data folders (raw, temporary, streaming)
+# -----------------------------
+# Data Files
+# -----------------------------
 data/raw/
-data/streaming/
 data/tmp/
+data/streaming/
+*.sqlite
+*.db
+*.db-journal
 
-# Secrets / Configs
+# -----------------------------
+# Secrets & Credentials
+# -----------------------------
 .env
+.env.*
 *.key
 *.pem
+*.crt
 token.txt
 .databrickscfg
+secrets.yaml
 
-# Log and Report files
+# -----------------------------
+# Logs, Reports, and Output
+# -----------------------------
+logs/
 *.log
 *.bak
+*.out
 
-# Archive / Compressed
+# -----------------------------
+# Archives / Compressed
+# -----------------------------
 *.zip
 *.tar
 *.tar.gz
 *.rar
+*.7z
+
+# -----------------------------
+# Testing / Coverage
+# -----------------------------
+.coverage
+.cache/
+.tox/
+pytest_cache/
+htmlcov/
+
+# -----------------------------
+# Build Artifacts
+# -----------------------------
+dist/
+build/
