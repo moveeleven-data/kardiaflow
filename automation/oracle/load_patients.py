@@ -1,34 +1,30 @@
 """
 Script: load_patients.py
 
-This script loads synthetic patient data from a CSV file into an Oracle XE database, ensuring
-data quality through cleaning, deduplication, and validation. It’s designed for batch ingestion
-in pipelines where raw data may be incomplete, inconsistent, or exceed schema constraints.
+This script loads synthetic patient data from a CSV file into an Oracle XE database.
+It validates, cleans, and inserts rows while skipping and logging any that fail.
 
-1. Read only the expected columns from the CSV.
-2. Clean the data: malformed dates are nulled, long strings are trimmed to match Oracle limits,
-   and missing values are normalized to None.
-3. Query the Oracle DB to identify existing patient IDs and filter them out of the load.
-4. Attempt to insert each cleaned record; if it fails (e.g. due to constraint violations),
-   we skip it and log the issue.
+Steps:
+1. Read expected columns from CSV using pandas.
+2. Normalize values (nulls, string length, dates).
+3. Filter out patients already in the database (via ID).
+4. Insert each new record into Oracle; log failures.
 """
 
 import os
 import cx_Oracle
 import pandas as pd
 
-# ---------- CONFIG ----------
-expected_columns = [
+# ---------- CONFIGURATION ----------
+EXPECTED_COLUMNS = [
     'ID', 'BIRTHDATE', 'DEATHDATE', 'SSN', 'DRIVERS', 'PASSPORT',
     'PREFIX', 'FIRST', 'LAST', 'SUFFIX', 'MAIDEN', 'MARITAL',
     'RACE', 'ETHNICITY', 'GENDER', 'BIRTHPLACE', 'ADDRESS'
 ]
 
-input_path = "data/raw/ehr/patients.csv"
-output_log = "logs/skipped_patients.csv"
-# ----------------------------
-
-print("Starting script...")
+INPUT_PATH = "data/raw/ehr/patients.csv"
+OUTPUT_LOG = "logs/skipped_patients.csv"
+ORACLE_DSN = cx_Oracle.makedsn("localhost", 1521, service_name="XE")
 
 # ---------- HELPER FUNCTIONS ----------
 def safe_date(val):
@@ -44,32 +40,34 @@ def trim(val, maxlen):
     if pd.isnull(val): return None
     return str(val).strip()[:maxlen]
 
-# ---------- LOAD CSV ----------
-print("Loading CSV...")
-df = pd.read_csv(input_path, usecols=expected_columns)
-print(f"Loaded {len(df)} rows from CSV.")
+# ---------- MAIN SCRIPT ----------
+print("Starting script...")
 
+# Load and preprocess CSV
+print("Loading CSV...")
+df = pd.read_csv(INPUT_PATH, usecols=EXPECTED_COLUMNS)
+print(f"Loaded {len(df)} rows from CSV.")
 df = df.where(pd.notnull(df), None)
 
-# ---------- CONNECT TO ORACLE ----------
+# Connect to Oracle
 print("Connecting to Oracle...")
-dsn = cx_Oracle.makedsn("localhost", 1521, service_name="XE")
-conn = cx_Oracle.connect(user="system", password="oracle", dsn=dsn)
+conn = cx_Oracle.connect(user="system", password="oracle", dsn=ORACLE_DSN)
 cursor = conn.cursor()
 print("Connected.")
 
+# Get already existing patient IDs
 print("Fetching existing patient IDs...")
 cursor.execute("SELECT ID FROM patients")
-existing_ids = set(r[0] for r in cursor.fetchall())
-print(f"Found {len(existing_ids)} existing patients in the database.")
+existing_ids = set(row[0] for row in cursor.fetchall())
+print(f"Found {len(existing_ids)} existing patients.")
 
-# ---------- FILTER OUT EXISTING ----------
-print("Filtering out already-inserted rows...")
+# Filter and validate rows
+print("Filtering and validating rows...")
 df = df[~df['ID'].isin(existing_ids)]
-df = df[df['ID'].notnull()]  # Ensure no missing IDs
-print(f"{len(df)} rows remaining to process.")
+df = df[df['ID'].notnull()]
+print(f"{len(df)} new rows to process.")
 
-# ---------- CLEAN DATA ----------
+# Clean field values
 print("Cleaning data...")
 df['ID']         = df['ID'].apply(lambda x: trim(x, 50))
 df['BIRTHDATE']  = df['BIRTHDATE'].apply(safe_date)
@@ -82,9 +80,10 @@ df['MARITAL']    = df['MARITAL'].apply(lambda x: trim(x, 10))
 df['DRIVERS']    = df['DRIVERS'].apply(lambda x: trim(x, 50))
 df['ETHNICITY']  = df['ETHNICITY'].apply(lambda x: trim(x, 50))
 
-# ---------- INSERT ROWS ----------
-skipped_rows = []
+# Insert into Oracle
 print("Beginning insert loop...")
+skipped_rows = []
+
 for i, row in df.iterrows():
     try:
         if not row['ID']:
@@ -112,15 +111,15 @@ for i, row in df.iterrows():
     except Exception as e:
         skipped_rows.append((i, row['ID'], str(e)))
 
-# ---------- FINISH ----------
+# Commit and cleanup
 print("Committing changes...")
 conn.commit()
 conn.close()
 print(f"Loaded {len(df) - len(skipped_rows)} new patients into Oracle.")
 print(f"Skipped {len(skipped_rows)} rows.")
 
-# ---------- SAVE SKIPPED ROWS ----------
+# Log skipped rows
 if skipped_rows:
-    os.makedirs(os.path.dirname(output_log), exist_ok=True)
-    pd.DataFrame(skipped_rows, columns=["row_index", "patient_id", "error"]).to_csv(output_log, index=False)
-    print(f"Logged skipped rows to {output_log}")
+    os.makedirs(os.path.dirname(OUTPUT_LOG), exist_ok=True)
+    pd.DataFrame(skipped_rows, columns=["row_index", "patient_id", "error"]).to_csv(OUTPUT_LOG, index=False)
+    print(f"Logged skipped rows to {OUTPUT_LOG}")

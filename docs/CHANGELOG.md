@@ -2,21 +2,21 @@
 
 ## 2025-05-30
 
-Today focused on the ingestion and validation of the synthetic EHR patient dataset into Oracle XE. We developed and finalized a robust Python script (`load_patients.py`) to batch load `patients.csv` from `data/raw/ehr/` into the `patients` table within the Oracle database. The script utilizes **pandas** for high-throughput data wrangling and **cx_Oracle** for database interaction.
+Today focused on the ingestion and validation of the synthetic EHR patient
+dataset into Oracle XE. I developed and finalized a robust Python script
+(`load_patients.py`) to batch load `patients.csv` from `data/raw/ehr/` into
+the `patients` table within the Oracle database. The script utilizes **pandas**
+for high-throughput data wrangling and **cx_Oracle** for database interaction.
 
 Critical data quality safeguards were implemented within the pipeline:
 
 - **Primary key enforcement**: Rows with missing or null `ID` values are skipped.
 - **Deduplication logic**: Previously inserted patients are excluded by checking against existing Oracle records.
 - **Field length validation**: Fields such as `SUFFIX`, `GENDER`, and `SSN` are trimmed to Oracle-safe lengths to avoid `ORA-12899` errors.
-- **Date coercion**: Invalid or malformed dates are gracefully nullified using `pandas.to_datetime`, preserving otherwise valid records.
+- **Date coercion**: Invalid or malformed dates are nullified using `pandas.to_datetime`, preserving otherwise valid records.
 - **Error resilience**: Failed inserts are caught individually and logged to `logs/skipped_patients.csv` for review.
 
 Performance-wise, the script successfully ingested over **133,000** patient records while skipping a small subset (~72 rows) due to data violations—these were logged for future inspection.
-
-To support clean version control, the `.gitignore` was updated to exclude the `logs/` directory and generated CSVs containing insert failures. This allows the repository to remain clean while preserving transparency in load operations.
-
-This ingestion layer forms a crucial link in the overall KardiaFlow architecture, bridging raw EHR exports with downstream analytics and validation pipelines.
 
 ---
 
