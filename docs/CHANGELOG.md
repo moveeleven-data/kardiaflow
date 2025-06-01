@@ -1,5 +1,18 @@
 # KardiaFlow Project — Changelog
 
+## 2025-06-01
+
+Resolved Oracle XE ingestion failures on `encounters.csv` (~1.5M rows) caused
+by index space exhaustion in the default `SYSTEM` tablespace. Since SYSTEM is
+reserved for internal Oracle metadata and has limited space, I created a
+dedicated user tablespace (`USERS_DATA`) to store the `encounters` table and
+its indexes. I then updated `load_encounters.py` to support a retry mode
+(via `logs/skipped_encounters.csv`) and replaced row-by-row inserts with
+`executemany()` in batches for performance and stability. The script now bulk
+loads in chunks with mid-batch commits and retries only failed rows. Final run
+successfully loaded all ~1.5M encounters with no remaining skips. Also completed
+ingestion of `procedures.csv` into Oracle: 624,139 rows loaded with 0 skips.
+
 ## 2025-05-30
 
 Today focused on the ingestion and validation of the synthetic EHR patient
