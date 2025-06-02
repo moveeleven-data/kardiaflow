@@ -1,0 +1,52 @@
+# automation/infra/docker-compose.yml
+#
+# Recreates the three local databases used by KardiaFlow
+# ------------------------------------------------------
+# • Oracle XE 11g      → localhost:1521  (container: oracle-xe)
+# • PostgreSQL 15      → localhost:5433  (container: kardia_postgres)
+# • MongoDB 7          → localhost:27017 (container: kardia_mongo)
+#
+# Volumes are declared so data survives `docker-compose down` (without -v).
+
+version: "3.9"
+
+services:
+  oracle-xe:
+    image: oracleinanutshell/oracle-xe-11g
+    container_name: oracle-xe
+    ports:
+      - "1521:1521"   # SQL*Net
+      - "8080:8080"   # APEX web console (optional)
+    volumes:
+      - oracle_data:/u01/app/oracle
+    environment:
+      - TZ=UTC        # keep timestamps consistent
+    restart: unless-stopped
+
+  kardia_postgres:
+    image: postgres:15
+    container_name: kardia_postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: claims
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpass   # change as needed
+      TZ: UTC
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  kardia_mongo:
+    image: mongo:7
+    container_name: kardia_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  oracle_data:
+  pg_data:
+  mongo_data:

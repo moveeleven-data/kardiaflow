@@ -5,9 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/automation/mongodb/load_feedback.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/automation/postgres/load_claims.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/automation/postgres/load_providers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/batch_etl/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/automation/infra/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +54,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "project.propVCSSupport.Mappings",
+    "settings.editor.selected.configurable": "com.intellij.jupyter.py.connections.configurable.JupyterServersConfigurable",
     "settings.editor.splitter.proportion": "0.17370892",
     "typescript.add.unambiguous.imports.on.the.fly": "true",
     "vue.rearranger.settings.migration": "true"
@@ -86,7 +91,7 @@
       <workItem from="1745522797203" duration="6263000" />
       <workItem from="1748389664311" duration="16000" />
       <workItem from="1748389681925" duration="15927000" />
-      <workItem from="1748566414732" duration="11742000" />
+      <workItem from="1748566414732" duration="17712000" />
     </task>
     <servers />
   </component>

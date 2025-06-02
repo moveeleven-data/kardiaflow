@@ -2,16 +2,30 @@
 
 ## 2025-06-01
 
-Resolved Oracle XE ingestion failures on `encounters.csv` (~1.5M rows) caused
-by index space exhaustion in the default `SYSTEM` tablespace. Since SYSTEM is
-reserved for internal Oracle metadata and has limited space, I created a
-dedicated user tablespace (`USERS_DATA`) to store the `encounters` table and
-its indexes. I then updated `load_encounters.py` to support a retry mode
-(via `logs/skipped_encounters.csv`) and replaced row-by-row inserts with
-`executemany()` in batches for performance and stability. The script now bulk
-loads in chunks with mid-batch commits and retries only failed rows. Final run
-successfully loaded all ~1.5M encounters with no remaining skips. Also completed
-ingestion of `procedures.csv` into Oracle: 624,139 rows loaded with 0 skips.
+Resolved Oracle XE ingestion failures on `encounters.csv` (~1.5M rows) due to
+index space exhaustion in the default `SYSTEM` tablespace. Created a dedicated
+`USERS_DATA` tablespace for user data and updated `load_encounters.py` to
+support mid-batch commits, `executemany()`, and retry logging via
+`logs/skipped_encounters.csv`. Final run completed with no skipped rows. Also
+ingested `procedures.csv` (624,139 rows, 0 skips).
+
+Stood up a new PostgreSQL container (`postgres:15` on port 5433), created the
+`claims` database, and developed ingestion scripts for `claims.csv` and
+`providers.csv`. Scripts include snake_case normalization, deduplication on
+primary keys, and schema alignment. Successfully loaded 4,500 claims and
+1,500 providers.
+
+Deployed MongoDB (`mongo:7` on port 27017) and created the `healthcare`
+database. Wrote an ingestion script for `feedback.json` that parses timestamps,
+cleans text fields, and inserts into the `feedback` collection. All 50 documents
+loaded successfully.
+
+Finally, created a validation notebook (`source_validation_checks.ipynb`)
+to confirm ingestion integrity across all systems. Ran cross-database row
+counts, sampled data, and checked for anomalies in `patients`, `claims`,
+and `feedback`. All counts and structures verified.
+
+---
 
 ## 2025-05-30
 

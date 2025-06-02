@@ -63,3 +63,25 @@ This project simulates responsible healthcare data practices by incorporating:
 - **PHI identification and masking** for fields like name, birthdate, and medical record number
 - **Security best practices**, such as separation of secrets, encryption in transit, and audit logging
 - **Data governance artifacts**, including data lineage diagrams, update frequency, and ownership tracking
+
+---
+
+### Note: Oracle XE Access via `sqlplus` (WSL)
+
+To run SQL queries directly against our Oracle XE database, we use [`sqlplus`](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqpug/using-SQL-Plus.html)—a command-line client bundled with Oracle's Instant Client. Since `sqlplus` is not available through `apt`, we install it manually.
+
+We downloaded and extracted the following Linux packages into `~/oracle/`:
+- `instantclient-basic-linux.x64-21.*.zip`
+- `instantclient-sqlplus-linux.x64-21.*.zip`
+- `instantclient-sdk-linux.x64-21.*.zip` (optional, for dev work)
+
+After unzipping, we configured our environment by appending the following to `~/.zshrc` (or `~/.bashrc`):
+
+export LD_LIBRARY_PATH=~/oracle/instantclient_21_*/:$LD_LIBRARY_PATH
+export PATH=~/oracle/instantclient_21_*/:$PATH
+
+Then reload the shell:
+source ~/.zshrc
+
+Now we connect to Oracle XE from WSL:
+sqlplus system/oracle@//localhost:1521/XE
