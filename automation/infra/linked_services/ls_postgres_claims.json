@@ -1,0 +1,29 @@
+{
+    "name": "ls_postgres_claims",
+    "type": "Microsoft.DataFactory/factories/linkedservices",
+    "properties": {
+        "description": "Linked service for Docker-hosted PostgreSQL 15 database (claims) via SHIR",
+        "annotations": [],
+        "type": "PostgreSqlV2",
+        "typeProperties": {
+            "server": "127.0.0.1",
+            "port": "5433",
+            "database": "claims",
+            "username": "postgres",
+            "password": {
+                "type": "AzureKeyVaultSecret",
+                "store": {
+                    "referenceName": "ls_kv_kardiaflow",
+                    "type": "LinkedServiceReference"
+                },
+                "secretName": "pg-pwd"
+            },
+            "sslMode": 0,
+            "authenticationType": "Basic"
+        },
+        "connectVia": {
+            "referenceName": "kardiaflow-shir",
+            "type": "IntegrationRuntimeReference"
+        }
+    }
+}
