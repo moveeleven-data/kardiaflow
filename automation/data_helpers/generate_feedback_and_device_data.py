@@ -1,9 +1,20 @@
+import csv
 import json
 from datetime import datetime, timedelta
 import random
 import os
 
-# Realistic comments to randomly choose from
+# === Load patient UUIDs ===
+patient_ids = []
+with open("data/raw/ehr/patients.csv", newline="") as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        patient_ids.append(row["ID"])
+
+# Sample only up to 50 patients to match previous volume
+sampled_patients = random.sample(patient_ids, min(50, len(patient_ids)))
+
+# === Generate feedback and device data ===
 comments_pool = [
     "Staff was very kind and professional.",
     "Wait time was too long for a routine check-up.",
@@ -17,12 +28,10 @@ comments_pool = [
     "I didn’t feel like my concerns were taken seriously."
 ]
 
-# Generate data
 feedback_data = []
 device_data = []
 
-for i in range(50):
-    patient_id = f"p{1000 + i}"
+for i, patient_id in enumerate(sampled_patients):
     visit_id = f"v{5000 + i}"
     timestamp = (datetime.utcnow() - timedelta(minutes=random.randint(1, 1440))).isoformat() + "Z"
 
@@ -42,14 +51,13 @@ for i in range(50):
         "device_id": f"fitbit-{random.randint(1000, 9999)}"
     })
 
-# Ensure folder exists
+# === Write to files ===
 os.makedirs("data/raw/feedback", exist_ok=True)
 
-# Write files
 with open("data/raw/feedback/feedback.json", "w") as f:
     json.dump(feedback_data, f, indent=2)
 
 with open("data/raw/feedback/device_data.json", "w") as f:
     json.dump(device_data, f, indent=2)
 
-print("Clean and realistic feedback + device JSON files generated.")
+print("Regenerated feedback and device data with real patient UUIDs.")

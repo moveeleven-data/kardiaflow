@@ -5,7 +5,10 @@
 - `data/raw/claims/providers.csv`
 
 ### Dataset Overview
-Synthetic dataset containing 4,500 health insurance claims. Designed to simulate real-world claim scenarios for analysis, ETL pipelines, validation, and machine learning. Generated using the Faker library to mimic real claim data without privacy risk.
+Synthetic dataset containing 4,500 health insurance claims. Designed to simulate
+real-world claim scenarios for analysis, ETL pipelines, validation, and machine
+learning. Generated using the Faker library to mimic real claim data without
+privacy risk.
 
 ---
 

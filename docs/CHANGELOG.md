@@ -1,5 +1,21 @@
 # KardiaFlow Project — Changelog
 
+## Changelog – 2025-06-02
+
+- Set up and tested all data connections needed for Azure Data Factory to move
+  data between systems.
+- Created and connected to:
+  - A local Oracle XE database
+  - A local PostgreSQL database (on port 5433)
+  - A local MongoDB instance
+  - A cloud-based Azure Data Lake Storage (ADLS Gen2) account named
+    `kardiaflowstorage`
+- Used a self-hosted integration runtime (SHIR) to securely connect local
+  databases to Azure.
+- Stored all passwords and access keys in Azure Key Vault (`kardiaflow-kv`)
+  for security.
+- Verified that all connections worked by running tests in the ADF user interface.
+
 ## 2025-06-01
 
 Resolved Oracle XE ingestion failures on `encounters.csv` (~1.5M rows) due to
