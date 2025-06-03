@@ -14,11 +14,23 @@ Added a data validation layer to ensure successful data loading by
 cross-checking row counts and performing basic data validation. Used the ADF
 Monitor to track pipeline progress and verify completeness of the ingested data.
 
-Set up for Databricks (PySpark) transformation by adding a folder called
-`data/analysis/` to store Parquet files for later transformation. Developed
-a `read_parquet.py` script using PySpark to quickly check the integrity of
-Parquet files by verifying row counts and displaying a preview of the first
-5 rows of data.
+Set up Databricks and PySpark for data transformation. Mounted Azure Data Lake
+Storage (ADLS Gen2) to DBFS and successfully loaded Parquet files into Databricks
+notebooks. Performed initial exploration of the data by displaying schemas and
+previewing the first few rows of the patients, encounters, and procedures datasets.
+Verified successful loading and examined the structure to prepare for subsequent
+data transformations.
+
+Set up an Azure Databricks workspace and cluster for data transformation using
+PySpark. Loaded raw data from Azure Data Lake Storage (ADLS Gen2) into Databricks,
+reading Parquet files into Spark DataFrames and performing initial schema
+exploration. Transformed the data by renaming columns, joining patient records
+with encounter and procedure data, handling missing values, and adding new
+fields like encounter count and readmission flags. Repartitioned the DataFrame
+for efficient parallel processing and wrote the cleaned data to ADLS Gen2 in
+Parquet format, partitioned by `final_patient_ID` and `encounter_DATE`. Verified
+data output by successfully writing 5000 rows, ensuring data quality and
+preparing for future processing steps.
 
 ## Changelog – 2025-06-02
 
