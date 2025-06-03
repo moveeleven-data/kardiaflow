@@ -1,5 +1,25 @@
 # KardiaFlow Project — Changelog
 
+## Changelog – 2025-06-03
+
+Developed and tested Azure Data Factory (ADF) copy pipelines to move data from
+multiple source systems (Oracle, PostgreSQL, MongoDB) into raw landing zones in
+Azure Data Lake Storage (ADLS Gen2). Utilized the Copy Activity in ADF to
+extract data as Parquet/CSV and load it into the cloud, organizing pipelines
+by source. Verified data ingestion through ADF execution and monitoring, ensuring
+successful data landing and row count matching. Set up logging and notifications
+for success and failure events.
+
+Added a data validation layer to ensure successful data loading by
+cross-checking row counts and performing basic data validation. Used the ADF
+Monitor to track pipeline progress and verify completeness of the ingested data.
+
+Set up for Databricks (PySpark) transformation by adding a folder called
+`data/analysis/` to store Parquet files for later transformation. Developed
+a `read_parquet.py` script using PySpark to quickly check the integrity of
+Parquet files by verifying row counts and displaying a preview of the first
+5 rows of data.
+
 ## Changelog – 2025-06-02
 
 - Set up and tested all data connections needed for Azure Data Factory to move

@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/data/analysis/read_parquet.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/data_dictionary.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/data_dictionary.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +64,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\data\analysis" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation\infra\linked_services" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation\data_helpers" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation\db_checks" />
@@ -87,7 +88,7 @@
       <workItem from="1745522797203" duration="6263000" />
       <workItem from="1748389664311" duration="16000" />
       <workItem from="1748389681925" duration="15927000" />
-      <workItem from="1748566414732" duration="24819000" />
+      <workItem from="1748566414732" duration="32861000" />
     </task>
     <servers />
   </component>
