@@ -1,6 +1,31 @@
 # KardiaFlow Project — Changelog
 
-## Changelog – 2025-06-03
+## 2025-06-04
+
+After uncovering substantial and silently accumulating costs tied to ADLS Gen2
+transaction billing, NAT Gateway persistence, and unremovable infrastructure
+triggered by Unity Catalog's Access Connector, the KardiaFlow environment
+(`kardiaflow-rg`) was systematically dismantled. Despite having Owner-level
+permissions, key resources remained locked behind deny assignments automatically
+applied during Unity Catalog provisioning. This prevented deletion of the
+NAT Gateway, public IPs, and associated networking components. The situation
+was resolved only after escalating to Microsoft Support, who manually removed
+the deny policies. With that, all residual services—including Databricks-managed
+identities, virtual networks, and the storage account holding partitioned
+Parquet output—were eliminated, halting all further billing.
+
+With the environment now fully reset, the project enters a structured four-day
+simulation phase grounded in hardened cloud hygiene. The new protocol emphasizes
+transient infrastructure by creating and deleting a dedicated resource group daily,
+avoiding external storage, and limiting all transformation outputs to `/dbfs/tmp/`.
+Over the next four days, I will sequentially explore safe implementations of
+streaming ingestion (via Spark’s rate source), star schema modeling and serverless
+SQL, Great Expectations for data quality, and Unity Catalog through offline
+simulation or short-lived, controlled sessions. This phase will prioritize
+operational reversibility and explicit cost boundaries, instilling best practices
+for cloud-native data engineering without risk of recurrence.
+
+## 2025-06-03
 
 Developed and tested Azure Data Factory (ADF) copy pipelines to move data from
 multiple source systems (Oracle, PostgreSQL, MongoDB) into raw landing zones in
