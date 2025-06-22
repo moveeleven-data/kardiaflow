@@ -5,15 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/automation/infra/deploy.bicep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/POSTMORTEM.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/automation/infra/teardown.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks/legacy/streaming/.gitkeep" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automation/infra/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_infra/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automation/infra/linked_services/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_infra/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automation/infra/linked_services/ls_adls_bronze.json" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_infra/ls_adls_bronze.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automation/infra/linked_services/ls_mongo_healthcare.json" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_infra/ls_mongo_healthcare.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automation/infra/linked_services/ls_oracle_xe.json" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_infra/ls_oracle_xe.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automation/infra/linked_services/ls_postgres_claims.json" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_infra/ls_postgres_claims.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/automation/dags/.gitkeep" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/batch_etl/source_validation_checks.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/legacy/batch_etl/source_validation_checks.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/streaming/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/automation/infra/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,11 +68,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\notebooks\legacy" />
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\archive\infra" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\archive" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow" />
-      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\automation\infra\linked_services\archive" />
-      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\data\analysis" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -96,7 +94,7 @@
       <workItem from="1748389664311" duration="16000" />
       <workItem from="1748389681925" duration="15927000" />
       <workItem from="1748566414732" duration="43009000" />
-      <workItem from="1750609884695" duration="6224000" />
+      <workItem from="1750609884695" duration="14497000" />
     </task>
     <servers />
   </component>

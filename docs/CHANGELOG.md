@@ -1,5 +1,23 @@
 # KardiaFlow Project — Changelog
 
+## 2025-06-22
+
+Completed **Phase 1** of KardiaFlow: safe, cost-transparent infrastructure deployment and teardown.
+
+- Rebuilt `deploy.bicep` to provision **Azure Databricks**, **Key Vault**, and **Data Factory** only — fully tagged and parameterized.
+- Implemented `automation/infra/teardown.sh` to delete the Databricks workspace and parent resource group — fully idempotent and fast.
+- Verified clean infra loop:
+  - `az group create`
+  - `az deployment group create`
+  - `./automation/infra/teardown.sh`
+- Confirmed:
+  - Public-only Databricks (`enableNoPublicIp: false`)
+  - No NAT Gateways or public IPs in managed RG
+  - Key Vault with soft-delete enabled and purge protection off
+- Created **$2 monthly Azure Budget Alert** (email only) in portal
+
+This completes the first **safe, disposable, cost-controlled** deployment cycle — ready for pipeline buildout.
+
 ## 2025-06-04
 
 After uncovering substantial and silently accumulating costs tied to ADLS Gen2
