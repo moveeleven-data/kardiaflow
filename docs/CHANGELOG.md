@@ -2,21 +2,27 @@
 
 ## 2025-06-22
 
-Completed **Phase 1** of KardiaFlow: safe, cost-transparent infrastructure deployment and teardown.
+Completed Phase 1 and began Phase 2 of KardiaFlow by deploying safe,
+cost-controlled infrastructure and validating an initial data pipeline run.
+Used `deploy.bicep` to provision Azure Databricks (public-only, no VNet),
+Key Vault (soft-delete enabled, purge protection off), and Azure Data Factory.
+Confirmed no NAT Gateways or other hidden costs. Created a $5/month
+Azure Budget Alert to prevent overages.
 
-- Rebuilt `deploy.bicep` to provision **Azure Databricks**, **Key Vault**, and **Data Factory** only — fully tagged and parameterized.
-- Implemented `automation/infra/teardown.sh` to delete the Databricks workspace and parent resource group — fully idempotent and fast.
-- Verified clean infra loop:
-  - `az group create`
-  - `az deployment group create`
-  - `./automation/infra/teardown.sh`
-- Confirmed:
-  - Public-only Databricks (`enableNoPublicIp: false`)
-  - No NAT Gateways or public IPs in managed RG
-  - Key Vault with soft-delete enabled and purge protection off
-- Created **$2 monthly Azure Budget Alert** (email only) in portal
+Built and verified a full infra loop with `az group create`,
+`az deployment group create`, and `automation/infra/teardown.sh`, ensuring
+clean teardown and full idempotence. Launched a minimal 1-node Databricks
+cluster (Standard_D4s_v3, 10-min auto-terminate), and uploaded `patients_1k.csv`
+to DBFS via CLI.
 
-This completes the first **safe, disposable, cost-controlled** deployment cycle — ready for pipeline buildout.
+Created and executed the `00_mask_transform_validate` notebook, reading the
+file with minimal schema inference, previewing rows, and writing a small Delta
+table (`kardia_patients_stage`) with a load timestamp. Verified Spark plan and
+partition count to ensure cost-efficiency.
+
+Linked the Databricks workspace to GitHub via Repos, committed the notebook,
+and pulled changes locally in PyCharm. All steps support reproducibility,
+fast iteration, and teardown-safe development.
 
 ## 2025-06-04
 
