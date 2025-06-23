@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/00_data_validation_patients_1k.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/databricks/notebooks/00_data_validation_patients_1k.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/legacy/batch_etl/source_validation_checks.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/legacy/streaming/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/docs/MERMAID.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/MERMAID.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/MERMAID.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/kardiaflow_architecture.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +90,7 @@
       <workItem from="1748389664311" duration="16000" />
       <workItem from="1748389681925" duration="15927000" />
       <workItem from="1748566414732" duration="43009000" />
-      <workItem from="1750609884695" duration="16751000" />
+      <workItem from="1750609884695" duration="30366000" />
     </task>
     <servers />
   </component>

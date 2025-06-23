@@ -1,5 +1,12 @@
 # KardiaFlow Project — Changelog
 
+## 2025-06-23
+
+- Finalized full KardiaFlow pipeline diagram with PHI-compliant batch + streaming ETL.
+- Clarified ingestion types (Auto Loader, COPY INTO, Batch JSON, etc.).
+- Optimized Silver/Gold modeling layout and annotations.
+- Differentiated streaming vs batch paths.
+
 ## 2025-06-22
 
 Completed Phase 1 and began Phase 2 of KardiaFlow by deploying safe,

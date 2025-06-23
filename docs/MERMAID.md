@@ -1,59 +1,58 @@
-%% KardiaFlow Phase-4 Medallion Architecture
-%% paste this verbatim into README.md or a Databricks markdown cell
-
-flowchart TD
-  %% ───────── Raw Landing ─────────
-  subgraph RAW["🟦 RAW Land Zone (CSV folders)"]
+---
+config:
+  theme: neutral
+  look: neo
+  layout: fixed
+---
+flowchart LR
+ subgraph RAW["🟦 RAW – Landing"]
     direction TB
-    RP["/incoming/patients/ \n(new CSV every ~15 s)"]
-    RE["/incoming/encounters/ \n(new CSV every ~15 s)"]
+        P["/patients/"]
+        E["/encounters/"]
+        C["/claims/"]
+        PR["/providers/"]
+        FDBK["/feedback/"]
+        DEV["/device/"]
   end
-
-  %% ───────── Bronze ─────────
-  subgraph BRZ["🟫 Bronze — Auto Loader Tables"]
+ subgraph BRZ["🟫 Bronze – Auto Loader (Streaming)"]
     direction TB
-    BP[bronze_patients]
-    BE[bronze_encounters]
+        BP["bronze_patients"]
+        BE["bronze_encounters"]
+        BC["bronze_claims"]
   end
-
-  %% ───────── CDC / CDF views ─────────
-  subgraph CDF["🪞 CDF Views (no storage)"]
+ subgraph SIL["🥈 Silver – Clean & Modeled"]
     direction TB
-    BPC[bronze_patients_changes\n(table_changes)]
-    BEC[bronze_encounters_changes\n(table_changes)]
+        SP["silver_patients"]
+        SE["silver_encounters"]
+        SC["silver_claims_current"]
+        SProv["silver_providers_dim"]
+        SFB["silver_feedback"]
+        SDHR["silver_device_5m_hr"]
+        WIDE_PE["silver_patient_encounter"]
+        WIDE_PEC["silver_claims_enriched"]
   end
-
-  %% ───────── Silver ─────────
-  subgraph SIL["🥈 Silver — Clean & Modeled"]
+ subgraph GLD["🥇 Gold – BI / KPI"]
     direction TB
-    SP[silver_patients]
-    SE[silver_encounters]
-    SPE[silver_patients_encounters\n(wide join)]
+        G1["vw_gender_breakdown"]
+        G2["vw_encounters_by_month"]
+        G3["gold_claims_kpi_hour"]
+        G5["gold_patient_sentiment_daily"]
+        G6["gold_hr_alerts"]
   end
-
-  %% ───────── Gold ─────────
-  subgraph GLD["🥇 Gold — BI Layer"]
-    direction TB
-    G1[vw_gender_breakdown\n(materialized)]
-    G2[vw_encounters_by_month\n(materialized)]
-    G3[vw_patient_load_stats\n(view)]
-    G4[gold_patient_summary\n(final table)]
-  end
-
-  %% ───────── Edges / flow arrows ─────────
-  RP -- "Auto Loader\ncloudFiles.format=csv" --> BP
-  RE -- "Auto Loader\ncloudFiles.format=csv" --> BE
-
-  BP -- "Delta CDF\n(table_changes)" --> BPC
-  BE -- "Delta CDF\n(table_changes)" --> BEC
-
-  BPC -- "MERGE INTO\n(dedup, mask)" --> SP
-  BEC -- "MERGE INTO\n(clean)" --> SE
-
-  SP -- "JOIN\npatient_id" --> SPE
-  SE -- "JOIN\npatient_id" --> SPE
-
-  SPE --> G1
-  SPE --> G2
-  SPE --> G3
-  SPE --> G4
+    P -- Auto Loader --> BP
+    E -- Auto Loader --> BE
+    C -- Auto Loader --> BC
+    PR -- Nightly COPY INTO --> SProv
+    FDBK -- Batch JSON --> SFB
+    DEV -- Hourly Parquet --> SDHR
+    BP -- CDF --> SP
+    BE -- CDF --> SE
+    BC -- "SCD-1" --> SC
+    SP -. PK .-> WIDE_PE
+    SE -. FK .-> WIDE_PE
+    SC -- join ProviderID --> WIDE_PEC
+    SProv -- join ProviderID --> WIDE_PEC
+    WIDE_PE --> G1 & G2
+    WIDE_PEC --> G3
+    SFB --> G5
+    SDHR -- agg 5 min --> G6
