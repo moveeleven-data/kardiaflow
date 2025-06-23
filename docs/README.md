@@ -11,7 +11,7 @@ in a modern, cloud-native environment.
 
 This high-level diagram shows how structured and semi-structured healthcare data flows from ingestion to transformation, validation, and secure storage using Azure-native tools.
 
-![KardiaFlow Architecture](https://github.com/okv627/KardiaFlow/docs/kardiaflow.lineage.png)
+![KardiaFlow Architecture](https://github.com/okv627/KardiaFlow/raw/master/docs/kardiaflow_lineage.png)
 
 ### Data Sources
 
