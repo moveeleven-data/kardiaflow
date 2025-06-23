@@ -111,7 +111,7 @@ Notes:
 
 **Notes:**
 - Use `ID` as the primary key
-- Used as a lookup/join key in encounters and procedures
+- Used as a lookup/join key in encounters
 
 ---
 
@@ -129,22 +129,4 @@ Notes:
 
 **Notes:**
 - Encounters represent visits, checkups, emergency visits, etc.
-- Can be used to group procedures or feedback by visit context
-
----
-
-### File: `procedures.csv`
-
-| Field Name         | Type   | Description                                                  |
-|--------------------|--------|--------------------------------------------------------------|
-| `DATE`             | Date   | Date the procedure was performed                             |
-| `PATIENT`          | UUID   | Foreign key referencing the patient (`patients.ID`)          |
-| `ENCOUNTER`        | UUID   | Foreign key referencing the encounter (`encounters.ID`)      |
-| `CODE`             | String | Procedure code (e.g., CPT or SNOMED style)                   |
-| `DESCRIPTION`      | String | Description of the procedure                                 |
-| `REASONCODE`       | String | Code for the reason the procedure was performed              |
-| `REASONDESCRIPTION`| String | Human-readable reason for the procedure                      |
-
-**Notes:**
-- Can be joined with `encounters` and `patients` for full context
-- Useful for filtering surgical vs diagnostic activity
+- Can be used to group feedback by visit context
