@@ -1,8 +1,18 @@
 # KardiaFlow Project — Changelog
 
+## [kardiaflow-v1] - 2025-06-24
+
+Successfully implemented the full end-to-end ETL pipeline for the `patients`
+flow in Databricks. This includes raw data validation, Bronze Delta ingestion
+with Change Data Feed, PHI-safe transformation into Silver, and creation of a
+KPI Gold view. Environment paths were cleaned up and standardized for
+Databricks-only deployment, and a scheduled job with four ordered tasks was
+configured and verified. Using temp view in Gold layer for cost-effective
+dashboarding.
+
 ## 2025-06-23
 
-Raw → Gold View Pipeline Complete
+Raw -> Gold View Pipeline Complete (in local Dev)
 
 Today we finalized the KardiaFlow architecture, integrating batch and streaming
 PHI-compliant ETL paths and clarifying ingestion options like Auto Loader and
@@ -12,10 +22,6 @@ masked Silver layer. Unit tests confirmed data quality (masking, enum
 correctness, uniqueness), and we capped the workflow by creating a Gold-layer
 KPI view (`vw_gender_breakdown`) using Delta SQL over a temp view. The pipeline
 runs seamlessly in both local and Databricks environments.
-
-This marks completion of a full-stack mini pipeline — raw → Bronze → Silver → Gold
-— complete with Delta features, unit tests, and production-ready KPIs.
-
 
 ## 2025-06-22
 

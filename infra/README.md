@@ -33,7 +33,7 @@ Teardown Instructions
 Destroys all dev resources, including managed RGs.
 
 # From the project root
-./automation/infra/teardown.sh
+./infra/teardown.sh
 
 This script will:
 

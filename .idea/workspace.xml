@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/00_validation/val_patients_10_records.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/01_bronze/bronze_patients.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/01_bronze/make_cdf_view.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/02_silver/silver_patients.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/03_gold/create_gold_views.py" beforeDir="false" />
-    </list>
+    <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
