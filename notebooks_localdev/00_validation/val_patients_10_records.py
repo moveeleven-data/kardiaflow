@@ -1,7 +1,7 @@
 #%%
 # Databricks notebook source
 # MAGIC %md
-# MAGIC ## KardiaFlow – micro-inspection of 100-row patients slice (ultra-cheap)
+# MAGIC ## KardiaFlow – micro-inspection of 10-row patients slice (ultra-cheap)
 
 # COMMAND ----------
 import os, sys, pathlib
@@ -14,12 +14,12 @@ from pyspark.sql import functions as F
 # ─── Runtime switch ────────────────────────────────────────────────────────────
 MODE = os.getenv("KARDIA_ENV", "dev")        # dev | prod
 raw_root      = cfg("raw_root")
-patients_path = f"{raw_root}/patients_100.csv"   # already only 100 rows
+patients_path = f"{raw_root}/patients_10.csv"   # already only 10 rows
 
 # ─── Spark session (1 core in dev, normal in prod) ────────────────────────────
 builder = (
     SparkSession.builder
-    .appName("validate_patients_100")
+    .appName("validate_patients_10")
     .config("spark.sql.shuffle.partitions", "1")
 )
 if MODE == "dev":
@@ -39,7 +39,7 @@ df = (
          .option("header", True)
          .option("inferSchema", False)
          .csv(patients_path)
-         .cache()                # touch the 100 rows only once
+         .cache()                # touch the 10 rows only once
 )
 row_cnt = df.count()             # single action
 
@@ -54,13 +54,13 @@ else:
     print("🛈 DEV mode – no Delta write.")
 
 # ─── Human summary ────────────────────────────────────────────────────────────
-print("\n=== VALIDATION SUMMARY (100-row slice) ===")
-print(f"Row count OK?          {row_cnt == 100}  ({row_cnt})")
+print("\n=== VALIDATION SUMMARY (10-row slice) ===")
+print(f"Row count OK?          {row_cnt == 10}  ({row_cnt})")
 print(f"ID column no NULLs?    {null_id.count() == 0}")
 print(f"GENDER values OK?      {bad_gender.count() == 0}")
 print("==========================================\n")
 
-if row_cnt != 100 or null_id.count() or bad_gender.count():
+if row_cnt != 10 or null_id.count() or bad_gender.count():
     print("Data quality failed. Sample offending rows ↓")
     null_id.take(5)    and print(null_id.take(5))
     bad_gender.take(5) and print(bad_gender.take(5))

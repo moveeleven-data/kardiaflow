@@ -26,9 +26,8 @@ ENV/
 # -----------------------------
 # Data Files
 # -----------------------------
-data/raw/
-data/tmp/
-data/streaming/
+data/
+data/bronze
 *.sqlite
 *.db
 *.db-journal

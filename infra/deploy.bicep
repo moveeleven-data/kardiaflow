@@ -5,8 +5,8 @@ targetScope = 'resourceGroup'
 param location string = resourceGroup().location
 
 param dataFactoryName         string = 'kardia-adf'
-param keyVaultName            string = 'kardia-kv'        // change if you didn’t purge
-param databricksWorkspaceName string = 'kardia-dbx'       // change if you want a new name
+param keyVaultName            string = 'kardia-kv'
+param databricksWorkspaceName string = 'kardia-dbx'
 param managedRgName           string = 'kardia-dbx-managed'
 param deploymentTimestamp     string = utcNow()
 
@@ -35,7 +35,7 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   tags       : commonTags
   properties : {
     tenantId: subscription().tenantId
-    sku: {                               // ← semicolon replaced by comma
+    sku: {
       family: 'A'
       name  : 'standard'
     }

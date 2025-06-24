@@ -25,7 +25,7 @@ az group create --name kardia-rg-dev --location eastus
 # 2. Run the deployment (this provisions Databricks, Key Vault, ADF)
 az deployment group create \
   --resource-group kardia-rg-dev \
-  --template-file automation/infra/deploy.bicep
+  --template-file infra/deploy.bicep
 
 ---
 
