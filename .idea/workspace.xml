@@ -6,14 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curated/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/00_validation/val_patients_10_records.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/streaming/.gitkeep" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/infra/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/infra/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/00_validation/val_patients_100_records.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_databricks/00_validation/val_patients_100_records.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/00_validation/val_patients_10_records.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_localdev/00_validation/val_encounters_100_records.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/00_validation/val_encounters_10_records.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks_localdev/00_validation/val_patients_100_records.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/00_validation/val_patients_10_records.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/databases/ddl/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/databases/seeds/.gitkeep" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +90,7 @@
       <workItem from="1748389664311" duration="16000" />
       <workItem from="1748389681925" duration="15927000" />
       <workItem from="1748566414732" duration="43009000" />
-      <workItem from="1750609884695" duration="45183000" />
+      <workItem from="1750609884695" duration="45598000" />
     </task>
     <servers />
   </component>
