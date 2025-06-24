@@ -4,16 +4,35 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="" />
+    <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/databases/ddl/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/databases/seeds/.gitkeep" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 5
-}]]></component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;okv627&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:okv627/KardiaFlow.git&quot;,
+    &quot;accountId&quot;: &quot;019f5dd9-c375-4cac-827e-aea6ecd9d776&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2xhUB6mTZfnKGSvGm3z2d7QkKhu" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -23,9 +42,14 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/KV-62/Desktop/KardiaFlow",
+    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "project.propVCSSupport.Mappings",
+    "settings.editor.selected.configurable": "vcs.Git",
     "settings.editor.splitter.proportion": "0.17370892",
     "typescript.add.unambiguous.imports.on.the.fly": "true",
     "vue.rearranger.settings.migration": "true"
@@ -37,6 +61,15 @@
         <option name="myUseModuleSdk" value="true" />
       </console-settings>
     </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\data\legacy" />
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\data" />
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow" />
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\notebooks\01_bronze" />
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow\notebooks\02_silver" />
+    </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -55,6 +88,9 @@
       <updated>1745522795901</updated>
       <workItem from="1745522797203" duration="6263000" />
       <workItem from="1748389664311" duration="16000" />
+      <workItem from="1748389681925" duration="15927000" />
+      <workItem from="1748566414732" duration="43009000" />
+      <workItem from="1750609884695" duration="45598000" />
     </task>
     <servers />
   </component>
