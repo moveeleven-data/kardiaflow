@@ -5,20 +5,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f17e8e30-76c6-4c29-9620-475807851eb6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/notebooks/00_validation/val_patients_100_records.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notebooks/01_bronze/make_cdf_view.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notebooks/03_gold/create_gold_views.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks_localdev/03_gold/vw_encounters_by_month.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks_localdev/cdf_views/cdf_claims.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks_localdev/cdf_views/cdf_encounters.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks_localdev/cdf_views/cdf_patients.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks_localdev/utils/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/archive/legacy_connectors/db_checks/test_oracle_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/legacy_connectors/db_checks/test_oracle_connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/00_validation/val_encounters_1k.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/00_validation/val_encounters_100_records.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/00_validation/val_patients_1k.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_patients.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/01_bronze/bronze_patients.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_patients.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/02_silver/silver_patients.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/03_gold/vw_gender_breakdown.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/03_gold/vw_gender_breakdown.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/utils/common_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/utils/common_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_silver_patients.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_silver_patients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/00_validation/val_encounters_100_records.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/00_validation/val_encounters_100_records.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/00_validation/val_patients_100_records.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/00_validation/val_patients_100_records.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_claims.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/bronze_claims.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_device.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/bronze_device.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_encounters.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/bronze_encounters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_feedback.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/bronze_feedback.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_patients.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/bronze_patients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/bronze_providers.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/bronze_providers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/01_bronze/make_cdf_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/01_bronze/make_cdf_view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/02_silver_cleaning.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/02_silver_cleaning.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_claims_current.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/00_validation/val_patients_100_records.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_claims_enriched.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/01_bronze/bronze_patients.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_device_5m_hr.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_device_5m_hr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_encounters.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_encounters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_feedback.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_feedback.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_observability_5m.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_observability_5m.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_patient_encounter.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/01_bronze/make_cdf_view.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_patients.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_patients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/02_silver/silver_providers_dim.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/02_silver/silver_patients.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/03_gold/create_gold_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/03_gold/create_gold_views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/03_gold/gold_claims_kpi_hour.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/03_gold/gold_claims_kpi_hour.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/03_gold/vw_encounters_by_month.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_databricks/03_gold/create_gold_views.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/03_gold/vw_gender_breakdown.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/03_gold/vw_gender_breakdown.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/cdf_views/cdf_claims.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_claims_current.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/cdf_views/cdf_encounters.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_claims_enriched.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/cdf_views/cdf_patients.sql" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_patient_encounter.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/02_silver/silver_providers_dim.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/utils/common_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks_localdev/utils/common_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,9 +95,9 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\KV-62\Desktop\KardiaFlow" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\notebooks\01_bronze" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\notebooks\02_silver" />
-      <recent name="C:\Users\KV-62\Desktop\KardiaFlow" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\archive\legacy_automation" />
       <recent name="C:\Users\KV-62\Desktop\KardiaFlow\archive\legacy_connectors" />
     </key>
@@ -101,7 +121,7 @@
       <workItem from="1748389664311" duration="16000" />
       <workItem from="1748389681925" duration="15927000" />
       <workItem from="1748566414732" duration="43009000" />
-      <workItem from="1750609884695" duration="41462000" />
+      <workItem from="1750609884695" duration="42727000" />
     </task>
     <servers />
   </component>
