@@ -4,7 +4,6 @@ targetScope = 'resourceGroup'
 @description('Azure region for all resources')
 param location string = resourceGroup().location
 
-param dataFactoryName         string = 'kardia-adf'
 param keyVaultName            string = 'kardia-kv'
 param databricksWorkspaceName string = 'kardia-dbx'
 param managedRgName           string = 'kardia-dbx-managed'
@@ -16,16 +15,6 @@ var commonTags = {
   costCenter  : 'data-engineering'
   billingTier : 'minimal'
   provisioned : deploymentTimestamp
-}
-
-/*──────── Azure Data Factory ────────*/
-resource datafactory 'Microsoft.DataFactory/factories@2018-06-01' = {
-  name       : dataFactoryName
-  location   : location
-  tags       : commonTags
-  properties : {
-    publicNetworkAccess: 'Enabled'
-  }
 }
 
 /*──────── Key Vault ────────*/
