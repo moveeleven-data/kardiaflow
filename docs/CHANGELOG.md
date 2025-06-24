@@ -2,10 +2,20 @@
 
 ## 2025-06-23
 
-- Finalized full KardiaFlow pipeline diagram with PHI-compliant batch + streaming ETL.
-- Clarified ingestion types (Auto Loader, COPY INTO, Batch JSON, etc.).
-- Optimized Silver/Gold modeling layout and annotations.
-- Differentiated streaming vs batch paths.
+Raw → Gold View Pipeline Complete
+
+Today we finalized the KardiaFlow architecture, integrating batch and streaming
+PHI-compliant ETL paths and clarifying ingestion options like Auto Loader and
+COPY INTO. We validated a raw 100-row CSV, ingested it into a Bronze Delta
+table with Change Data Feed enabled, then transformed it to a schema-enforced,
+masked Silver layer. Unit tests confirmed data quality (masking, enum
+correctness, uniqueness), and we capped the workflow by creating a Gold-layer
+KPI view (`vw_gender_breakdown`) using Delta SQL over a temp view. The pipeline
+runs seamlessly in both local and Databricks environments.
+
+This marks completion of a full-stack mini pipeline — raw → Bronze → Silver → Gold
+— complete with Delta features, unit tests, and production-ready KPIs.
+
 
 ## 2025-06-22
 
