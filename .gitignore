@@ -27,7 +27,8 @@ ENV/
 # Data Files
 # -----------------------------
 data/
-data/bronze
+spark-warehouse/
+metastore_db/
 *.sqlite
 *.db
 *.db-journal
@@ -55,7 +56,7 @@ logs/
 # -----------------------------
 # Archives / Compressed
 # -----------------------------
-oracle_zips/
+archive/
 *.zip
 *.tar
 *.tar.gz
