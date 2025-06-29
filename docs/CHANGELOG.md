@@ -1,6 +1,6 @@
 # KardiaFlow Project — Changelog
 
-## [kardiaflow-v1] - 2025-06-24
+## kardiaflow-v1 - 2025-06-24
 
 Successfully implemented the full end-to-end ETL pipeline for the `patients`
 flow in Databricks. This includes raw data validation, Bronze Delta ingestion
