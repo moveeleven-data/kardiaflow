@@ -1,0 +1,11 @@
+ClaimID,PatientID,ProviderID,ClaimAmount,ClaimDate,DiagnosisCode,ProcedureCode,ClaimStatus,ClaimType,ClaimSubmissionMethod
+10944daf-f7d5-4e1d-8216-72ffa609fe41,8552381d-7960-4f64-b190-b20b8ada00a1,4a4cb19c-4863-41cf-84b0-c2b21aace988,3807.95,2024-06-07,yy006,hd662,Pending,Routine,Paper
+fcbebb25-fc24-4c0f-a966-749edcf83fb1,327f43ad-e3bd-4473-a9ed-46483a0a156f,422e02dd-c1fd-43dd-8af4-0c3523f997b1,9512.07,2023-05-30,tD052,mH831,Approved,Routine,Online
+9e9983e7-9ea7-45f5-84d8-ce49ccd8a4a1,6f3acdf7-73aa-4afa-9c2e-b25b27bdb5b0,f7733b3f-0980-47b5-a7a0-ee390869355b,7346.74,2022-09-27,zx832,dg637,Pending,Emergency,Online
+a06273ed-44bb-452b-bbad-8618de080494,5d58e183-701e-406c-a8c6-5b73cac5e912,f7a04581-de96-44ee-b773-8adac02baa59,6026.72,2023-06-25,kr421,kG326,Pending,Routine,Phone
+f702a717-254b-4cff-a0c7-8395db2f6616,8a8ebdf6-3af0-4f14-82f3-37b937c3d270,b80b9e77-97f0-47d7-b561-19f9658a7bdf,1644.58,2023-07-24,LZ261,cx805,Pending,Inpatient,Phone
+78657d24-a96e-461d-970b-d54329d9ceff,6c46c6a2-55c5-47de-a91c-62d26c145105,5c45438c-7854-448c-bd53-7f28a3321133,1644.35,2023-08-09,qM187,no581,Pending,Outpatient,Paper
+5e2751ed-c6af-44ed-b95d-c91a19784c9e,71e037fc-cc4d-4a54-bdb1-ab2eda84f310,bedfcca2-7c2c-4d1e-a86b-d2694cbd334b,675.03,2024-05-01,tZ864,hJ616,Approved,Inpatient,Paper
+73fe8baf-7689-421a-962d-e3992b67e546,50190ee4-81f2-4f39-85e0-de57f69cb2f9,dc3d59d2-e1f1-4314-b276-bb4ae84b37e9,8675.14,2023-10-24,wO325,RD702,Approved,Inpatient,Online
+2fb15151-2d53-49db-a95b-35e26edf9c98,61da1afe-54d5-4c0f-88f0-edb09118959e,97145993-2c15-42b2-a738-b999bd669788,6051.04,2023-07-31,rW725,da104,Denied,Inpatient,Online
+b5086d7b-f636-4830-9533-a62f4bba719e,720e20a1-6bdf-4f4c-b112-fe32c8552055,1d92ed08-3a88-4ede-84bc-62d879f40327,7109.92,2024-04-13,ss584,UE642,Approved,Outpatient,Paper

@@ -33,6 +33,18 @@ metastore_db/
 *.db
 *.db-journal
 
+# include specific test files
+!data/raw/
+!data/raw/claims/
+!data/raw/claims/claims_10.csv
+!data/raw/claims/providers_10.csv
+!data/raw/ehr/
+!data/raw/ehr/encounters_10.csv
+!data/raw/ehr/patients_10.csv
+!data/raw/feedback/
+!data/raw/feedback/feedback_10.csv
+!data/raw/feedback/device_data_10.json
+
 # -----------------------------
 # Secrets & Credentials
 # -----------------------------
