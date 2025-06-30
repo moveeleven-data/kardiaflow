@@ -1,6 +1,27 @@
 # KardiaFlow Project — Changelog
 
-## kardiaflow-v1 - 2025-06-24
+## 2025-06-29
+
+Completed the patients branch of the KardiaFlow pipeline.  
+* Created dedicated landing folders (`dbfs:/kardia/raw/patients/`, `…/encounters/`) plus shared roots for schema tracking (`/kardia/_schemas/`) and stream checkpoints (`/kardia/_checkpoints/`).  
+* Added a 10-row smoke test file.
+* Implemented an Auto Loader Bronze stream with a fixed `StructType`, schema-drift tracking, and `delta.
+enableChangeDataFeed=true`; the stream runs in `availableNow` mode and checkpoints to `/kardia/_checkpoints/bronze_patients`.
+* Verified CDF is active from the first data commit, registered `kardia_bronze.bronze_patients` in the metastore.
+
+Built the Silver transform to read only incremental CDF rows, mask direct PHI columns, and deduplicate on `ID`, overwriting `dbfs:/kardia/silver/silver_patients` on each run.  
+A Gold notebook now materialises `vw_gender_breakdown`, refreshed after every ingest.  
+Manual file drops (e.g., `patients_more_10_v2.csv`) were successfully processed end-to-end, confirming that the checkpointed Auto Loader ingests only new data and the Silver/Gold layers update instantly.  
+With schema roots, checkpoints, and reusable notebook patterns in place, the pipeline is fully aligned with the diagram and ready to clone for `encounters` tomorrow.
+
+**Pipeline flow:**
+1. Validate the incoming CSV locally.
+2. Copy it into the raw landing folder in DBFS.
+3. Trigger a one-time `availableNow` Auto Loader read into the Bronze Delta table (with CDF enabled).
+4. Re-run the Silver notebook to transform only new CDF changes, deduplicate, and mask PHI.
+5. Refresh Gold KPI views from the updated Silver table.
+
+## 2025-06-24
 
 Successfully implemented the full end-to-end ETL pipeline for the `patients`
 flow in Databricks. This includes raw data validation, Bronze Delta ingestion
