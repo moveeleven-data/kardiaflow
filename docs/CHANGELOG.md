@@ -1,5 +1,22 @@
 # KardiaFlow Project — Changelog
 
+## 2025-06-30 — Implemented Encounters Flow and Integrated with Patients
+
+Added and seeded a new raw landing folder (/kardia/raw/encounters/) with a 10-row
+CSV for validation. Created an Auto Loader stream for kardia_bronze.bronze_encounters
+with CDF enabled, schema evolution tracking, and checkpointing. Built a
+new Silver table, silver_encounters, as a continuous stream. Joined this to the
+static silver_patients dimension using a broadcast join to form silver_patient_encounters.
+
+Added a new Gold KPI view, vw_encounters_by_month, aggregating directly from
+the joined table. Refactored vw_gender_breakdown to read directly from silver_patients,
+and updated the lineage diagram to reflect this change.
+
+Validated full pipeline behavior across both flows: raw-to-Gold completes within
+60 seconds, with CDF driving precise Silver updates and downstream refreshes.
+
+The patients + encounters pipeline now matches the intended design and is fully operational.
+
 ## 2025-06-29
 
 Completed the patients branch of the KardiaFlow pipeline.  
