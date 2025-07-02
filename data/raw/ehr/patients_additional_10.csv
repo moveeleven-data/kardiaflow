@@ -1,0 +1,11 @@
+ID,BIRTHDATE,DEATHDATE,SSN,DRIVERS,PASSPORT,PREFIX,FIRST,LAST,MARITAL,RACE,ETHNICITY,GENDER,BIRTHPLACE,ADDRESS
+8c5db839-f91c-4e5b-a2e2-1a491f54b5de,1986-11-03,,999-10-1010,S99910101,,Mr.,Ethan,Brooks,"married",white,german,M,Springfield MA US,200 Chestnut St Springfield MA 01103 US
+9a21d5d4-bad3-4d9a-bf03-c42c7f3b95e3,1990-02-17,,999-20-2020,S99920202,,Ms.,Sophia,Martinez,"single",hispanic,mexican,F,Lawrence MA US,221 River Rd Lawrence MA 01840 US
+a7f021f5-1f58-4a4b-bb42-d771ee713741,1972-08-29,,999-30-3030,S99930303,,Dr.,Henry,Patel,"widowed",asian,indian,M,Framingham MA US,243 Forest St Framingham MA 01701 US
+b69d47ee-5e94-496e-82de-e783e40de230,2003-04-11,,999-40-4040,S99940404,,Mr.,Logan,White,"single",white,polish,M,Marlborough MA US,265 Beacon St Marlborough MA 01752 US
+c8f0abf6-d60d-4eb3-82cd-df4fd4bb41a9,1981-01-20,,999-50-5050,S99950505,,Mrs.,Natalie,Hughes,"married",black,haitian,F,New Bedford MA US,287 Shore Rd New Bedford MA 02744 US
+d7bc8731-79e2-4e63-bc70-5f3c0080fa56,1965-06-14,,999-60-6060,S99960606,,Mr.,Brian,Kelly,"divorced",white,irish,M,Fitchburg MA US,309 Willow Ave Fitchburg MA 01420 US
+e3db1a41-d178-41ae-a9a3-d038374f775b,1997-12-01,,999-70-7070,S99970707,,Ms.,Isabella,Rivera,"single",hispanic,puerto_rican,F,Haverhill MA US,331 Glen St Haverhill MA 01830 US
+f248de6b-7a11-4dc0-8ff8-e35b86de7853,1979-09-06,,999-80-8080,S99980808,,Dr.,Jason,Wright,"married",black,nigerian,M,Peabody MA US,353 Brookline Ave Peabody MA 01960 US
+04ab9b17-0f58-4a4b-8140-56110f0f7d18,1985-03-22,,999-90-9090,S99990909,,Mrs.,Chloe,Ng,"single",asian,thai,F,Plymouth MA US,375 Meadow Ln Plymouth MA 02360 US
+15f96ea0-7f2a-4ef5-bf42-77b92f26d816,1993-07-19,,999-01-0101,S99901010,,Mr.,Noah,Baker,"single",white,russian,M,Revere MA US,397 Sunset Blvd Revere MA 02151 US
