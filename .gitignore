@@ -42,7 +42,7 @@ metastore_db/
 !data/raw/ehr/encounters_10.csv
 !data/raw/ehr/patients_10.csv
 !data/raw/feedback/
-!data/raw/feedback/feedback_10.csv
+!data/raw/feedback/feedback_10.json
 !data/raw/feedback/device_data_10.json
 
 # -----------------------------
