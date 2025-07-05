@@ -1,5 +1,40 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-05
+
+Extended retention duration to 30 days in Bronze Patients and Encounters Delta
+tables using 'delta.changeDataFeed.retentionDuration' = '30 days'.
+
+Added .option("mergeSchema","true") to Silver Encounters writeStream, and
+renamed START to START_DATE for clarity - .withColumnRenamed("DATE", "START_DATE").
+
+## 2025-07-04
+
+Refactored Bronze ingestion and validation scripts for clarity and consistency.
+Converted `claims_10.csv` to Avro to give the claims pipeline an explicitly typed,
+schema-embedded format. Rewrote `device_data_10.json`, originally a single JSON
+array, into line-delimited JSON and then Parquet—Auto Loader and Structured
+Streaming require one JSON object per line, and Parquet supports the hourly,
+windowed aggregations planned for the device-telemetry flow.
+
+Updated the Bronze encounters schema to make the `ID` and `PATIENT` columns
+non-nullable and corrected the `DATE` column type from `TimestampType` to
+`DateType`. Added a quarantine path (`badRecordsPath`) to the Bronze patients
+ingestion script. Standardized reader options to use string literals `"true"`
+and `"false"` for `header` and `inferSchema`. Replaced inline SQL with `F.expr()`
+for improved readability in Spark queries. Improved variable and path naming
+for clarity across the Bronze ingestion scripts.
+
+## 2025-07-02
+
+Refactored all scripts in the Patients and Encounters flow to improve
+maintainability and prepare for DLT migration. Enabled continuous streaming
+mode in the Silver Encounters transformation and verified end-to-end
+functionality. Added a JSON job definition to orchestrate the workflow.
+Finalized ETL logic across Bronze, Silver, and Gold layers, and resolved a bug
+in Silver Patients where an incorrect variable was used in CDF version tracking.
+Revalidated the full pipeline to confirm correctness.
+
 ## 2025-06-30 — Implemented Encounters Flow and Integrated with Patients
 
 Added and seeded a new raw landing folder (/kardia/raw/encounters/) with a 10-row
