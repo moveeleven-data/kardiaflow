@@ -1,11 +1,44 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-07
+
+Removed unused cost-related fields (TOTAL_CLAIM_COST, BASE_ENCOUNTER_COST) from
+the Silver encounters stream and dropped the claim_cost metric from the Gold
+monthly aggregation. These columns were previously hardcoded with placeholder
+values (0.0) despite no corresponding data in the source. The Silver schema was
+reduced to 8 columns, and the Gold layer now reports only monthly encounter
+counts grouped by month, GENDER, and BIRTH_YEAR. This cleanup simplifies the
+pipeline, reduces I/O and storage, and avoids misleading metrics.
+
+In the Silver Encounters transform, renamed the raw DATE column to EVENT_DATE_STR
+and parsed it explicitly using to_date and to_timestamp with the "yyyy-MM-dd"
+format to ensure deterministic handling of date-only values. Introduced EVENT_TS
+for use with withWatermark, replacing the previous implicit cast to START_TS,
+and then aliased it back to START_TS in the final output for consistency.
+START_DATE is now derived directly from the parsed DateType, improving clarity.
+These changes make the stream more robust and schema-safe.
+
+Also updated the schema path in Bronze scripts to use bronze_encounters,
+aligning it with the naming conventions used elsewhere in the project.
+
 ## 2025-07-06
 
-Changed path and table names for clarity. Changed references to bronze tables to
-FROM kardia_bronze.bronze_patients from the more verbose FROM delta.`dbfs:/kardia/bronze/bronze_patients`
-Rename STATE_PATH to BOOKMARK_FILE for clarity in silver patients.
+We fixed a subtle but important correctness issue in the Silver merge logic by
+replacing a naive .dropDuplicates(["ID"]) call—which would have retained an
+arbitrary row per patient ID—with a deterministic approach that explicitly
+keeps only the most recent post-image for each patient. Using a window function
+(row_number() over a partition by ID ordered by _commit_version descending),
+we now ensure that only the latest change per ID (based on Delta Lake commit
+lineage) is processed during the merge. This aligns with SCD Type 1 semantics
+and eliminates the risk of randomly overwriting newer updates with stale data.
 
+Renamed `STATE_PATH` to `BOOKMARK_FILE` for clarity and updated all table references
+to use standard SQL identifiers (e.g., `FROM kardia_bronze.bronze_patients`
+instead of file paths).
+
+Removed `.option("cloudFiles.includeExistingFiles", "true")` from Bronze
+ingestion scripts. When using `trigger(availableNow=True)`, Auto Loader already
+processes all existing files at startup, making the option redundant.
 
 ## 2025-07-05
 
