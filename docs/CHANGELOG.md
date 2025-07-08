@@ -2,11 +2,11 @@
 
 ## 2025-07-08
 
-Added a true SCD-1 upsert to the Silver Encounters pipeline: each micro-batch now runs a Delta Lake MERGE inside foreachBatch, guaranteeing exactly one latest row per EncounterID. The previous append-only path was removed, and the Silver table is now pre-created from a static schema snapshot to avoid streaming-write errors.
-
-Replaced the always-on left-join stream between Silver Encounters and Silver Patients with a single batch overwrite job. The batch job re-reads both Silver tables, performs a left join to attach masked demographics (GENDER, BIRTH_YEAR), and overwrites kardia_silver.silver_patient_encounters. Rows with as-yet-unloaded patients now surface as NULL, giving Gold KPIs an accurate “unknown” bucket without the complexity of continuous streaming.
-
-Restored option("cloudFiles.includeExistingFiles","true") in the Bronze Auto-Loader scripts to ensure historical CSV files are ingested on first run.
+Updated the Gold-layer KPI view that calculates total monthly encounter volume
+from the Silver silver_patient_encounters table by grouping on START_TS month.
+Records with missing patient metadata (GENDER or BIRTH_YEAR) are excluded from
+the main KPI and instead tracked in a separate QA table gold_encounters_qa_unmatched
+to monitor unmatched records.
 
 ## 2025-07-07
 
@@ -25,6 +25,27 @@ for use with withWatermark, replacing the previous implicit cast to START_TS,
 and then aliased it back to START_TS in the final output for consistency.
 START_DATE is now derived directly from the parsed DateType, improving clarity.
 These changes make the stream more robust and schema-safe.
+
+Added a true SCD Type 1 upsert mechanism to the Silver Encounters pipeline.
+Instead of appending rows (which could lead to duplicate EncounterIDs across
+batches), we now use foreachBatch to run a Delta Lake MERGE operation on each
+micro-batch. This ensures that only the most recent record for each EncounterID
+is retained in the Silver table, matching typical business expectations for
+encounter-level facts. To support this safely, we removed the append-based
+streaming write and now explicitly create the Silver Delta table ahead of time
+using an empty static DataFrame that carries the correct schema. This avoids
+runtime errors from trying to write a streaming DataFrame to a non-existent
+table or from mismatched schemas during development.
+
+Replaced the always-on left-join stream between Silver Encounters and Silver
+Patients with a single batch overwrite job. The batch job re-reads both Silver
+tables, performs a left join to attach masked demographics (GENDER, BIRTH_YEAR),
+and overwrites kardia_silver.silver_patient_encounters. Rows with as-yet-unloaded
+patients now surface as NULL, giving Gold KPIs an accurate “unknown” bucket
+without the complexity of continuous streaming.
+
+Restored option("cloudFiles.includeExistingFiles","true") in the Bronze Auto-Loader
+scripts to ensure historical CSV files are ingested on first run.
 
 Also updated the schema path in Bronze scripts to use bronze_encounters,
 aligning it with the naming conventions used elsewhere in the project.
