@@ -1,5 +1,13 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-08
+
+Added a true SCD-1 upsert to the Silver Encounters pipeline: each micro-batch now runs a Delta Lake MERGE inside foreachBatch, guaranteeing exactly one latest row per EncounterID. The previous append-only path was removed, and the Silver table is now pre-created from a static schema snapshot to avoid streaming-write errors.
+
+Replaced the always-on left-join stream between Silver Encounters and Silver Patients with a single batch overwrite job. The batch job re-reads both Silver tables, performs a left join to attach masked demographics (GENDER, BIRTH_YEAR), and overwrites kardia_silver.silver_patient_encounters. Rows with as-yet-unloaded patients now surface as NULL, giving Gold KPIs an accurate “unknown” bucket without the complexity of continuous streaming.
+
+Restored option("cloudFiles.includeExistingFiles","true") in the Bronze Auto-Loader scripts to ensure historical CSV files are ingested on first run.
+
 ## 2025-07-07
 
 Removed unused cost-related fields (TOTAL_CLAIM_COST, BASE_ENCOUNTER_COST) from
