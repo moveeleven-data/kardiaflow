@@ -2,11 +2,17 @@
 
 ## 2025-07-08
 
-Updated the Gold-layer KPI view that calculates total monthly encounter volume
-from the Silver silver_patient_encounters table by grouping on START_TS month.
-Records with missing patient metadata (GENDER or BIRTH_YEAR) are excluded from
-the main KPI and instead tracked in a separate QA table gold_encounters_qa_unmatched
-to monitor unmatched records.
+Refactored the Gold-layer logic to simplify the demo.
+The KPI for monthly encounter volume is now surfaced through a view-only
+design (`vw_gold_encounters_by_month`), eliminating the need for a persisted Delta
+table. This view directly aggregates the Silver `silver_encounters_demographics`
+table, excluding encounters with missing patient metadata (GENDER or BIRTH_YEAR),
+which are now tracked separately in the QA table `gold_encounters_missing_patient`.
+
+A second QA table, `gold_patients_no_encounter`, was added to monitor patients who
+never appear in the encounters fact table. To further streamline the code,
+previously included partitioning and broadcast join logic were removed, along
+with an unused checkpoint path in `03_silver_patients_encounters_join.ipynb`.
 
 ## 2025-07-07
 
