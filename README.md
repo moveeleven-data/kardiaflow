@@ -10,7 +10,7 @@ The project covers end-to-end ingestion, transformation, change data capture, da
 
 This high-level diagram shows how structured and semi-structured healthcare data flows from ingestion to transformation, validation, and secure storage using Azure-native tools.
 
-![KardiaFlow Architecture](https://github.com/okv627/KardiaFlow/raw/master/docs/kardiaflow_lineage.png?v=2)
+![KardiaFlow Architecture](https://github.com/okv627/KardiaFlow/raw/master/docs/assets/kardiaflow_lineage.png?v=2)
 
 ### Data Sources
 

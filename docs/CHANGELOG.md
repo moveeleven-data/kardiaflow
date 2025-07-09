@@ -1,5 +1,20 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-09
+
+Updated the lineage diagram to include a legend for ingestion and transformation types.
+Finalized the providers flow: source data will be stored in Postgres, read via JDBC into
+a Bronze Delta table, and loaded into Silver using a batch SCD Type 2 process.
+
+For the feedback/device flow, Bronze device will stream into Silver using a stream-static
+join, while Bronze feedback will be batch-appended. The lineage diagram was updated to
+reflect these decisions.
+
+Also simplified the gender breakdown KPI by removing the materialized table and using
+a view-only approach. Documented all patients and encounters notebooks.
+
+Verified entire end-to-end Patients + Encounters pipeline.
+
 ## 2025-07-08
 
 Refactored the Gold-layer logic to simplify the demo.
