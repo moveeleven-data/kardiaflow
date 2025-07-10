@@ -1,5 +1,34 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-11
+
+Removed unused .withWatermark("EVENT_TS", "1 day") from the Silver Encounters
+stream since the query is stateless. Added a 2-year filter on START_DATE in the
+Gold aggregation to enable partition pruning.
+
+## 2025-07-10
+
+Replaced the static read of the silver_encounters table with a streaming read
+using spark.readStream.table. Switched the write logic from batch .write.mode("overwrite") to a
+streaming .writeStream.outputMode("append") with trigger(availableNow=True) and a
+configured checkpoint path to ensure idempotent, incremental processing. The left
+join and output schema were preserved exactly to maintain compatibility with
+downstream Gold-layer logic.
+
+Previously used CTAS and version bookmarks to manage Delta CDF manually.
+Now replaced with a simpler incremental streaming job. Reads only inserts and updates
+from Bronze, masks PHI, and derives `BIRTH_YEAR`. Uses `row_number()` on `_commit_version`
+to retain the latest change per patient ID. Performs SCD Type 1 upserts via `foreachBatch`,
+with a checkpoint for exactly-once processing. This reduces complexity and removes the
+need for explicit version tracking logic.
+
+In the Gold-layer metrics notebook, replaced the vw_gold_encounters_by_month
+view with a materialized Delta table named gold_encounters_by_month using a
+streaming write in complete mode. This overwrites the table in each
+run. The change enables downstream consumers to read from a table instead of a view,
+simplifying integration. The two QA tables (gold_encounters_missing_patient and
+gold_patients_no_encounter) were left as batch jobs.
+
 ## 2025-07-09
 
 Updated the lineage diagram to include a legend for ingestion and transformation types.
