@@ -1,23 +1,47 @@
 Providers & Claims Ingestion
 
-This pipeline sets up and ingests two datasets into the Bronze layer of a Databricks Lakehouse: provider metadata (via Postgres) and synthetic health claims (via Avro files and Auto Loader). We use a single-node Postgres instance started by a cluster init script that runs in driver RAM. The embedded Postgres database persists across cluster termination.
+This pipeline ingests two datasets into the Bronze layer of a Databricks Lakehouse:
+provider metadata (via Postgres) and synthetic health claims (via Avro files and
+Auto Loader). A single-node Postgres instance is installed in driver RAM at cluster
+startup via an init script and configured using Databricks secrets. The database
+is fully ephemeral—if the cluster auto-terminates, the driver VM (and with it, all
+Postgres binaries, data, and tables) is wiped and reinitialized on the next start.
 
-The Postgres password is kept out of Git and notebooks, stored in DBFS in a plaintext file.
+The Postgres password is stored in a Databricks secret scope (kardia) and injected
+into the init script at runtime using an environment variable.
 
 Providers: JDBC Ingestion
 
-1. Start the cluster without any init script or environment variables.
+Before cluster creation:
 
-2. Run 99_bootstrap_raw_dirs_and_files.ipynb. This will create the raw input directory, verify that providers_10.csv is uploaded to /FileStore/tables/, and save the PostgreSQL password (demo123) to DBFS at /secrets/pg_pw.
+1. Run the following CLI commands once per workspace to set up secure secrets.
 
-3. Edit the cluster settings to attach the start_postgres.sh init script and set the environment variable POSTGRES_PW=demo123, then restart the cluster. This installs and configures PostgreSQL inside the driver using the password.
+databricks secrets create-scope --scope kardia
+databricks secrets put --scope kardia --key pg_pw
+# Enter demo123 when prompted (or any password)
 
-4. Run 00_seed_providers_postgres.ipynb to wait for PostgreSQL to come online, load providers_10.csv into Spark, and overwrite the providers table in Postgres.
+2. Start the cluster without any init script or environment variables.
 
-5. Run 01_bronze_jdbc_providers.ipynb to read the providers table via JDBC and write to kardia_bronze.bronze_providers.
+3. Run `99_bootstrap_raw_dirs_and_files.ipynb`. This creates the raw input
+directory and verifies that providers_10.csv and claims_10.avro are uploaded to
+/FileStore/tables/. It also copies the Avro file into the streaming watch folder.
+
+4. Edit the cluster settings. Attach the start_postgres.sh init script. Set the
+environment variable POSTGRES_PW={{secrets/kardia/pg_pw}}.
+
+5. Restart the cluster. This installs and starts PostgreSQL inside the driver
+and sets the postgres password using the resolved secret value.
+
+6. Run `00_seed_providers_postgres.ipynb`. Waits for PostgreSQL to come online, 
+loads providers_10.csv into Spark, and writes to a providers table in the embedded
+Postgres database. Reads password via dbutils.secrets.get("kardia", "pg_pw").
+
+7. Run `01_bronze_jdbc_providers.ipynb`. Reads the providers table via JDBC and
+appends to kardia_bronze.bronze_providers.
 
 Claims: Streaming Ingestion
 
-1. Bootstrap: The same bootstrap notebook also copies the uploaded claims_10.avro file into the Auto Loader watch directory dbfs:/kardia/raw/claims/.
+1. Bootstrap: The same 99_bootstrap_raw_dirs_and_files.ipynb notebook copies the uploaded claims_10.avro file into the Auto Loader watch directory at dbfs:/kardia/raw/claims/.
 
-2. Bronze Ingest: The 01_bronze_stream_claims_autoloader.ipynb notebook defines the Avro schema in code, creates the target Delta table, and runs a one-shot Auto Loader streaming job using availableNow=true. The .option("mergeSchema", "true") setting allows schema evolution from initial data.
+2. Run 01_bronze_stream_claims_autoloader.ipynb. This defines the Avro schema in
+code, creates the target Delta table, and performs a one-shot Auto Loader ingest.
