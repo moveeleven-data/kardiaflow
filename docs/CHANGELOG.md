@@ -1,5 +1,13 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-12
+
+Added and validated the full ingestion flow for provider and claim data in the Bronze layer. A bootstrap notebook was created to initialize the raw directory structure, verify test files, and write a plaintext demo password to DBFS for Postgres setup. An init script and environment variable were attached to the cluster, allowing a single-node embedded Postgres instance to install and launch on restart, with the password applied from environment variables.
+
+Added JDBC ingestion for provider metadata by first seeding the Postgres database with providers_10.csv and then reading the resulting table into Delta as kardia_bronze.bronze_providers. For claim data, added an Auto Loader stream that read Avro files from the raw directory, applied a defined schema, and wrote to kardia_bronze.bronze_claims.
+
+Confirmed both Bronze tables were populated with expected row counts and configured for CDF.
+
 ## 2025-07-11
 
 Removed unused .withWatermark("EVENT_TS", "1 day") from the Silver Encounters
