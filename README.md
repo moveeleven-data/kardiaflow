@@ -72,6 +72,20 @@ This project simulates responsible healthcare data practices by incorporating:
 
 ---
 
+NOTE: All source files and every Delta table are stored in DBFS object storage which is
+encrypted at rest automatically. Reads and writes between the cluster and that object
+store travel over TLS-encrypted HTTPS, so those stages are also encrypted in transit.
+Inside the cluster, two paths remain unencrypted: Spark shuffle/broadcast traffic between
+driver and workers and the JDBC connection to the temporary Postgres instance on the
+driver node (plain TCP on localhost).
+
+In Production, I would connect to a managed Postgres instance (Azure Database, RDS)
+over VNet with TLS enforced. The cloud provider provides the certificate and credentials
+come from Azure Key Vault/Secrets Manger. The database would already be encrypted
+at rest with Transparent Data Encryption (TDE).
+
+---
+
 ## Branches
 
 - [`master`](https://github.com/okv627/KardiaFlow/tree/master): Full commit history showing development process

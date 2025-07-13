@@ -1,5 +1,17 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-13
+
+Revised the partitioning strategy for the Silver Encounters table:
+
+Switched from daily granularity using START_DATE, which created thousands of
+empty folders, to yearly granularity using a new YEAR_KEY column. This change
+was prompted by the first full-scale test of the patient and encounter pipeline
+using the complete datasets (~0.25 GB each).
+
+The START_DATE column was removed from the Silver Encounters schema and all
+downstream logic, as it is no longer in use.
+
 ## 2025-07-12
 
 Added and validated the full ingestion flow for provider and claim data in the
