@@ -1,5 +1,13 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-14
+
+Removed all partitioning logic from Silver and Gold Encounters tables.
+
+Despite switching to monthly partitioning on 07-13, further testing showed that
+even encounter_month produced dozens of small partitions under 1MB each, well
+below the recommended 1GB target. Overpartitioning lead to slower queries.
+
 ## 2025-07-13
 
 Revised the partitioning strategy for the Silver Encounters table:
