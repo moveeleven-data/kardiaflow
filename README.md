@@ -18,9 +18,22 @@ This high-level diagram shows how structured and semi-structured healthcare data
   - `patients.csv`  : demographic and ID information
   - `encounters.csv`: hospital visit metadata
 
-- **Insurance Claims Data (Structured, Simulated)** — CSV files representing PostgreSQL-style claims and provider records:
-  - `claims.csv`: claim cost, provider, coverage, billing codes
+- **Insurance Claims Data (Structured, Simulated)** — Avro/CSV files representing PostgreSQL-style claims and provider 
+  records:
+  - `claims.avro`: claim cost, provider, coverage, billing codes
   - `providers.csv`: metadata about insurers and medical providers
+
+We ingest raw claims as Avro files into the Bronze layer because Avro is a
+compact, binary, row-based format that embeds its schema with the data,
+making it ideal for structured ingestion. It supports schema evolution through
+nullable fields, default values, and aliases, which helps future-proof the
+pipeline as upstream claim formats change. Since we're not querying the raw
+files directly, only using them as a source for loading into Delta tables, Avro’s
+row format is efficient for ingestion without the overhead of columnar storage.
+This approach keeps raw file sizes small and integrates smoothly with Databricks
+Auto Loader for streaming or batch ingestion.
+
+
 
 - **Patient Feedback & Device Logs (Semi-Structured, Simulated)** — JSON files imitating MongoDB-style documents:
   - `feedback.json`: patient satisfaction surveys

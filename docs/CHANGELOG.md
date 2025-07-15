@@ -1,5 +1,21 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-15
+
+Implemented and validated the full Silver and Gold layers of the claims and providers
+pipeline in KardiaFlow. The Silver layer includes a Type-1 upsert for claims using CDF
+and a Type-2 SCD merge for providers to preserve history.
+
+Added three Gold tables using a SQL-based notebook. The hourly Claims table aggregates
+claim count, total amount, and average amount; the provider spend table uses a CTE for
+daily totals and applies SUM and AVG with a 7-day rolling window; and the QA table
+calculates unmatched provider counts and match rates. Both are Type-1 overwrite snapshots.
+
+Edited the Gold scripts for Patients and Encounters to match the new SQL-only approach.
+Replaced mixed PySpark and SQL logic with direct SQL statements for monthly encounter
+rollups and QA views. The final pipeline now runs cleanly end to end, with all Gold
+layers rewritten in SQL.
+
 ## 2025-07-14
 
 Removed all partitioning logic from Silver and Gold Encounters tables.

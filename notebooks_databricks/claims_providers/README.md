@@ -30,8 +30,14 @@ Before cluster creation:
 
 1. In local dev environment, run the following CLI commands to set up secure secrets:
 
-databricks secrets create-scope kardia --initial-manage-principal "users" --profile adb-41051511323219
-databricks secrets put-secret kardia pg_pw --string-value demo123 --profile adb-41051511323219
+Replace Workspace URL with current Workspace URL.
+
+databricks auth login \
+  --host https://adb-1962984722680540.0.azuredatabricks.net \
+  --profile adb-1962984722680540
+
+databricks secrets create-scope kardia --initial-manage-principal "users" --profile adb-1962984722680540
+databricks secrets put-secret kardia pg_pw --string-value demo123 --profile adb-1962984722680540
 
 2. Start the cluster without any init script or environment variables.
 
@@ -40,8 +46,8 @@ This creates the raw input directory and verifies that providers_10.csv and
 claims_10.avro are uploaded to /FileStore/tables/. It also copies the Avro
 file into the streaming watch folder.
 
-4. Edit the cluster settings. Attach the start_postgres.sh init script. Set the
-environment variable POSTGRES_PW={{secrets/kardia/pg_pw}}.
+4. Edit the cluster settings. Attach the start_postgres.sh init script in the
+utilies folder. Set the environment variable POSTGRES_PW={{secrets/kardia/pg_pw}}.
 
 5. Restart the cluster. This installs and starts PostgreSQL inside the driver
 and sets the postgres password using the resolved secret value.
@@ -55,7 +61,8 @@ appends to kardia_bronze.bronze_providers.
 
 Claims: Streaming Ingestion
 
-1. Bootstrap: The same 99_bootstrap_raw_dirs_and_files.ipynb notebook copies the uploaded claims_10.avro file into the Auto Loader watch directory at dbfs:/kardia/raw/claims/.
+1. Bootstrap: The same 99_bootstrap_raw_dirs_and_files.ipynb notebook copies the
+uploaded claims_10.avro file into the Auto Loader watch directory at dbfs:/kardia/raw/claims/.
 
 2. Run 01_bronze_stream_claims_autoloader.ipynb. This defines the Avro schema in
 code, creates the target Delta table, and performs a one-shot Auto Loader ingest.
