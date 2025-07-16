@@ -1,5 +1,16 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-16
+
+Fixed the SCD-2 process in Silver Providers by first closing current rows when tracked
+fields change, then inserting new or changed versions using Bronze _ingest_ts as the
+start timestamp. This prevents duplicate history from being created on reruns by
+ensuring only actual changes trigger new versions.
+
+In the claims Silver notebook, we added a foreachBatch setup that reads incrementally
+from Bronze using CDF with availableNow. We changed the deduplication to use row_number()
+on ClaimID, and moved the merge logic into a clean upsert_to_silver function.
+
 ## 2025-07-15
 
 Implemented and validated the full Silver and Gold layers of the claims and providers
