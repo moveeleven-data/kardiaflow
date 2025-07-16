@@ -9,7 +9,6 @@ This folder contains the infrastructure-as-code (IaC) scripts for safely deployi
 - Azure Resource Group (`kardia-rg-dev`)
 - Azure Key Vault (`kardia-kv`)
 - Azure Databricks Workspace (`kardia-dbx`)
-- Azure Data Factory (`kardia-adf`)
 
 This stack uses no VNet injection, no ADLS, no Unity Catalog, and no costly NAT Gateways — just a clean, safe, minimal dev environment.
 
