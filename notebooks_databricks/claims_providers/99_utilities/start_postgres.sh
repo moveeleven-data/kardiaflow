@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
-echo '[init] Installing PostgreSQL…'
+echo '[init] Installing Postgres…'
 sudo apt-get -qq update
 sudo apt-get -qq install -y postgresql postgresql-contrib > /dev/null
-echo '[init] Starting PostgreSQL…'
+echo '[init] Starting Postgres…'
 sudo service postgresql start
 
 if [[ -z "${POSTGRES_PW}" ]]; then
@@ -12,4 +12,4 @@ if [[ -z "${POSTGRES_PW}" ]]; then
 fi
 
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${POSTGRES_PW}';"
-echo '[init] PostgreSQL ready on port 5432.'
+echo '[init] Postgres ready on port 5432.'
