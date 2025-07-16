@@ -39,27 +39,24 @@ databricks auth login \
 databricks secrets create-scope kardia --initial-manage-principal "users" --profile adb-1962984722680540
 databricks secrets put-secret kardia pg_pw --string-value demo123 --profile adb-1962984722680540
 
-2. Start the cluster without any init script or environment variables.
+2. Edit the cluster settings. Attach the start_postgres.sh init script in the
+utilies folder. Set the environment variable POSTGRES_PW={{secrets/kardia/pg_pw}}.
+Restart the cluster. This installs and starts PostgreSQL inside the driver and
+sets the postgres password using the resolved secret value.
 
 3. Ensure the test files were added to DBFS and run `99_bootstrap_raw_dirs_and_files.ipynb`.
 This creates the raw input directory and verifies that providers_10.csv and
 claims_10.avro are uploaded to /FileStore/tables/. It also copies the Avro
 file into the streaming watch folder.
 
-4. Edit the cluster settings. Attach the start_postgres.sh init script in the
-utilies folder. Set the environment variable POSTGRES_PW={{secrets/kardia/pg_pw}}.
-
-5. Restart the cluster. This installs and starts PostgreSQL inside the driver
-and sets the postgres password using the resolved secret value.
-
-6. Run `99_seed_providers_postgres.ipynb`. Waits for PostgreSQL to come online, 
+4. Run `99_seed_providers_postgres.ipynb`. Waits for PostgreSQL to come online, 
 loads providers_10.csv into Spark, and writes to a providers table in the embedded
 Postgres database. Reads password via dbutils.secrets.get("kardia", "pg_pw").
 
-7. Run `01_bronze_jdbc_providers.ipynb`. Reads the providers table via JDBC and
+5. Run `01_bronze_jdbc_providers.ipynb`. Reads the providers table via JDBC and
 appends to kardia_bronze.bronze_providers.
 
-Claims: Streaming Ingestion
+Claims: Incremental Batch Ingestion
 
 1. Bootstrap: The same 99_bootstrap_raw_dirs_and_files.ipynb notebook copies the
 uploaded claims_10.avro file into the Auto Loader watch directory at dbfs:/kardia/raw/claims/.
