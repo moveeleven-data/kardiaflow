@@ -1,104 +1,88 @@
-// KardiaFlow minimal stack + ADLS raw landing (v1.3j · 2025-07-17)
+// KardiaFlow minimal ADLS + Databricks w/ storage MSI (v1.4c · 2025-07-17)
 targetScope = 'resourceGroup'
 
-/*─────────────────────── Parameters ───────────────────────*/
-@description('Azure region for all resources')
+/*──────────────────── Parameters ────────────────────*/
+@description('Azure region')
 param location string = resourceGroup().location
 
-@description('Azure Databricks workspace name')
+@description('Databricks workspace name')
 param databricksWorkspaceName string = 'kardia-dbx'
 
-@description('Name of the Databricks managed resource group (must exist or be created separately).')
+@description('Managed resource group for Databricks')
 param managedRgName string = 'kardia-dbx-managed'
 
-@description('Globally-unique storage account name for ADLS Gen2 (lowercase, 3–24 chars).')
+@description('ADLS Gen2 account name (lowercase)')
 param adlsAccountName string = 'kardiaadlsdemo'
 
-@description('Container name to hold raw landing data.')
+@description('Raw container name')
 param adlsRawContainerName string = 'raw'
 
-@description('Deployment timestamp tag value.')
-param deploymentTimestamp string = utcNow()
-
-
-/*─────────────────────── Common Tags ───────────────────────*/
-var commonTags = {
-  owner       : 'KardiaFlow'
-  env         : 'dev'
-  costCenter  : 'data-engineering'
-  billingTier : 'minimal'
-  provisioned : deploymentTimestamp
-}
-
-
-/*──────────────────── ADLS Gen2 Storage ────────────────────*/
-
-// Storage account with hierarchical namespace (ADLS Gen2)
+/*──────────────── ADLS Gen2 Storage ─────────────────*/
 resource adls 'Microsoft.Storage/storageAccounts@2024-01-01' = {
   name     : adlsAccountName
   location : location
-  tags     : commonTags
-  sku      : {
-    name: 'Standard_LRS'                             // lowest-cost redundancy
-  }
+  sku      : { name: 'Standard_LRS' }
   kind     : 'StorageV2'
   properties: {
-    isHnsEnabled             : true                  // enable hierarchical namespace (required for ADLS)
-    allowBlobPublicAccess    : false                 // block anonymous access
+    isHnsEnabled             : true
+    allowBlobPublicAccess    : false
     minimumTlsVersion        : 'TLS1_2'
     supportsHttpsTrafficOnly : true
-    publicNetworkAccess      : 'Enabled'             // avoid PE/NAT cost in demo
+    publicNetworkAccess      : 'Enabled'
   }
 }
 
-// Required default blob service (parent to containers)
 resource adlsBlob 'Microsoft.Storage/storageAccounts/blobServices@2024-01-01' = {
   parent     : adls
   name       : 'default'
   properties : {}
 }
 
-// Raw landing container (e.g., for providers, claims)
 resource adlsRaw 'Microsoft.Storage/storageAccounts/blobServices/containers@2024-01-01' = {
   parent     : adlsBlob
   name       : adlsRawContainerName
-  properties : {
-    publicAccess: 'None'                             // block public read access
-  }
+  properties : { publicAccess: 'None' }
 }
 
-
-/*───────────────────── Databricks Workspace ─────────────────────*/
-resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' = {
+/*──────── Databricks Workspace ────────────────────*/
+resource databricks 'Microsoft.Databricks/workspaces@2025-03-01-preview' = {
   name     : databricksWorkspaceName
   location : location
-  tags     : commonTags
-  sku      : {
-    name: 'standard'
+  sku      : { name: 'standard' }
+  tags     : {
+    owner       : 'KardiaFlow'
+    env         : 'dev'
+    costCenter  : 'data-engineering'
+    billingTier : 'minimal'
   }
   properties: {
     managedResourceGroupId : '/subscriptions/${subscription().subscriptionId}/resourceGroups/${managedRgName}'
     publicNetworkAccess    : 'Enabled'
     parameters: {
-      enableNoPublicIp: {
-        value: false                                     // allow public IPs (no NAT)
-      }
+      enableNoPublicIp: { value: false }
     }
+    // Enable system‑assigned storage identity for MSI access
+    storageAccountIdentity: {}
   }
 }
 
+/*── Grant Blob Data Reader to workspace storage MSI ───*/
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  // static name so Bicep can calculate at compile time
+  name : guid(resourceGroup().id, adlsRaw.id, 'reader')
+  scope: adlsRaw
+  properties: {
+    // Use the storage MSI principal from workspace properties
+    principalId     : databricks.properties.storageAccountIdentity.principalId
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'  // Storage Blob Data Reader
+    )
+  }
+}
 
-/*──────────────────────── Outputs ────────────────────────*/
+/*──────────────────── Outputs ────────────────────*/
+var suffix = environment().suffixes.storage
 
-// Databricks workspace URL (e.g., adb-xxxx.azuredatabricks.net)
+output adlsRawUri   string = 'abfss://${adlsRawContainerName}@${adlsAccountName}.dfs.${suffix}/'
 output databricksUrl string = databricks.properties.workspaceUrl
-
-// Environment-aware storage suffix (e.g., core.windows.net, core.usgovcloudapi.net, etc.)
-var storageSuffix = environment().suffixes.storage
-
-// Convenience ABFSS URI for raw container (for Spark config)
-// abfss://<container>@<acct>.dfs.<suffix>/
-output adlsRawUri string = 'abfss://${adlsRawContainerName}@${adlsAccountName}.dfs.${storageSuffix}/'
-
-// Storage account name (used in notebook Spark config)
-output adlsAccount string = adls.name
