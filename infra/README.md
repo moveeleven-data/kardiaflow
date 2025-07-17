@@ -29,19 +29,16 @@ az deployment group create \
 
 # 3. Using Databricks UI, generate PAT.
 
-# 4. In shell, fresh Databricks PAT:
+# 4. In local IDE, export fresh Databricks PAT:
 export DATABRICKS_PAT=""
 
 # 5. Generate & store SAS in Databricks by running the following command:
 bash infra/gen_sas.sh
 
+# 6. Teardown Instructions. Destroys all dev resources, including managed RGs.
 
----
+From the project root, run:
 
-Teardown Instructions
-Destroys all dev resources, including managed RGs.
-
-# From the project root
 ./infra/teardown.sh
 
 This script will:
