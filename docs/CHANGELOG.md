@@ -2,16 +2,20 @@
 
 ## 2025-07-17
 
-Added a `gen_sas.sh` script that dynamically resolves the Databricks workspace URL,
-generates a 24-hour container-level SAS token for ADLS using the connection
-string, and stores it securely in a Databricks secret scope `kardia/adls_raw_sas`.
-This enables repeatable, secure access to raw data after daily teardowns without
-manual intervention.
+Added a gen_sas.sh script that dynamically resolves the Databricks workspace URL,
+generates a 24-hour container-level SAS token for ADLS using the connection string,
+and stores it securely in a Databricks secret scope kardia/adls_raw_sas. This enables
+repeatable, secure access to raw data after daily teardowns without manual intervention.
 
-Changed the Bicep file to support proper dynamic resolution and provisioning of
-the Databricks workspace and raw ADLS container, ensuring compatibility with the
-new SAS-based access pattern. Also changed the bronze_providers ingestion notebook
-to use Auto Loader on CSV files from ADLS instead of JDBC from Postgres.
+Changed the Bicep file to support proper dynamic resolution and provisioning of the
+Databricks workspace and raw ADLS container, ensuring compatibility with the new
+SAS-based access pattern. Also changed the bronze_providers ingestion notebook to
+use Auto Loader on CSV files from ADLS instead of JDBC from Postgres.
+
+Moved data validation to a post-Bronze pattern and added validation notebooks for
+claims and providers to verify row counts, uniqueness, and schema conformity after
+ingestion. Confirmed the full claim and provider ingestion paths are completed and
+working end-to-end using Auto Loader with ADLS inputs and Delta Lake Bronze outputs.
 
 ## 2025-07-16
 

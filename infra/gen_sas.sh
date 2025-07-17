@@ -23,7 +23,7 @@ DB_HOST=$(az deployment group show \
   --query properties.outputs.databricksUrl.value -o tsv)
 export DATABRICKS_HOST="https://${DB_HOST}"
 export DATABRICKS_TOKEN="$PAT"
-echo "✔ Databricks host: $DATABRICKS_HOST"
+echo "Databricks host: $DATABRICKS_HOST"
 
 # 3) Configure Databricks CLI non‑interactively
 databricks configure --token \
