@@ -24,7 +24,17 @@ az group create --name kardia-rg-dev --location eastus
 # 2. Run the deployment (this provisions Databricks, Key Vault, ADF)
 az deployment group create \
   --resource-group kardia-rg-dev \
-  --template-file infra/deploy.bicep
+  --template-file infra/deploy.bicep \
+  --name kardiaflow
+
+# 3. Using Databricks UI, generate PAT.
+
+# 4. In shell, fresh Databricks PAT:
+export DATABRICKS_PAT=""
+
+# 5. Generate & store SAS in Databricks by running the following command:
+bash infra/gen_sas.sh
+
 
 ---
 
