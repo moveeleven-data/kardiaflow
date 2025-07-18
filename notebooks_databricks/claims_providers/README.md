@@ -16,9 +16,11 @@ shuffle/broadcast traffic between driver and workers.
 
 Providers: ADLS Ingestion to Bronze to Silver
 
-1. Upload providers.csv to the ADLS Gen2 container raw, under the path providers/providers.csv. This is directly accessible by the Databricks workspace via managed identity.
+1. Upload providers.tsv to the ADLS Gen2 container raw, under the path providers/providers.tsv. This is directly 
+   accessible by the Databricks workspace via managed identity.
 
-2. Run 01_bronze_stream_providers_autoloader.ipynb to ingest provider CSVs into kardia_bronze.bronze_providers using Auto Loader with ABFS path access and managed identity authentication.
+2. Run 01_bronze_stream_providers_autoloader.ipynb to ingest provider TSVs into kardia_bronze.bronze_providers using 
+   Auto Loader with ABFS path access and managed identity authentication.
 
 3. Run 01_validate_bronze_providers.ipynb to run basic assertions on the Bronze Providers table. This is non-blocking and will not fail the pipeline if issues are found.
 

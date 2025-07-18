@@ -24,7 +24,8 @@ Patients: Raw to Bronze to Silver
 
 Encounters: Raw to Bronze to Silver
 
-1. Run 00_bronze_stream_encounters_autoloader.ipynb to stream encounter CSVs into kardia_bronze.bronze_encounters.
+1. Run 00_bronze_stream_encounters_autoloader.ipynb to stream encounter Excel (XLSX) files into kardia_bronze.
+   bronze_encounters.
 
 2. Run 01_validate_bronze_patients to run basic assertions on Bronze Patients table. This is non-blocking and will not fail the pipeline if issues are found.
 
