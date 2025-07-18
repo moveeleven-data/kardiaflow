@@ -1,5 +1,14 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-18
+
+Updated Bronze notebooks to support Auto Loader ingestion for new file formats.
+Replaced raw ingestion types:
+- Encounters: CSV to Excel (XLSX)
+- Providers: CSV to TSV
+
+Split and converted raw data into standardized test sets.
+
 ## 2025-07-17
 
 Added a gen_sas.sh script that dynamically resolves the Databricks workspace URL,

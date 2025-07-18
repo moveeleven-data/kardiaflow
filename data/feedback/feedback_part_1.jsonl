@@ -1,0 +1,10 @@
+{"patient_id": "d6ae810c-07ba-409b-bb32-4c08c0bf89ab", "visit_id": "v5000", "timestamp": "2025-06-03T02:11:31.627357Z", "satisfaction_score": 4, "comments": "Check-in process was fast and efficient."}
+{"patient_id": "9eecaeff-7791-45ee-a9fd-0c9c2774a742", "visit_id": "v5001", "timestamp": "2025-06-02T17:45:31.627527Z", "satisfaction_score": 3, "comments": "Wait time was too long for a routine check-up."}
+{"patient_id": "6cb2a05e-9e4d-4f91-ab63-0cdba58e2fc1", "visit_id": "v5002", "timestamp": "2025-06-03T13:19:31.627537Z", "satisfaction_score": 3, "comments": "Confused by some of the billing details."}
+{"patient_id": "818cd561-57d7-4a88-be56-ae3e67eb72cd", "visit_id": "v5003", "timestamp": "2025-06-02T19:01:31.627544Z", "satisfaction_score": 3, "comments": "Staff was very kind and professional."}
+{"patient_id": "7e197574-5983-4e06-9965-3af22a5fc25a", "visit_id": "v5004", "timestamp": "2025-06-03T14:07:31.627550Z", "satisfaction_score": 2, "comments": "I didn\u2019t feel like my concerns were taken seriously."}
+{"patient_id": "b6e4f6ac-b325-4a84-ac69-f3e501b69157", "visit_id": "v5005", "timestamp": "2025-06-03T14:18:31.627614Z", "satisfaction_score": 2, "comments": "Confused by some of the billing details."}
+{"patient_id": "2fb0d4a0-d81e-4af5-a21d-4bb8379105e0", "visit_id": "v5006", "timestamp": "2025-06-02T23:53:31.627621Z", "satisfaction_score": 1, "comments": "Check-in process was fast and efficient."}
+{"patient_id": "6e1cd974-8bc7-40a7-8f82-b182d78351cd", "visit_id": "v5007", "timestamp": "2025-06-03T12:23:31.627627Z", "satisfaction_score": 5, "comments": "The doctor answered all my questions clearly."}
+{"patient_id": "0f9d41d2-e06e-41c0-b66c-ebea4c97b24e", "visit_id": "v5008", "timestamp": "2025-06-03T01:09:31.627633Z", "satisfaction_score": 5, "comments": "I felt rushed during my consultation."}
+{"patient_id": "8dfc2c37-b6d0-4d8d-91c5-fa237e777f45", "visit_id": "v5009", "timestamp": "2025-06-02T19:50:31.627639Z", "satisfaction_score": 5, "comments": "Staff was very kind and professional."}
