@@ -9,7 +9,9 @@ Replaced raw ingestion types:
 
 Split and converted raw data into standardized test sets.
 
-Refactored all notebooks in Patient/Encounter and Claim/Provider flows.
+Refactored all notebooks in Patient/Encounter and Claim/Provider flows. 
+
+Refined Silver logic to cleanse valid gender and birth year.
 
 ## 2025-07-17
 
