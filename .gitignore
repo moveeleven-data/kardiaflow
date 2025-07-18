@@ -52,9 +52,9 @@ data/device/*
 # Encounters (Excel)
 !data/encounters/
 data/encounters/*
-!data/encounters/encounters_part_1.xlsx
-!data/encounters/encounters_part_2.xlsx
-!data/encounters/encounters_part_3.xlsx
+!data/encounters/encounters_part_1.avro
+!data/encounters/encounters_part_2.avro
+!data/encounters/encounters_part_3.avro
 
 # Feedback (JSONL)
 !data/feedback/
