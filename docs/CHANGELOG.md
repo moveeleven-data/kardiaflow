@@ -4,10 +4,12 @@
 
 Updated Bronze notebooks to support Auto Loader ingestion for new file formats.
 Replaced raw ingestion types:
-- Encounters: CSV to Excel (XLSX)
+- Encounters: CSV to Avro
 - Providers: CSV to TSV
 
 Split and converted raw data into standardized test sets.
+
+Refactored all notebooks in Patient/Encounter and Claim/Provider flows.
 
 ## 2025-07-17
 
