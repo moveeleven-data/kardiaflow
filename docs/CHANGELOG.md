@@ -1,5 +1,16 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-19
+
+Added ingestion tracking to validation notebooks by writing row counts and
+timestamps into a centralized kardia_meta.bronze_qc table. This metadata log
+supports simple auditing of each Bronze load. Added _ingest_ts and _source_file
+audit columns to all Bronze-layer tables to improve traceability.
+
+Applied strict column constraints (e.g., NOT NULL, CHECK) in Silver-layer tables
+to enforce data quality. Refactored and cleaned all utility notebooks. Rewrote
+all file movement and bootstrap notebooks and handle existence checks.
+
 ## 2025-07-18
 
 Updated Bronze notebooks to support Auto Loader ingestion for new file formats.
