@@ -1,48 +1,49 @@
-Providers & Claims Ingestion
+# Claims & Providers Ingestion
 
 This pipeline ingests two datasets into the Bronze layer of a Databricks Lakehouse:
-provider metadata (via CSV files in ADLS Gen2 using Auto Loader) and synthetic health
-claims (via Avro files and Auto Loader). The provider data now resides in the raw 
-container of an Azure Data Lake Storage Gen2 account and Auto Loader ingests it
-using a SAS token stored securely in a Databricks secret scope.
-
-NOTE: All source files (except Providers) and every Delta table are stored in DBFS object storage,
-which is encrypted at rest automatically. Reads and writes between the cluster
-and that object store travel over TLS-encrypted HTTPS, so those stages are also
-encrypted in transit. Inside the cluster, one path remains unencrypted: Spark
-shuffle/broadcast traffic between driver and workers.
+provider metadata (via TSV files in ADLS Gen2 using Auto Loader) and synthetic health
+claims (via Avro files stored in DBFS). Provider files are stored in an Azure Data
+Lake Storage Gen2 container, and Auto Loader accesses them using a SAS token stored
+securely in a Databricks secret scope.
 
 ---
 
-Providers: ADLS Ingestion to Bronze to Silver
+## Bootstrap: Raw Folder and File Setup
 
-1. Upload providers.tsv to the ADLS Gen2 container raw, under the path providers/providers.tsv. This is directly 
-   accessible by the Databricks workspace via managed identity.
+Run 99_bootstrap_raw_claims.ipynb to create the raw input folder and copy claims_part_1.avro into the DBFS directory:
+- dbfs:/kardia/raw/claims/
 
-2. Run 01_bronze_stream_providers_autoloader.ipynb to ingest provider TSVs into kardia_bronze.bronze_providers using 
-   Auto Loader with ABFS path access and managed identity authentication.
-
-3. Run 01_validate_bronze_providers.ipynb to run basic assertions on the Bronze Providers table. This is non-blocking and will not fail the pipeline if issues are found.
-
-4. Run 02_silver_providers_transform.ipynb to batch read from Bronze, apply SCD Type 2 logic, and write deduplicated rows to kardia_silver.silver_providers.
+To add more files later, use 99_move_new_claim_files_to_raw.ipynb.
 
 
-Claims: DBFS to Bronze to Silver
+## ADLS Gen2 -> Bronze -> Silver **(Providers)**
 
-1. Run 99_bootstrap_raw_dirs_and_files.ipynb to copy the uploaded claims_10.avro file into the Auto Loader watch directory at dbfs:/kardia/raw/claims/.
+1. Upload providers.tsv to the ADLS Gen2 container raw, under the path: raw/providers/providers.tsv. The workspace accesses this path via managed identity or SAS token.
 
-2. Run 01_bronze_stream_claims_autoloader.ipynb to ingest claim Avro files into kardia_bronze.bronze_claims using Auto Loader and a predefined schema.
+2. Run 01_bronze_stream_providers_autoloader.ipynb to ingest provider TSV files into kardia_bronze.bronze_providers using Auto Loader. The ingestion reads directly from Azure Data Lake Storage Gen2 using Azure Blob File System paths with managed identity authentication.
 
-3. Run 01_validate_bronze_claims.ipynb to run basic assertions on the Bronze Claims table. This is non-blocking and will not fail the pipeline if issues are found.
+3. Run 01_validate_bronze_providers.ipynb to validate the Bronze Providers table. This performs row-level checks and adds a summary to kardia_meta.bronze_qc, but will not halt the pipeline if validation fails.
 
-4. Run 02_silver_claims_transform.ipynb to batch read Bronze claims, apply SCD Type 1 logic, and write cleansed data into kardia_silver.silver_claims.
-
-
-Silver Join: Claims and Providers
-
-- Run 02_silver_claims_enriched_join.ipynb to batch join Silver claims with provider details and write enriched results to kardia_silver.silver_claims_enriched.
+4. Run 02_silver_providers_transform.ipynb to batch read from Bronze, apply SCD Type 2 logic, and write deduplicated provider records to kardia_silver.silver_providers.
 
 
-Gold: Hourly Metrics and Provider Spend
+## DBFS -> Bronze -> Silver **(Claims)**
 
-- Run 03_gold_claims_metrics.ipynb to compute hourly claim volume and 7-day rolling spend metrics.
+1. Run 99_bootstrap_raw_dirs_and_files.ipynb to copy the uploaded claims_part_1.avro file into the Auto Loader watch directory:
+dbfs:/kardia/raw/claims/.
+
+2. Run 01_bronze_stream_claims_autoloader.ipynb to ingest claim Avro files into kardia_bronze.bronze_claims using Auto Loader. The pipeline infers the schema from Avro metadata and stores it for reuse, appending new data incrementally with Change Data Feed enabled.
+
+3. Run 01_validate_bronze_claims.ipynb to perform null, uniqueness, and value-range checks on the Bronze Claims table. The validation results are logged to kardia_meta.bronze_qc.
+
+4. Run 02_silver_claims_transform.ipynb to read from Bronze, apply SCD Type 1 logic, and write the cleansed data into kardia_silver.silver_claims.
+
+
+## Silver Join: **Claims and Providers**
+
+- Run 02_silver_claims_enriched_join.ipynb to join Silver claims with Silver providers and write enriched results to kardia_silver.silver_claims_enriched.
+
+
+## Gold: Hourly Metrics and Provider Spend
+
+- Run 03_gold_claims_metrics.ipynb to compute hourly claim volumes and 7-day rolling spend metrics, saving the results to Gold tables.
