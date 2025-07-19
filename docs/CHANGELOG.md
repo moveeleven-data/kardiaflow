@@ -11,6 +11,8 @@ Applied strict column constraints (e.g., NOT NULL, CHECK) in Silver-layer tables
 to enforce data quality. Refactored and cleaned all utility notebooks. Rewrote
 all file movement and bootstrap notebooks and handle existence checks.
 
+Standardized naming conventions for both columns and notebooks across all datasets.
+
 ## 2025-07-18
 
 Updated Bronze notebooks to support Auto Loader ingestion for new file formats.

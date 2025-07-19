@@ -29,18 +29,19 @@ To add more files later, use 99_move_new_pat_enc_files_to_raw.ipynb.
 
 ## Raw -> Bronze -> Silver **(Encounters)**
 
-1. Run 00_bronze_stream_encounters_autoloader.ipynb to ingest encounter Avro files into kardia_bronze.bronze_encounters using Auto Loader with .trigger(availableNow=True).
+1. Run 00_bronze_encounters_autoloader.ipynb to ingest encounter Avro files into kardia_bronze.bronze_encounters using Auto Loader with .trigger(availableNow=True).
 
 2. Run 01_validate_bronze_encounters.ipynb to validate Bronze Encounters data and append summary metrics to 
 kardia_meta.bronze_qc.
 
-3. Run 02_silver_encounters_transform.ipynb to stream inserts and updates using CDF and foreachBatch, parse timestamps, and upsert clean records into kardia_silver.silver_encounters.
+3. Run 02_silver_encounters_transform.ipynb to incrementally process inserts and updates using CDF, parse timestamps, and upsert clean records into kardia_silver.silver_encounters.
 
 
-## Silver (Stream-Static) Join: **Patients and Encounters**
+## Silver Join: **Patients and Encounters**
 
-- Run 02_silver_enc_demographics_join.ipynb to enrich each encounter with demographic fields from the Silver Patients 
- table and write the result to kardia_silver.silver_encounters_demographics.
+- Run 02_silver_encounters_with_patients_join.ipynb to enrich each encounter with demographic fields from the Silver 
+  Patients 
+ table and write the result to kardia_silver.silver_encounters_with_patients.
 
 
 ## Gold: Gender Breakdown & Monthly Volumes
