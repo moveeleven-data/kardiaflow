@@ -42,13 +42,6 @@ data/claims/*
 !data/claims/claims_part_2.avro
 !data/claims/claims_part_3.avro
 
-# Device (Parquet)
-!data/device/
-data/device/*
-!data/device/device_data_part_1.parquet
-!data/device/device_data_part_2.parquet
-!data/device/device_data_part_3.parquet
-
 # Encounters (Excel)
 !data/encounters/
 data/encounters/*
