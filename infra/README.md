@@ -1,6 +1,8 @@
 # KardiaFlow Infrastructure Deployment Guide
 
-This folder contains the infrastructure-as-code (IaC) scripts for deploying and tearing down the minimal KardiaFlow development environment in Azure using Bicep and the Azure CLI.
+This folder contains the infrastructure-as-code (IaC) scripts for deploying and
+tearing down the minimal KardiaFlow development environment in Azure using Bicep
+and the Azure CLI.
 
 ---
 

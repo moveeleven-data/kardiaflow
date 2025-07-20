@@ -2,16 +2,26 @@
 
 ## 2025-07-19
 
-Added ingestion tracking to validation notebooks by writing row counts and
-timestamps into a centralized kardia_meta.bronze_qc table. This metadata log
-supports simple auditing of each Bronze load. Added _ingest_ts and _source_file
-audit columns to all Bronze-layer tables to improve traceability.
+Added ingestion tracking to validation notebooks by writing row counts and timestamps
+into a centralized kardia_meta.bronze_qc table. This metadata log supports simple
+auditing of each Bronze load. Added _ingest_ts and _source_file audit columns to
+all Bronze-layer tables to improve traceability.
 
 Applied strict column constraints (e.g., NOT NULL, CHECK) in Silver-layer tables
-to enforce data quality. Refactored and cleaned all utility notebooks. Rewrote
-all file movement and bootstrap notebooks and handle existence checks.
+to enforce data quality. Refactored and cleaned all utility notebooks. Rewrote all
+file movement and bootstrap notebooks and handle existence checks. Added filters
+to Gold Gender Breakdown.
 
 Standardized naming conventions for both columns and notebooks across all datasets.
+
+Fixed issue preventing Bronze ingestion of Patient records: Added back missing
+columns 'Maiden' and 'Suffix'.
+
+Learned a critical lesson about ingestion reliability: Never manually modify raw
+input schemas, even if the data looks wrong. CSV files are structurally brittle
+and sensitive to positional shifts. Always assume the schema is correct until
+proven otherwise, and perform all validation and cleaning downstream in code.
+Treat raw files as immutable assets.
 
 ## 2025-07-18
 
