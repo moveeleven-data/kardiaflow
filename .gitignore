@@ -38,9 +38,9 @@ data/*
 # Claims (Avro)
 !data/claims/
 data/claims/*
-!data/claims/claims_part_1.avro
-!data/claims/claims_part_2.avro
-!data/claims/claims_part_3.avro
+!data/claims/claims_part_1.parquet
+!data/claims/claims_part_2.parquet
+!data/claims/claims_part_3.parquet
 
 # Encounters (Excel)
 !data/encounters/

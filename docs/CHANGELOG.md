@@ -1,5 +1,26 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-20
+
+Deleted the device dataset. Replaced the feedback dataset with a provider-centric
+schema using provider_id as a clean foreign key to providers.ProviderID. Converted
+claims.csv to Parquet for better ingestion speed and schema control.
+
+Overhauled the Silver and Gold layers. Introduced three enriched Silver join tables:
+
+- silver_enriched_encounters (patients + encounters) for lifecycle and cohort metrics
+- silver_enriched_claims (claims + providers) for financial KPIs and QA
+- silver_enriched_feedback (feedback + providers) for experience and sentiment analysis
+
+Reorganized Gold into four targeted fact tables:
+
+- gold_patient_lifecycle: Time between visits, patient lifetime span, new/returning classification, age-band utilization
+- gold_claim_anomalies: Approval rates by specialty, denial breakdowns, high-cost procedures, rapid-fire claims
+- gold_feedback_metrics: Satisfaction scores, tag/comment analysis, and encounter-feedback match rates
+- gold_provider_rolling_spend: Daily provider spend and 7-day rolling KPIs using window functions
+
+Existing QA views were removed from Gold and will be restructured into a dedicated validation layer.
+
 ## 2025-07-19
 
 Added ingestion tracking to validation notebooks by writing row counts and timestamps
