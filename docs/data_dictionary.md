@@ -2,16 +2,15 @@
 
 ## Source Files
 
-- `dbfs:/kardia/raw/claims/claims.csv`
+- `dbfs:/kardia/raw/claims/claims.parquet`
 - `dbfs:/kardia/raw/claims/providers.tsv`
 - `dbfs:/kardia/raw/ehr/patients.csv`
 - `dbfs:/kardia/raw/ehr/encounters.avro`
 - `dbfs:/kardia/raw/feedback/feedback.json`
-- `dbfs:/kardia/raw/feedback/device_data.json`
 
 ---
 
-## File: `claims.csv`
+## File: `claims.parquet`
 
 | Field Name             | Type     | Description                                                             |
 |------------------------|----------|-------------------------------------------------------------------------|
@@ -66,7 +65,7 @@
 |--------------------|--------|------------------------------------------|
 | `ID`               | UUID   | Unique identifier for the encounter      |
 | `DATE`             | Date   | Encounter date                           |
-| `PATIENT`          | UUID   | Foreign key to `patients.ID`             |
+| `PATIENT`          | UUID   | Foreign key referencing `ID` in `patients.csv` |
 | `CODE`             | String | Encounter type code                      |
 | `DESCRIPTION`      | String | Human-readable encounter description     |
 | `REASONCODE`       | String | Reason code for the visit                |
@@ -74,27 +73,19 @@
 
 ---
 
-## File: `feedback.json`
+## File: `feedback.jsonl`
 
-| Field Name         | Type     | Description                                 |
-|--------------------|----------|---------------------------------------------|
-| `patient_id`       | UUID     | Links to patient                            |
-| `visit_id`         | UUID     | Optional join to encounter                  |
-| `timestamp`        | ISODate  | When the feedback was recorded              |
-| `satisfaction_score` | Integer | Rating from 1 to 5                         |
-| `comments`         | String   | Free-form text                              |
-
----
-
-## File: `device_data.json`
-
-| Field Name   | Type     | Description                                   |
-|--------------|----------|-----------------------------------------------|
-| `patient_id` | UUID     | Links to patient                              |
-| `timestamp`  | ISODate  | Timestamp of telemetry record                 |
-| `heart_rate` | Integer  | Heart rate in BPM                             |
-| `steps`      | Integer  | Number of steps                               |
-| `device_id`  | String   | Unique device ID                              |
+| Field Name           | Type            | Description                                                                     |
+|----------------------|-----------------|---------------------------------------------------------------------------------|
+| `feedback_id`        | UUID            | Unique identifier for each feedback record                                      |
+| `provider_id`        | UUID            | Foreign key referencing `ProviderID` in the `providers.tsv` dataset                                          |
+| `timestamp`          | ISO 8601        | Date and time when the feedback was submitted                                   |
+| `visit_id`           | UUID            | Identifier of the related visit or encounter                                    |
+| `satisfaction_score` | Integer         | Rating of the experience, typically from 1 (lowest) to 5 (highest)              |
+| `comments`           | String          | Free-form patient input about their experience                                  |
+| `source`             | String          | Origin of the feedback, such as `"in_clinic"`, `"web_portal"`, or `"mobile_app"` |
+| `tags`               | Array of String | List of category labels for the feedback (e.g., `"staff"`, `"parking"`)         |
+| `metadata`           | Object          | Additional structured data, such as `{"response_time_ms": 1238}`                |
 
 ---
 

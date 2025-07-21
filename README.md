@@ -14,18 +14,13 @@ The following diagram illustrates the end-to-end data flow across ingestion, tra
 
 ### Data Sources
 
-| Dataset            | Format| Sample File  |
-|--------------------|-------|--------------|
-| Patients           | CSV   | `patients.csv` |
-| Encounters         | Avro  | `encounters.avro` |
-| Claims             | CSV   | `claims.csv` |
-| Providers          | TSV   | `providers.tsv` |
-| Feedback           | JSON  | `feedback.json` |
-| Device Telemetry   | JSON  | `device_data.json` |
-
-- Feedback and device logs are simulated JSON arrays modeled after MongoDB-style documents.
-  - `feedback.json`: patient satisfaction surveys
-  - `device_data.json`: wearable health metrics (e.g., heart rate, step count)
+| Dataset            | Format  | Sample File        |
+|--------------------|---------|--------------------|
+| Patients           | CSV     | `patients.csv`     |
+| Encounters         | Avro    | `encounters.avro`  |
+| Claims             | Parquet | `claims.parquet`   |
+| Providers          | TSV     | `providers.tsv`    |
+| Feedback           | JSON    | `feedback.json`    |
 
 ---
 
@@ -45,12 +40,3 @@ The following diagram illustrates the end-to-end data flow across ingestion, tra
 - All Delta tables and raw files are stored in Databricks File System (DBFS), which is encrypted at rest.
 - All traffic between the cluster and storage is secured via TLS-encrypted HTTPS.
 - No real PHI is used — all data is synthetic and generated for simulation purposes only.
-
----
-
-## Branches
-
-- [`kardiaflow-v1`](https://github.com/okv627/KardiaFlow/tree/kardiaflow-v1): Main branch with the latest stable pipeline implementation
-- [`master`](https://github.com/okv627/KardiaFlow/tree/master): Legacy development branch
-
-
