@@ -32,27 +32,24 @@ deduplicate rows, mask PHI fields, derive BIRTH_YEAR, and upsert into kardia_sil
 
 ## Raw -> Bronze -> Silver **(Encounters)**
 
-1. Run 00_bronze_encounters_autoloader.ipynb to ingest encounter Avro files into
-kardia_bronze.bronze_encounters using Auto Loader with .trigger(availableNow=True).
+1. Run 01_bronze_encounters_autoloader.ipynb to stream encounter Avro files into
+kardia_bronze.bronze_encounters using Auto Loader.
 
 2. Run 01_validate_bronze_encounters.ipynb to validate Bronze Encounters data and
 append summary metrics to kardia_meta.bronze_qc.
 
-3. Run 02_silver_encounters_transform.ipynb to incrementally process inserts and
-updates using CDF, parse timestamps, and upsert clean records into kardia_silver.silver_encounters.
+3. Run 02_silver_encounters_transform.ipynb to consume CDF changes from Bronze, parse event timestamps,
+and continuously upsert clean records into kardia_silver.silver_encounters.
 
 
 ## Silver Join: **Patients and Encounters**
 
-- Run 02_silver_encounters_with_patients_join.ipynb to enrich each encounter with
+- Run 02_silver_encounters_enriched.ipynb to enrich each encounter with
 demographic fields from the Silver Patients table and write the result to
-kardia_silver.silver_encounters_with_patients.
+kardia_silver.silver_encounters_enriched.
 
 
 ## Gold: Gender Breakdown & Monthly Volumes
 
-1. Run 03_gold_gender_breakdown.ipynb to compute the latest gender distribution
-and merge results into the Gold Gender Breakdown table.
-
-2. Run 03_gold_encounters_by_month.ipynb to aggregate monthly encounter volumes
-and refresh supporting QA tables that track data completeness.
+- Run 03_gold_patient_lifecycle.ipynb to track patient visit intervals, lifetime
+span, age-band engagement, and new/returning classification.
