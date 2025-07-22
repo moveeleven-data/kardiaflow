@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 # Safe teardown script for KardiaFlow dev environment
 # Deletes Databricks workspace, then removes the parent resource group.
-# Usage: ./teardown.sh
 set -euo pipefail
 
-RG="kardia-rg-dev"     # Parent resource group created by deploy.bicep
-WORKSPACE="kardia-dbx" # Databricks workspace name
+# Load environment variables
+source "$(dirname "$0")/.env"
 
 # Delete Databricks workspace (will also delete the managed RG)
 az databricks workspace delete --resource-group "$RG" --name "$WORKSPACE" --yes || true

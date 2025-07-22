@@ -20,24 +20,27 @@ Designed for local development and demos. No NAT Gateway, no Unity Catalog, no V
 
 > **Run these from your local terminal. Make sure you're logged into the correct Azure subscription.**
 
-# 1. Create resource group (must exist before deployment)
-az group create --name kardia-rg-dev --location eastus
+# 1. Load environment variables
+source infra/.env
 
-# 2. Deploy Databricks and ADLS via Bicep
+# 2. Create the resource group
+az group create --name "$RG" --location eastus
+
+# 3. Deploy Databricks and ADLS via Bicep
 az deployment group create \
-  --resource-group kardia-rg-dev \
+  --resource-group "$RG" \
   --template-file infra/deploy.bicep \
-  --name kardiaflow
+  --name "$DEPLOY"
 
-# 3. Generate PAT via Databricks UI.
+# 4. Generate PAT via Databricks UI.
 
-# 4. Export PAT via local IDE:
+# 5. Export PAT via local IDE:
 export DATABRICKS_PAT=""
 
-# 5. Generate & store SAS in Databricks:
+# 6. Generate & store SAS in Databricks:
 bash infra/gen_sas.sh
 
-# 6. Teardown Instructions. To safely destroy all provisioned resources, run:
+# 7. Teardown Instructions. To safely destroy all provisioned resources, run:
 ./infra/teardown.sh
 
 The teardown script script will:

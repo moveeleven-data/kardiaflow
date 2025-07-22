@@ -9,7 +9,7 @@ This file supplements the data dictionary by outlining how raw source datasets r
 - **patients.csv** is the central table in the EHR dataset. It connects to:
   - `encounters.avro` via `patients.ID → encounters.PATIENT`
 
-- **claims.csv** connects to:
+- **claims.parquet** connects to:
   - `patients.csv` via `claims.PatientID → patients.ID`
   - `providers.tsv` via `claims.ProviderID → providers.ProviderID`
 
@@ -21,19 +21,20 @@ This file supplements the data dictionary by outlining how raw source datasets r
 
 ## 2. Source File Types & Storage Format
 
-| File(s)                 | Format       | Type             | Storage Location                |
-|-------------------------|--------------|------------------|---------------------------------|
-| patients_part_*.csv     | CSV          | Structured       | `dbfs:/kardia/raw/ehr/`         |
-| encounters_part_*.avro  | Avro         | Structured       | `dbfs:/kardia/raw/ehr/`         |
-| claims_part_*.csv       | CSV          | Structured       | `dbfs:/kardia/raw/claims/`      |
-| providers.tsv           | TSV          | Structured       | `dbfs:/kardia/raw/claims/`      |
-| feedback.json           | JSON array   | Semi-structured  | `dbfs:/kardia/raw/feedback/`    |
-| device_data.json        | JSON array   | Semi-structured  | `dbfs:/kardia/raw/feedback/`    |
+| File(s)                | Format     | Type             | Storage Location                |
+|------------------------|------------|------------------|---------------------------------|
+| patients_part_*.csv    | CSV        | Structured       | `dbfs:/kardia/raw/ehr/`         |
+| encounters_part_*.avro | Avro       | Structured       | `dbfs:/kardia/raw/ehr/`         |
+| claims_part_*.parquet  | Parquet    | Structured       | `dbfs:/kardia/raw/claims/`      |
+| providers_part_*.tsv   | TSV        | Structured       | `dbfs:/kardia/raw/claims/`      |
+| feedback_part_*.json   | JSON array | Semi-structured  | `dbfs:/kardia/raw/feedback/`    |
 
 ---
 
 ## 3. Intended Usage in Pipeline
 
-- All files are ingested using **Databricks Auto Loader** into **Bronze Delta tables** on DBFS.
-- Transformation logic occurs in **Silver** via CDF with deduplication, PHI masking, and constraint enforcement.
-- Final Gold views are served directly from **Databricks Delta** and visualized using **Databricks SQL dashboards**.
+All files are ingested into Bronze Delta tables on DBFS. Most use Databricks Auto Loader to support scalable, schema-evolving ingestion. The feedback flow, however, uses COPY INTO for simplicity and compatibility with JSON array files, as it involves lower data quality risk and does not require the full governance and streaming features applied to core datasets.
+- Silver-layer transformations apply Change Data Feed (CDF), deduplication, PHI masking, and constraint enforcement 
+to produce clean, enriched Delta tables.
+- Gold tables serve as the primary analytical surface, powering Databricks SQL dashboards and downstream reporting 
+use cases.

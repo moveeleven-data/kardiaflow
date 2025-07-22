@@ -1,5 +1,9 @@
 # KardiaFlow Project — Changelog
 
+## 2026-07-21
+
+Create .env and remove hardcoded variables from infra files.
+
 ## 2025-07-20
 
 Deleted the device dataset. Replaced the feedback dataset with a provider-centric

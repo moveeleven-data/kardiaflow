@@ -12,11 +12,12 @@ Over the course of several development iterations, the project accrued over **$2
 
 ### 1. ADLS Gen2 Transaction Costs
 - Frequent partitioned overwrite operations triggered **excessive write transactions**, especially during PySpark `overwrite` writes to partitioned directories.
-- ADLS billed **per operation**, not per GB, leading to dozens of dollars in transaction charges even on tiny datasets.
+- ADLS billed **per operation**, not per GB, leading to hundreds of dollars in transaction charges even on tiny 
+  datasets.
 
 ### 2. NAT Gateway Idle Billing (via SHIR)
 - Creating a SHIR VM to support ADF resulted in the **silent deployment of NAT Gateways** for outbound traffic.
-- NATs billed per hour whether traffic existed or not. After just a few days, idle charges exceeded **$60**.
+- NATs billed per hour whether traffic existed or not. After just a few days, idle charges exceeded **$20**.
 
 ### 3. Missing Teardown Controls
 - No teardown automation was in place. Forgotten or stranded RGs and workspaces quietly continued incurring costs.
@@ -28,12 +29,12 @@ Over the course of several development iterations, the project accrued over **$2
 
 ## Impact
 
-| Area                  | Outcome                                      |
-|-----------------------|----------------------------------------------|
-| Azure billing         | ~$250 in unexpected charges across services  |
-| Resource hygiene      | Multiple RGs required manual cleanup         |
-| Time loss             | ~6 hours spent with Azure Support            |
-| Project progress      | Paused and reset to avoid further cost risk  |
+| Area                  | Outcome                                     |
+|-----------------------|---------------------------------------------|
+| Azure billing         | ~$250 in unexpected charges across services |
+| Resource hygiene      | Multiple RGs required manual cleanup        |
+| Time loss             | ~8 hours spent with Azure Support           |
+| Project progress      | Paused and reset to avoid further cost risk |
 
 ---
 

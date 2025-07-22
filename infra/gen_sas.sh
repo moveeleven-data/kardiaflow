@@ -1,23 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─── CONFIGURATION ────────────────────────────
-# edit only these values:
-SUB="cfe9f138-14a6-4e91-9a90-04d4d62999f9"
-RG="kardia-rg-dev"
-DEPLOY="kardiaflow"
-ADLS="kardiaadlsdemo"
-CONT="raw"
-PROFILE="kardia"
-# The PAT must come from the environment:
-: "${DATABRICKS_PAT:?Environment variable DATABRICKS_PAT must be set}"
-PAT="$DATABRICKS_PAT"
-# ───────────────────────────────────────────────
+# Load environment variables
+source "$(dirname "$0")/.env"
 
-# 1) Azure context
+# 1. Ensure all az commands are scoped to the correct Azure account
 az account set --subscription "$SUB"
 
-# 2) Get your workspace URL
+# 2. Get the Databricks workspace URL required for CLI auth
 DB_HOST=$(az deployment group show \
   -g "$RG" -n "$DEPLOY" \
   --query properties.outputs.databricksUrl.value -o tsv)
@@ -25,18 +15,18 @@ export DATABRICKS_HOST="https://${DB_HOST}"
 export DATABRICKS_TOKEN="$PAT"
 echo "Databricks host: $DATABRICKS_HOST"
 
-# 3) Configure Databricks CLI non‑interactively
+# 3. Configure Databricks CLI non‑interactively
 databricks configure --token \
   --host  "$DATABRICKS_HOST" \
   --token "$DATABRICKS_TOKEN" \
   --profile "$PROFILE"
 
-# 4) Create the secret scope if needed
+# 4. Create the secret scope. Ensure script doesn't fail if secret already exists.
 databricks secrets create-scope "$PROFILE" \
   --initial-manage-principal users \
   --profile "$PROFILE" 2>/dev/null || true
 
-# 5) Generate a 24 h SAS for your raw container
+# 5. Generate a 24h SAS token for 'Raw' container
 SAS_EXPIRY=$(date -u -d "+1 day" '+%Y-%m-%dT%H:%MZ')
 CONN_STR=$(az storage account show-connection-string \
   --resource-group "$RG" \
@@ -48,9 +38,9 @@ RAW_SAS=$(az storage container generate-sas \
   --permissions     rl \
   --expiry          "$SAS_EXPIRY" \
   --https-only      \
-  --output          tsv)
+  --output          tsv) # TSV used to cleanly extract token string
 
-# 6) Store the SAS in Databricks secrets
+# 6. Store the SAS in Databricks secrets
 echo -n "$RAW_SAS" | databricks secrets put-secret \
   "$PROFILE" adls_raw_sas \
   --profile "$PROFILE"

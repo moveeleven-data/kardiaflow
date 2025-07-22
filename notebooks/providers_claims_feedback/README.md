@@ -6,13 +6,16 @@ This pipeline ingests provider metadata, synthetic health claims, and patient fe
 
 ## Raw Bootstrap
 
-Claims files are manually uploaded to DBFS:
-- Claims: `dbfs:/kardia/raw/claims/claims_part_*.parquet`
+Test files must first be manually uploaded to:
+- `dbfs:/FileStore/tables/`
 
-Feedback files are uploaded to ADLS Gen2 under:
-- Feedback: `raw/feedback/feedback_part_*.jsonl`
+Then, run the appropriate bootstrap notebook to move them into raw ingestion zones:
 
-Run the relevant `99_bootstrap_*.ipynb` or `99_move_new_*.ipynb` notebooks to prepare these files for ingestion.
+- Claims → `dbfs:/kardia/raw/claims/claims_part_*.parquet`
+- Providers → `dbfs:/kardia/raw/providers/providers_part_*.avro`
+- Feedback → `dbfs:/kardia/raw/feedback/feedback_part_*.jsonl`
+
+Use the `99_bootstrap_raw_sources.ipynb` or `99_move_new_*_files_to_raw.ipynb` notebooks to prepare these files for ingestion.
 
 ---
 

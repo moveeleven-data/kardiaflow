@@ -19,53 +19,50 @@ param adlsRawContainerName string = 'raw'
 
 // ────────────── ADLS Gen2 ──────────────
 resource adls 'Microsoft.Storage/storageAccounts@2024-01-01' = {
-  name     : adlsAccountName
-  location : location
-  sku      : { name: 'Standard_LRS' }
-  kind     : 'StorageV2'
+  name: adlsAccountName
+  location: location
+  sku: {name: 'Standard_LRS'}
+  kind: 'StorageV2'
   properties: {
-    isHnsEnabled             : true
-    allowBlobPublicAccess    : false
-    minimumTlsVersion        : 'TLS1_2'
-    supportsHttpsTrafficOnly : true
-    publicNetworkAccess      : 'Enabled'
+    isHnsEnabled: true
+    allowBlobPublicAccess: false
+    minimumTlsVersion: 'TLS1_2'
+    supportsHttpsTrafficOnly: true
+    publicNetworkAccess: 'Enabled'
   }
 }
 
 resource adlsBlob 'Microsoft.Storage/storageAccounts/blobServices@2024-01-01' = {
-  parent     : adls
-  name       : 'default'
-  properties : {}
+  parent: adls
+  name: 'default'
+  properties: {}
 }
 
 resource adlsRaw 'Microsoft.Storage/storageAccounts/blobServices/containers@2024-01-01' = {
-  parent     : adlsBlob
-  name       : adlsRawContainerName
-  properties : { publicAccess: 'None' }
+  parent: adlsBlob
+  name: adlsRawContainerName
+  properties: {publicAccess: 'None'}
 }
 
 // ───────────── Databricks ─────────────
 resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' = {
-  name       : databricksWorkspaceName
-  location   : location
-  sku        : { name: 'standard' }
+  name: databricksWorkspaceName
+  location: location
+  sku: {name: 'standard'}
   tags: {
-    owner       : 'KardiaFlow'
-    env         : 'dev'
-    costCenter  : 'data-engineering'
-    billingTier : 'minimal'
+    owner: 'KardiaFlow'
+    env: 'dev'
+    costCenter: 'data-engineering'
+    billingTier: 'minimal'
   }
   properties: {
-    managedResourceGroupId : subscriptionResourceId('Microsoft.Resources/resourceGroups', managedRgName)
-    publicNetworkAccess    : 'Enabled'
+    managedResourceGroupId: subscriptionResourceId('Microsoft.Resources/resourceGroups', managedRgName)
+    publicNetworkAccess: 'Enabled'
     parameters: {
-      enableNoPublicIp: { value: false }
+      enableNoPublicIp: {value: false}
     }
   }
 }
 
 /*────────── Outputs ──────────*/
-var suffix = environment().suffixes.storage
-
-output adlsRawUri   string = 'abfss://${adlsRawContainerName}@${adlsAccountName}.dfs.${suffix}/'
 output databricksUrl string = databricks.properties.workspaceUrl
