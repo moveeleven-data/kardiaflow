@@ -6,11 +6,13 @@ Deleted the device dataset. Replaced the feedback dataset with a provider-centri
 schema using provider_id as a clean foreign key to providers.ProviderID. Converted
 claims.csv to Parquet for better ingestion speed and schema control.
 
-Overhauled the Silver and Gold layers. Introduced three enriched Silver join tables:
+Implemented full feedback pipeline from raw JSONL in ADLS to Bronze (Auto Loader),
+Silver (batch append), and Gold (aggregated satisfaction metrics). Overhauled the Silver and Gold layers.
 
-- silver_enriched_encounters (patients + encounters) for lifecycle and cohort metrics
-- silver_enriched_claims (claims + providers) for financial KPIs and QA
-- silver_enriched_feedback (feedback + providers) for experience and sentiment analysis
+Introduced three enriched Silver join tables:
+- silver_encounters_enriched: patients + encounters for lifecycle and cohort metrics
+- silver_claims_enriched: claims + providers for financial KPIs and QA
+- silver_feedback_enriched: feedback + providers for experience and sentiment analysis
 
 Reorganized Gold into four targeted fact tables:
 
@@ -19,7 +21,7 @@ Reorganized Gold into four targeted fact tables:
 - gold_feedback_metrics: Satisfaction scores, tag/comment analysis, and encounter-feedback match rates
 - gold_provider_rolling_spend: Daily provider spend and 7-day rolling KPIs using window functions
 
-Existing QA views were removed from Gold and will be restructured into a dedicated validation layer.
+Existing QA views were removed from Gold.
 
 ## 2025-07-19
 
