@@ -1,55 +1,52 @@
 # Patients & Encounters Ingestion
 
-This pipeline ingests patient and encounter records into the Bronze, Silver, and
-Gold layers of a Databricks Lakehouse. Patient data begins as raw CSV files, and
-encounter data as raw Avro files. Both are uploaded to DBFS and ingested into Bronze
-Delta tables using Auto Loader with predefined schemas. Change Data Feed is
-enabled on all Bronze tables to support efficient, incremental Silver-layer processing.
+This pipeline ingests patient and encounter records into a Databricks Lakehouse using Delta Lake and Auto Loader. All datasets land in a Bronze layer with Change Data Feed (CDF) enabled, are validated, then transformed into Silver and Gold layers for downstream analytics.
 
 ---
 
-## Bootstrap: Raw Folder and File Setup
+## Raw Bootstrap
 
-Run 99_bootstrap_raw_patients_encounters.ipynb to create the raw input folders and copy patients_part_1.csv and 
-encounters_part_1.avro into their respective DBFS directories:
-- dbfs:/kardia/raw/patients/
-- dbfs:/kardia/raw/encounters/
+Patient and encounter files are manually uploaded to DBFS:
 
-To add more files later, use 99_move_new_pat_enc_files_to_raw.ipynb.
+- Patients: `dbfs:/kardia/raw/patients/patients_part_*.csv`
+- Encounters: `dbfs:/kardia/raw/encounters/encounters_part_*.avro`
 
+Run `99_bootstrap_raw_patients_encounters.ipynb` to initialize folders and copy sample files.  
+Use `99_move_new_pat_enc_files_to_raw.ipynb` to add additional files later.
 
-## Raw -> Bronze -> Silver **(Patients)**
+---
 
-1. Run 00_bronze_patients_autoloader.ipynb to ingest patient CSV files into
-kardia_bronze.bronze_patients using Auto Loader.
+## Bronze Ingestion
 
-2. Run 01_validate_bronze_patients.ipynb to validate row counts, uniqueness,
-and nulls in the Bronze Patients table. This notebook also logs metadata to kardia_meta.bronze_qc.
+| Dataset    | Source | Format | Loader      | Bronze Table                      |
+|------------|--------|--------|-------------|-----------------------------------|
+| Patients   | DBFS   | CSV    | Auto Loader | `kardia_bronze.bronze_patients`   |
+| Encounters | DBFS   | Avro   | Auto Loader | `kardia_bronze.bronze_encounters` |
 
-3. Run 02_silver_patients_transform.ipynb to read from Bronze using CDF,
-deduplicate rows, mask PHI fields, derive BIRTH_YEAR, and upsert into kardia_silver.silver_patients.
+Each ingestion notebook reads raw files using a predefined schema, adds audit columns, and writes to a Bronze Delta table with CDF enabled.
 
+---
 
-## Raw -> Bronze -> Silver **(Encounters)**
+## Silver Transformation
 
-1. Run 01_bronze_encounters_autoloader.ipynb to stream encounter Avro files into
-kardia_bronze.bronze_encounters using Auto Loader.
+| Dataset    | Logic         | Silver Table                           |
+|------------|---------------|----------------------------------------|
+| Patients   | Batch SCD Type 1 | `kardia_silver.silver_patients`        |
+| Encounters | Continuous Streaming | `kardia_silver.silver_encounters`      |
 
-2. Run 01_validate_bronze_encounters.ipynb to validate Bronze Encounters data and
-append summary metrics to kardia_meta.bronze_qc.
+Join notebooks create enriched views:
+- `silver_encounters_enriched`: Stream-static join of Silver encounters (streaming) with Silver patients (static) for demographic enrichment
 
-3. Run 02_silver_encounters_transform.ipynb to consume CDF changes from Bronze, parse event timestamps,
-and continuously upsert clean records into kardia_silver.silver_encounters.
+---
 
+## Gold KPIs
 
-## Silver Join: **Patients and Encounters**
+| Table                          | Description                                                        |
+|--------------------------------|--------------------------------------------------------------------|
+| `gold_patient_lifecycle`       | Visit intervals, patient lifespan, age bands, new/returning flags |
 
-- Run 02_silver_encounters_enriched.ipynb to enrich each encounter with
-demographic fields from the Silver Patients table and write the result to
-kardia_silver.silver_encounters_enriched.
+---
 
+## Validation
 
-## Gold: Gender Breakdown & Monthly Volumes
-
-- Run 03_gold_patient_lifecycle.ipynb to track patient visit intervals, lifetime
-span, age-band engagement, and new/returning classification.
+Each Bronze table has a validation notebook to check row counts, nulls, uniqueness, and data quality. Results are logged to `kardia_validation.*_summary` tables.

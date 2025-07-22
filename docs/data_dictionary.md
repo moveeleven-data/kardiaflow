@@ -81,7 +81,7 @@
 | `provider_id`        | UUID            | Foreign key referencing `ProviderID` in the `providers.tsv` dataset                                          |
 | `timestamp`          | ISO 8601        | Date and time when the feedback was submitted                                   |
 | `visit_id`           | UUID            | Identifier of the related visit or encounter                                    |
-| `satisfaction_score` | Integer         | Rating of the experience, typically from 1 (lowest) to 5 (highest)              |
+| `satisfaction_score` | Integer         | Rating of the experience, from 1 (lowest) to 5 (highest)              |
 | `comments`           | String          | Free-form patient input about their experience                                  |
 | `source`             | String          | Origin of the feedback, such as `"in_clinic"`, `"web_portal"`, or `"mobile_app"` |
 | `tags`               | Array of String | List of category labels for the feedback (e.g., `"staff"`, `"parking"`)         |
