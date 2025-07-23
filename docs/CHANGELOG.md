@@ -2,10 +2,25 @@
 
 ## 2025-07-23
 
+Created `docs/qualiflow.md`, a formal specification for a new framework called
+QualiFlow. QF defines a verifiable trust layer for datasets by bundling
+metadata such as lineage, data quality scores, and privacy indicators into a structured
+Evidence Bundle (JSON), and surfacing it through standardized Proof Indicators (UI
+badges, trust scores, freshness labels).
+
+The specification outlines QF’s goals, architecture (Evidence Bundle + Proof Indicators),
+implementation phases, and metadata schema (e.g., `dq_score`, `fingerprint`, `masked_fields`).
+
+This marks the beginning of integrating PoD into KardiaFlow as a first-class trust communication layer.
+
+Refactory notebook directory. Each Medallion layer now has its own folder, with pipeline
+folders within each layer.
+
 TO-DO:
-- Remove display utils banners, go back to hard coding them.
+- Fix display utils banners, some are duplicated, and getting an error every time.
 - Investigate issue where bootstrap script isn't populating ADLS with folders/files.
-- Verify data quality to end-to-end.
+- Make feedback use copy into not auto loader
+- Verify data quality to end-to-end (accuracy, completeness, consistency, validity, uniqueness, and timeliness/integrity)
 
 ## 2025-07-22
 

@@ -14,13 +14,13 @@ The following diagram illustrates the end-to-end data flow across ingestion, tra
 
 ### Data Sources
 
-| Dataset            | Format  | Sample File        |
-|--------------------|---------|--------------------|
-| Patients           | CSV     | `patients.csv`     |
-| Encounters         | Avro    | `encounters.avro`  |
-| Claims             | Parquet | `claims.parquet`   |
-| Providers          | TSV     | `providers.tsv`    |
-| Feedback           | JSON    | `feedback.json`    |
+| Dataset            | Format  |
+|--------------------|---------|
+| Patients           | CSV     |
+| Encounters         | Avro    |
+| Claims             | Parquet |
+| Providers          | TSV     |
+| Feedback           | JSON    |
 
 ---
 
