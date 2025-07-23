@@ -15,6 +15,10 @@ def _base_metrics(df: DataFrame, pk_col: str) -> Dict[str, F.Column]:
         "null_pk": F.sum(F.when(F.col(pk_col).isNull(), 1).otherwise(0)).alias("null_pk")
     }
 
+def bool_sum(cond_col):
+    """Return SUM over a boolean condition as INT."""
+    return F.sum(F.when(cond_col, 1).otherwise(0))
+
 def validate_and_log(
     df: DataFrame,
     table_name: str,
