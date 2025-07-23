@@ -13,12 +13,14 @@ implementation phases, and metadata schema (e.g., `dq_score`, `fingerprint`, `ma
 
 This marks the beginning of integrating PoD into Kardiaflow as a first-class trust communication layer.
 
-Refactory notebook directory. Each Medallion layer now has its own folder, with pipeline
+Refactored notebook directory. Each Medallion layer now has its own folder, with pipeline
 folders within each layer.
+
+Bootstrap script now populates ADLS with folders/files for Providers & Feedback flow. Changed SAS script
+to generate SAS tokens with write privileges in order to allow this.
 
 TO-DO:
 - Fix display utils banners, some are duplicated, and getting an error every time.
-- Investigate issue where bootstrap script isn't populating ADLS with folders/files.
 - Make feedback use copy into not auto loader
 - Verify data quality to end-to-end (accuracy, completeness, consistency, validity, uniqueness, and timeliness/integrity)
 
