@@ -1,5 +1,12 @@
 # KardiaFlow Project — Changelog
 
+## 2025-07-23
+
+TO-DO:
+- Remove display utils banners, go back to hard coding them.
+- Investigate issue where bootstrap script isn't populating ADLS with folders/files.
+- Verify data quality to end-to-end.
+
 ## 2025-07-22
 
 **Major Refactor and Modularization**
@@ -19,6 +26,8 @@
   - Consistent use of audit columns and validation
   - Reduced noise using helper functions across all layers
 - **Moved all hardcoded values** out of `infra/gen_sas.sh` and `teardown.sh` into `.env`
+
+Verified all changes work as expected end-to-end; pipelines works fine, gold tables produce meaningful results.
 
 ## 2025-07-21
 
