@@ -33,10 +33,10 @@ Each ingestion notebook reads raw files, infers schema (or uses an explicit one)
 
 ## Silver Transformation
 
-| Dataset   | Logic     | Silver Table                      |
-|-----------|-----------|-----------------------------------|
-| Providers | SCD Type 1 | `kardia_silver.silver_providers`  |
-| Claims    | SCD Type 2 | `kardia_silver.silver_claims`     |
+| Dataset   | Logic      | Silver Table                      |
+|-----------|------------|-----------------------------------|
+| Providers | SCD Type 2 | `kardia_silver.silver_providers`  |
+| Claims    | SCD Type 1 | `kardia_silver.silver_claims`     |
 | Feedback  | Append     | `kardia_silver.silver_feedback`   |
 
 Join notebooks create enriched views:
