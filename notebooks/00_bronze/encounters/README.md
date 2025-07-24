@@ -32,14 +32,3 @@ This layer ingests raw patient and encounter records into Delta tables in the `k
 | `01_bronze_encounters_autoloader`| `bronze_encounters`               | Continuous stream |
 
 ---
-
-## Post-Ingestion Validation
-
-Each ingestion notebook is followed by a validation notebook that computes basic quality metrics and logs them to summary tables in `kardia_validation`.
-
-| Dataset    | Validation Table                            |
-|------------|----------------------------------------------|
-| Patients   | `kardia_validation.bronze_patients_summary`  |
-| Encounters | `kardia_validation.bronze_encounters_summary` |
-
----

@@ -41,14 +41,3 @@ This layer ingests raw files into Delta tables under the `kardia_bronze` schema 
 | `01_bronze_feedback_copy_into`   | `bronze_feedback`                 | JSONL from ADLS with field casting and projection |
 
 ---
-
-## Post-Ingestion Validation
-
-After each Bronze write, a matching `01_validate_bronze_<dataset>.ipynb` logs key quality metrics to the `kardia_validation.<table>_summary` tables.
-
-Example:
-```sql
-SELECT * FROM kardia_validation.bronze_claims_summary ORDER BY validation_run_ts DESC;
-```
-
----

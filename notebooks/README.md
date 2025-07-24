@@ -49,32 +49,6 @@ Auto Loader is used for structured formats like CSV, Parquet, and TSV where incr
 
 ---
 
-## Validation (Bronze Only)
-
-Validation is performed **immediately after Bronze ingestion**. Each Bronze notebook ends with a structured validation step to ensure data quality and readiness for Silver transformation.
-
-Validation includes:
-
-- Null checks on required fields  
-- Primary key uniqueness  
-- Row count comparison to previous loads  
-- Schema profiling (e.g. distinct counts, column types)  
-- Presence of audit columns (`_ingest_ts`, `_source_file`)
-
-### Output Tables
-
-Results are stored in Delta tables:
-
-| Dataset     | Validation Table                                  |
-|-------------|---------------------------------------------------|
-| Patients    | `kardia_validation.bronze_patients_summary`       |
-| Encounters  | `kardia_validation.bronze_encounters_summary`     |
-| Claims      | `kardia_validation.bronze_claims_summary`         |
-| Providers   | `kardia_validation.bronze_providers_summary`      |
-| Feedback    | `kardia_validation.bronze_feedback_summary`       |
-
----
-
 ## Silver Transformation
 
 Silver notebooks apply:
@@ -111,3 +85,17 @@ Gold notebooks generate business-level aggregations for analytics and dashboards
 | `gold_claim_anomalies`       | Approval rates, denials, high-cost procedures               |
 | `gold_provider_rolling_spend`| Daily spend and 7-day rolling KPIs for provider payments     |
 | `gold_feedback_metrics`      | Satisfaction tags, comment analysis, sentiment scoring       |
+
+---
+
+## Validation
+
+All data quality checks are handled by a single, lightweight test script: `99_smoke_checks.py`.
+It runs structured **smoke tests** across Bronze, Silver, and Gold layers with no external dependencies.
+
+- **Bronze:** Verifies row count > 0, primary key is non-null and unique, and optionally checks `_ingest_ts` freshness  
+- **Silver:** Asserts that required columns exist (contract tests)  
+- **Gold:** Ensures key columns like `patient_id` and `avg_score` are not null  
+- **Results:** All checks are logged with status, metric name, and value to a persistent Delta table (`kardia_validation.smoke_results`) for visibility, auditability, and dashboard integration  
+
+---

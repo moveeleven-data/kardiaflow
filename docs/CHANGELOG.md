@@ -2,8 +2,9 @@
 
 ## 2025-07-24
 
+Removed Qualiflow. Consolidated Bronze testing strategy to one single validation notebook.
+
 TO-DO:
-- Verify data quality to end-to-end (accuracy, completeness, consistency, validity, uniqueness, and timeliness/integrity)
 - Consider landing all raw files in ADLS for simplicity.
 
 ## 2025-07-23
