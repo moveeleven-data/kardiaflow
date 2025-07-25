@@ -22,47 +22,46 @@ The following diagram illustrates the end-to-end data flow, including ingestion,
 &nbsp;&nbsp;&nbsp;&nbsp;• *Clinical*: Patients, Encounters  
 &nbsp;&nbsp;&nbsp;&nbsp;• *Billing & Feedback*: Claims, Providers, Feedback
 
-**Flexible Ingestion Framework**  
+**Multi-Format Ingestion**  
 &nbsp;&nbsp;&nbsp;&nbsp;• Structured formats (CSV, Avro, Parquet, TSV) via Auto Loader  
 &nbsp;&nbsp;&nbsp;&nbsp;• Semi-structured JSONL via COPY INTO  
-&nbsp;&nbsp;&nbsp;&nbsp;• All Bronze tables include `_ingest_ts`, `_source_file`, and enable Delta Change Data Feed (CDF)  
+&nbsp;&nbsp;&nbsp;&nbsp;• All Bronze tables include `_ingest_ts`, `_source_file`, and enable Change Data Feed (CDF)  
 
 
-**Robust Silver-Layer Transformations**  
-&nbsp;&nbsp;&nbsp;&nbsp;• Deduplication, PHI masking**, SCD Type 1/2  
+**Privacy-Aware Transformations**  
+&nbsp;&nbsp;&nbsp;&nbsp;• Deduplication, PHI masking, SCD Type 1/2  
 &nbsp;&nbsp;&nbsp;&nbsp;• Supports streaming and batch upserts  
-&nbsp;&nbsp;&nbsp;&nbsp;• Stream-static joins yield enriched Silver views  
 
 
 **Business-Ready Gold KPIs**  
 &nbsp;&nbsp;&nbsp;&nbsp;• Lifecycle metrics, spend trends, claim anomalies, feedback sentiment  
-&nbsp;&nbsp;&nbsp;&nbsp;• Outputs structured fact tables for analytics  
+&nbsp;&nbsp;&nbsp;&nbsp;• Materializes curated tables for analytics  
 
 
 **Automated Data Validation**  
 &nbsp;&nbsp;&nbsp;&nbsp;• `99_smoke_checks.py` tests row counts, nulls, duplicates, and schema contracts  
-&nbsp;&nbsp;&nbsp;&nbsp;• Logs results to `kardia_validation.smoke_results` (Delta)  
+&nbsp;&nbsp;&nbsp;&nbsp;• Logs results to Delta for auditing and observability  
 
 
 **Modular Notebook Design**  
 &nbsp;&nbsp;&nbsp;&nbsp;• One notebook per dataset and medallion layer  
-&nbsp;&nbsp;&nbsp;&nbsp;• Clear separation: Raw → Bronze → Silver → Gold  
+&nbsp;&nbsp;&nbsp;&nbsp;• Clean flow: Raw → Bronze → Silver → Gold  
 
 
 **Reproducible Infrastructure-as-Code**  
-&nbsp;&nbsp;&nbsp;&nbsp;• Deploys all Azure services via Bicep + Azure CLI  
-&nbsp;&nbsp;&nbsp;&nbsp;• Secrets managed via Databricks CLI v0  
-&nbsp;&nbsp;&nbsp;&nbsp;• Safe teardown with `infra/teardown.sh`
+&nbsp;&nbsp;&nbsp;&nbsp;• Declarative Bicep deployments via Azure CLI  
+&nbsp;&nbsp;&nbsp;&nbsp;• Secrets managed via Databricks CLI  
+&nbsp;&nbsp;&nbsp;&nbsp;• One-command teardown: `infra/teardown.sh`
 
 
 
 ## Setting Up the Infrastructure
 
-To deploy the Kardiaflow environment in Azure, follow the step-by-step instructions in:
+Deploy the full Azure environment via:
 
 [`infra/README.md`](infra/README.md) — *Infrastructure Deployment Guide*
 
-> ⚠️ All setup commands must be run from the **project root**.
+> ⚠️ Commands must be run from the **project root**.
 
 
 
@@ -73,14 +72,7 @@ To deploy the Kardiaflow environment in Azure, follow the step-by-step instructi
 | Cloud        | Azure                         |
 | Storage      | ADLS Gen2                     |
 | Compute      | Azure Databricks              |
-| ETL Engine   | Apache Spark (Structured)     |
-| Metadata     | Delta Lake + Change Data Feed |
+| ETL Engine   | Spark Structured Streaming     |
+| Metadata     | Delta Lake w/ CDF |
 | Infra-as-Code| Bicep + Azure CLI             |
-| Validation   | PySpark + Delta               |
-
-
-
-## Security & Compliance
-- All Delta tables and raw files are stored in Databricks File System (DBFS), which is encrypted at rest.
-- All traffic between the cluster and storage is secured via TLS-encrypted HTTPS.
-- No real PHI is used — all data is synthetic and generated for simulation purposes only.
+| Validation   | PySpark → Delta               |
