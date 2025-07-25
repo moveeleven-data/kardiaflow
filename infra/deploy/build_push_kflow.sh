@@ -18,7 +18,12 @@ source "$ENV_FILE"
 
 # ───────────── 1. Resolve kflow version ─────────────
 KFLOW_VER="$(python - <<'PY'
-import sys, tomllib, pathlib
+import sys, pathlib
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
 with open("pyproject.toml", "rb") as f:
     print(tomllib.load(f)["project"]["version"])
 PY

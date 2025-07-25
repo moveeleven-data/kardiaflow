@@ -1,6 +1,6 @@
 [project]
 name = "kflow"
-version = "0.2.3" # bump before pushing a new wheel
+version = "0.2.4" # bump before pushing a new wheel
 description = "Shared utilities for KardiaFlow ETL pipelines"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,3 +13,11 @@ dependencies = [
 # tomli is only needed when Python < 3.11
 requires = ["setuptools>=68", "wheel", "build", "tomli; python_version < '3.11'"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kflow*"]
+exclude = [
+  "archive*", "data*", "infra*", "logs*", "notebooks*",
+  "pipelines*", "metastore_db*", "tests*"
+]

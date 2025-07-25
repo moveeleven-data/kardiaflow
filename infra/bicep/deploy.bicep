@@ -17,7 +17,7 @@ param adlsAccountName string = 'kardiaadlsdemo'
 @description('Raw container name')
 param adlsRawContainerName string = 'raw'
 
-// ────────────── ADLS Gen2 ──────────────
+// ────────────── ADLS Gen2 ──────────────
 resource adls 'Microsoft.Storage/storageAccounts@2024-01-01' = {
   name: adlsAccountName
   location: location
