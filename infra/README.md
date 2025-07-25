@@ -41,7 +41,7 @@ az group create --name "$RG" --location eastus
 ```bash
 az deployment group create \
   --resource-group "$RG" \
-  --template-file infra/deploy.bicep \
+  --template-file infra/bicep/deploy.bicep
   --name "$DEPLOY"
 ```
 
@@ -60,7 +60,7 @@ az deployment group create \
 **6. Run gen_sas.sh to auto-generate and store the ADLS SAS token in Databricks**
 
 ```bash
-infra/gen_sas.sh
+infra/deploy/gen_sas.sh
 ```
 
 ---
@@ -70,7 +70,7 @@ infra/gen_sas.sh
 This will build the wheel using pyproject.toml and upload it to /Workspace/Shared/libs/ in the Databricks Workspace.
 
 ```bash
-infra/build_push_kflow.sh
+infra/deploy/build_push_kflow.sh
 ```
 
 ---
@@ -103,5 +103,5 @@ To preview what the deployment will do without actually creating resources:
 ```bash
 az deployment group what-if \
   --resource-group kardia-rg-dev \
-  --template-file automation/infra/deploy.bicep
+  --template-file infra/bicep/deploy.bicep
 ```
