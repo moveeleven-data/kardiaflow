@@ -87,23 +87,65 @@ infra/deploy/gen_sas.sh
 
 ---
 
-**7. Build and push the kflow wheel to the workspace**
+**7. Upload the wheel to Workspace Files (stable alias path):**
 
-This will build the wheel using pyproject.toml and upload it to /Workspace/Shared/libs/ in the Databricks Workspace.
+This builds the wheel from your local pyproject.toml and uploads it to a stable workspace location (/Workspace/Shared/libs/kflow-latest.whl), which will never change across versions.
 
 ```bash
-infra/deploy/build_push_kflow.sh
+python -m pip install --upgrade build
+python -m build
+
+# Create the folder once; harmless if it already exists
+databricks workspace mkdirs "/Shared/libs"
+
+# Overwrite the same alias path each time
+databricks workspace import --format AUTO \
+  --file dist/*.whl \
+  "/Shared/libs/kflow-latest.whl" --overwrite
 ```
 
----
+You now have a canonical install path:
 
-**8. Attach the wheel to your Databricks cluster**
-
-(Compute → Cluster → Libraries → Install → /Shared/libs/kflow-0.1.0-py3-none-any.whl)
+> /Workspace/Shared/libs/kflow-latest.whl
 
 ---
 
-**9. Tear down all provisioned resources safely**
+**8. Attach the wheel to each task (one-time only)**
+
+Add this to each job task definition:
+
+```bash
+"libraries": [
+  { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+]
+```
+
+> 💡 This is required because shared job clusters ignore cluster-level libraries — task-level libraries are the only reliable method unless you're using Unity Catalog or workspace init scripts (which are more complex to manage).
+
+**9. You can reset the job with the following command:**
+
+```bash
+databricks jobs reset --json @pipelines/reset_kardiaflow_full_run_batch.json
+```
+
+NOTE:
+
+When you cut a new wheel version, just run:
+
+```bash
+python -m build
+databricks workspace import --format AUTO \
+  --file dist/*.whl \
+  "/Shared/libs/kflow-latest.whl" --overwrite
+```
+- No JSON edits
+- No task edits
+- No cluster edits
+- No init script required
+
+---
+
+**10. Tear down all provisioned resources safely**
 
 ```bash
 ./infra/deploy/teardown.sh

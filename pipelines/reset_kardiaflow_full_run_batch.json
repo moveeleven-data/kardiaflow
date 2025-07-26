@@ -1,0 +1,399 @@
+{
+  "job_id": 1072906048300152,
+  "new_settings": {
+    "name": "Kardiaflow Full Run Batch",
+    "description": "This job executes the full KardiaFlow pipeline in mode=batch, processing all available test data. It covers ingestion, transformation, enrichment, aggregation, and validation layers, with streaming tasks configured to run as bounded batch-style flows.",
+    "email_notifications": {
+      "no_alert_for_skipped_runs": false
+    },
+    "webhook_notifications": {},
+    "timeout_seconds": 0,
+    "max_concurrent_runs": 1,
+    "tasks": [
+      {
+        "task_key": "Bronze_Ingest_Claims",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/claims/bronze_claims_autoloader",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Bronze_Ingest_Encounters",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/encounters/bronze_encounters_autoloader",
+          "base_parameters": {
+            "mode": "batch"
+          },
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Bronze_Ingest_Feedback",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/claims/bronze_feedback_copy_into",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Bronze_Ingest_Providers",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/claims/bronze_providers_autoloader",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Ingest_Bronze_Patients",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/encounters/bronze_patients_autoloader",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Transform_Claims",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Ingest_Claims"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/silver_claims_scd1_batch",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Transform_Encounters",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Ingest_Encounters"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/encounters/silver_encounters_scd1",
+          "base_parameters": {
+            "mode": "batch"
+          },
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Transform_Feedback",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Ingest_Feedback"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/silver_feedback_batch_append",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Transform_Patients",
+        "depends_on": [
+          {
+            "task_key": "Ingest_Bronze_Patients"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/encounters/silver_patients_scd1_batch",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Enriched_Encounters",
+        "depends_on": [
+          {
+            "task_key": "Silver_Transform_Patients"
+          },
+          {
+            "task_key": "Silver_Transform_Encounters"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/encounters/z_join_silver_encounters_enriched",
+          "base_parameters": {
+            "mode": "batch"
+          },
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Gold_Patient_Lifecycle",
+        "depends_on": [
+          {
+            "task_key": "Silver_Enriched_Encounters"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/encounters/gold_patient_lifecycle",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Transform_Providers",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Ingest_Providers"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/silver_providers_scd2_batch",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Enriched_Claims",
+        "depends_on": [
+          {
+            "task_key": "Silver_Transform_Claims"
+          },
+          {
+            "task_key": "Silver_Transform_Providers"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/z_join_silver_claims_enriched",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Gold_Claim_Anomalies",
+        "depends_on": [
+          {
+            "task_key": "Silver_Enriched_Claims"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_claim_anomalies",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Gold_Provider_Rolling_Spend",
+        "depends_on": [
+          {
+            "task_key": "Silver_Enriched_Claims"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_provider_rolling_spend",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Enriched_Feedback",
+        "depends_on": [
+          {
+            "task_key": "Silver_Transform_Feedback"
+          },
+          {
+            "task_key": "Silver_Transform_Providers"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/z_join_silver_feedback_enriched",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Gold_Feedback_Metrics",
+        "depends_on": [
+          {
+            "task_key": "Silver_Enriched_Feedback"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_feedback_metrics",
+          "source": "WORKSPACE"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Kardia_Smoke_Tests",
+        "depends_on": [
+          {
+            "task_key": "Gold_Claim_Anomalies"
+          },
+          {
+            "task_key": "Gold_Feedback_Metrics"
+          },
+          {
+            "task_key": "Gold_Provider_Rolling_Spend"
+          },
+          {
+            "task_key": "Gold_Patient_Lifecycle"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "spark_python_task": {
+          "python_file": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/04_tests/kardia_smoke_tests.py"
+        },
+        "libraries": [
+        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
+        ],
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      }
+    ],
+    "job_clusters": [
+      {
+        "job_cluster_key": "Kardia_Jobs_Cluster",
+        "new_cluster": {
+          "spark_version": "13.3.x-scala2.12",
+          "node_type_id": "Standard_D4s_v3",
+          "spark_env_vars": {
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+          },
+          "data_security_mode": "DATA_SECURITY_MODE_DEDICATED",
+          "runtime_engine": "STANDARD",
+          "kind": "CLASSIC_PREVIEW",
+          "is_single_node": true
+        }
+      }
+    ],
+    "queue": {
+      "enabled": true
+    },
+    "performance_target": "STANDARD",
+    "run_as": {
+      "user_name": "matthew.databrickslab2@outlook.com"
+    }
+  }
+}
