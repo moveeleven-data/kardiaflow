@@ -17,9 +17,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/claims/bronze_claims_autoloader",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -35,9 +32,6 @@
           },
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -50,9 +44,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/claims/bronze_feedback_copy_into",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -65,9 +56,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/claims/bronze_providers_autoloader",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -80,9 +68,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/00_bronze/encounters/bronze_patients_autoloader",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -100,9 +85,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/silver_claims_scd1_batch",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -123,9 +105,6 @@
           },
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -143,9 +122,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/silver_feedback_batch_append",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -163,9 +139,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/encounters/silver_patients_scd1_batch",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -189,9 +162,6 @@
           },
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -209,9 +179,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/encounters/gold_patient_lifecycle",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -229,9 +196,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/silver_providers_scd2_batch",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -252,9 +216,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/z_join_silver_claims_enriched",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -272,9 +233,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_claim_anomalies",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -292,9 +250,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_provider_rolling_spend",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -315,9 +270,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/02_silver/claims/z_join_silver_feedback_enriched",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -335,9 +287,6 @@
           "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_feedback_metrics",
           "source": "WORKSPACE"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -363,9 +312,6 @@
         "spark_python_task": {
           "python_file": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/04_tests/kardia_smoke_tests.py"
         },
-        "libraries": [
-        { "whl": "/Workspace/Shared/libs/kflow-latest.whl" }
-        ],
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
         "email_notifications": {},
@@ -384,7 +330,10 @@
           "data_security_mode": "DATA_SECURITY_MODE_DEDICATED",
           "runtime_engine": "STANDARD",
           "kind": "CLASSIC_PREVIEW",
-          "is_single_node": true
+          "is_single_node": true,
+          "init_scripts": [
+            { "workspace": { "destination": "/Shared/init/install_kflow.sh" } }
+          ]
         }
       }
     ],
