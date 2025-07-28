@@ -53,15 +53,30 @@ The following diagram illustrates the end-to-end data flow, including ingestion,
 &nbsp;&nbsp;&nbsp;&nbsp;• Secrets managed via Databricks CLI  
 &nbsp;&nbsp;&nbsp;&nbsp;• One-command teardown: `infra/teardown.sh`
 
+---
 
+## 📽️ Demo: DAG + Dashboard Walkthrough
+
+Want to see Kardiaflow in action? This end-to-end video walkthrough shows how data flows through each medallion layer and into dashboards powered by Gold tables.
+
+🎬 **Watch on YouTube:**  
+[![Watch the demo](https://img.youtube.com/vi/VBNmNdyTt7U/hqdefault.jpg)](https://youtu.be/GTbI-E3qnAM)
+
+> **In this demo:**  
+> • Lakeflow DAG execution (batch mode)  
+> • Gold table refresh and validation  
+> • Dashboard exploration (KPI views)  
+> • QA and business metrics tabs  
+>  
+> *Streaming mode is supported but not shown here.*
+
+---
 
 ## Setting Up the Infrastructure
 
 Deploy the full Azure environment via:
 
-[`infra/README.md`](infra/README.md) — *Infrastructure Deployment Guide*
-
-> ⚠️ Commands must be run from the **project root**.
+🔗 [`infra/README.md`](infra/README.md) — *Infrastructure Deployment Guide*
 
 ---
 

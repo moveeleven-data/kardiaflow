@@ -131,4 +131,13 @@ htmlcov/
 dist/
 build/
 .idea/workspace.xml
-*.whl
+*.whldocs
+
+
+# -----------------------------
+# Other Assets
+# -----------------------------
+docs/assets/kardiaflow_demo.mp4
+docs/assets/kardia_logo_transparent.png
+docs/assets/kardia_logo_transparent_2.png
+docs/assets/youtube_thumbnail.png

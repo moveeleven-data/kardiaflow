@@ -9,10 +9,14 @@ and the Azure CLI.
 
 KardiaFlow can be deployed in two modes depending on your Databricks workspace tier:
 
-| Mode      | Bicep File                | Workspace Tier | Notes                                  |
-|-----------|---------------------------|----------------|----------------------------------------|
+| Mode      | Bicep File                | Workspace Tier | Notes                                   |
+|-----------|---------------------------|----------------|-----------------------------------------|
 | Standard  | `deploy_standard.bicep`   | Databricks Standard SKU | Minimal cost; no Unity Catalog features |
-| Premium   | `deploy_premium.bicep`    | Databricks Premium SKU  | Enables Unity Catalog, dashboards, etc. |
+| Premium   | `deploy_premium.bicep`    | Databricks Premium SKU  | Enables dashboards                |
+
+> 💡 *Note:*  
+> Kardiaflow does **not** use Unity Catalog or Delta Live Tables (DLT).  
+> The pipeline architecture relies solely on Delta Lake, Auto Loader, and standard Databricks Jobs to ensure portability and minimal costs.
 
 ---
 
