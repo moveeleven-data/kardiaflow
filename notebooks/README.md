@@ -82,13 +82,13 @@ Gold notebooks generate business-level aggregations for analytics and dashboards
 
 ## Validation
 
-All data quality checks are handled by a single, lightweight test script: `99_smoke_checks.py`.
-It runs structured smoke tests across Bronze, Silver, and Gold layers with no external dependencies.
+All data quality checks are handled by a test suite centered on `99_run_smoke.py`.  
+It performs smoke tests across the Bronze, Silver, and Gold layers with no external dependencies beyond Spark and Delta Lake.
 
-- **Bronze:** Verifies row count > 0, primary key is non-null and unique, and optionally checks `_ingest_ts` freshness  
-- **Silver:** Asserts that required columns exist (contract tests)  
-- **Gold:** Ensures key columns like `patient_id` and `avg_score` are not null  
-- **Results:** All checks are logged with status, metric name, and value to a persistent Delta table (`kardia_validation.smoke_results`)
+- **Bronze:** Verifies row count > 0, primary key is non-null and unique, and optionally checks for `_ingest_ts` presence  
+- **Silver:** Confirms that all required columns are present in each table (contract-based schema checks)  
+- **Gold:** Validates that key columns such as `patient_id` and `avg_score` do not contain null values  
+- **Results:** All test outcomes are recorded in a persistent Delta table (`kardia_validation.smoke_results`) with timestamp, table, metric, value, status, and message
 
 ---
 
