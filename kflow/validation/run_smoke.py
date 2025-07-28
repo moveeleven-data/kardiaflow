@@ -19,7 +19,8 @@ subprocess.check_call([
     "kflow"
 ])
 
-from _00_config import (
+# Now import your smoke‑test modules from inside the kflow.tests package
+from .config import (
     RESULTS_TABLE,
     BRONZE,
     SILVER_CONTRACTS,
@@ -28,10 +29,10 @@ from _00_config import (
     FAIL,
     ERROR
 )
-from _01_logging_utils import LOGS, log
-from _10_bronze_checks import check_bronze
-from _11_silver_checks import check_silver_contract
-from _12_gold_checks import check_gold_not_null
+from .logging_utils   import LOGS, log
+from .bronze_checks   import check_bronze
+from .silver_checks   import check_silver_contract
+from .gold_checks     import check_gold_not_null
 
 # Create or reuse the Spark session
 spark = SparkSession.builder.getOrCreate()

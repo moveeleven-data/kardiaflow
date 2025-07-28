@@ -73,6 +73,8 @@ url=$(az databricks workspace show -g "$RG" -n "$WORKSPACE" --query "workspaceUr
 databricks configure --profile "$PROFILE" --host "https://$url" --token <<< "${DATABRICKS_PAT}"$'\n'
 ```
 
+If the CLI reports missing credentials, re-run `source infra/.env` to ensure environment variables are available.
+
 ---
 
 **7. Run gen_sas.sh to auto-generate and store the ADLS SAS token in Databricks**

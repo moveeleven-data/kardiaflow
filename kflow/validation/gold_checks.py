@@ -4,8 +4,8 @@
 
 from pyspark.sql import SparkSession, functions as F
 
-from _00_config import PASS, FAIL
-from _01_logging_utils import log
+from .config import PASS, FAIL
+from .logging_utils import log
 
 # Create or reuse the Spark session
 spark = SparkSession.builder.getOrCreate()

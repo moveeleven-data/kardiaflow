@@ -3,7 +3,7 @@
 # - LOGS: in-memory list of all test results
 # - log(): appends results and prints a summary line
 
-from _00_config import RUN_TS, PASS
+from .config import RUN_TS, PASS
 
 # A list to collect each test result as a dict.
 # Populated by log(), then written out in run_smoke.py.

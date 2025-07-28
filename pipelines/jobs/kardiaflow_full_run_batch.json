@@ -307,8 +307,9 @@
         }
       ],
       "run_if": "ALL_SUCCESS",
-      "spark_python_task": {
-        "python_file": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/04_tests/kardia_smoke_tests.py"
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/04_tests/run_validation",
+        "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
       "timeout_seconds": 0,
