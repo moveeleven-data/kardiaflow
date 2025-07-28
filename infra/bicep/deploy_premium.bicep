@@ -1,4 +1,4 @@
-// KardiaFlow • minimal ADLS+ Databricks (v1.6·2025‑07‑25)
+// KardiaFlow • Premium ADLS+ Databricks (v1.6·2025‑07‑25)
 // Path: infra/bicep/deploy.bicep
 targetScope = 'resourceGroup'
 

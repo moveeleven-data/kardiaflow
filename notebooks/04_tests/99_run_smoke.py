@@ -60,7 +60,6 @@ def run_all_smoke_tests() -> int:
     Returns:
         int: 0 if all tests PASS; 1 if any FAIL or ERROR.
     """
-    # Prepare the results table
     ensure_results_table()
 
     # --- Bronze tests ---
@@ -68,45 +67,61 @@ def run_all_smoke_tests() -> int:
         try:
             check_bronze(table_name, pk)
         except Exception:
-            error_msg = traceback.format_exc()
-            log("BRONZE", table_name, "exception", None, ERROR, error_msg)
+            error_message = traceback.format_exc()
+            log(
+                layer="BRONZE",
+                table=table_name,
+                metric="exception",
+                value=None,
+                status=ERROR,
+                message=error_message
+            )
 
     # --- Silver tests ---
     for table_name, expected_cols in SILVER_CONTRACTS.items():
         try:
             check_silver_contract(table_name, expected_cols)
         except Exception:
-            error_msg = traceback.format_exc()
-            log("SILVER", table_name, "exception", None, ERROR, error_msg)
+            error_message = traceback.format_exc()
+            log(
+                layer="SILVER",
+                table=table_name,
+                metric="exception",
+                value=None,
+                status=ERROR,
+                message=error_message
+            )
 
     # --- Gold tests ---
     for table_name, cols in GOLD_NOT_NULL.items():
         try:
             check_gold_not_null(table_name, cols)
         except Exception:
-            error_msg = traceback.format_exc()
-            log("GOLD", table_name, "exception", None, ERROR, error_msg)
+            error_message = traceback.format_exc()
+            log(
+                layer="GOLD",
+                table=table_name,
+                metric="exception",
+                value=None,
+                status=ERROR,
+                message=error_message
+            )
 
     # --- Persist results ---
     results_df = spark.createDataFrame(LOGS)
     results_df.write.mode("append").saveAsTable(RESULTS_TABLE)
 
-    # --- Summarize and return exit code ---
-    failure_count = results_df.filter(F.col("status").isin(FAIL, ERROR)).count()
-    if failure_count > 0:
-        summary = "FAIL"
-        exit_code = 1
-    else:
-        summary = "PASS"
-        exit_code = 0
-
+    # --- Summarize and exit ---
+    failures = results_df.filter(F.col("status").isin(FAIL, ERROR)).count()
+    summary = "FAIL" if failures > 0 else "PASS"
     print(f"\n===== SMOKE TEST SUMMARY: {summary} =====")
-    return exit_code
+
+    return 1 if failures > 0 else 0
 
 if __name__ == "__main__":
     try:
-        code = run_all_smoke_tests()
-        if code != 0:
+        exit_code = run_all_smoke_tests()
+        if exit_code != 0:
             raise Exception("Smoke tests failed")
     except Exception:
         traceback.print_exc()
