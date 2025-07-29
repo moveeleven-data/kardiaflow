@@ -1,4 +1,4 @@
-# 00_config.py
+# config.py
 # Configuration for KardiaFlow smoke tests:
 # - Defines test status constants and run timestamp
 # - Declares table-level test contracts for Bronze, Silver, and Gold layers
@@ -8,8 +8,8 @@ from datetime import datetime
 # -------------------------------------------------------------------------
 # Status constants for test outcomes
 # -------------------------------------------------------------------------
-PASS = "PASS"
-FAIL = "FAIL"
+PASS  = "PASS"
+FAIL  = "FAIL"
 ERROR = "ERROR"
 
 # -------------------------------------------------------------------------
@@ -51,7 +51,7 @@ SILVER_CONTRACTS = {
 # Gold-layer test contract: columns that must not contain nulls
 # -------------------------------------------------------------------------
 GOLD_NOT_NULL = {
-    "kardia_gold.gold_patient_lifecycle": ["patient_id"],
+    "kardia_gold.gold_patient_lifecycle":     ["patient_id"],
     "kardia_gold.gold_feedback_satisfaction": ["provider_id", "avg_score"],
 }
 

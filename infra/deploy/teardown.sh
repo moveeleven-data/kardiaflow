@@ -130,4 +130,4 @@ if rg_exists "$RG"; then
   fi
 fi
 
-echo "Teardown complete. (NetworkWatcherRG is intentionally left intact.)"
+echo "Teardown complete. (NetworkWatcherRG is left intact.)"

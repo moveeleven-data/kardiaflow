@@ -55,12 +55,14 @@ The following diagram illustrates the end-to-end data flow, including ingestion,
 
 ---
 
-## 📽️ Demo: DAG + Dashboard Walkthrough
+## 🎥 Video Walkthrough: See Kardiaflow in Action
 
 Want to see Kardiaflow in action? This end-to-end video walkthrough shows how data flows through each medallion layer and into dashboards powered by Gold tables.
 
-🎬 **Watch on YouTube:**  
-[![Watch the demo](https://img.youtube.com/vi/VBNmNdyTt7U/hqdefault.jpg)](https://youtu.be/GTbI-E3qnAM)
+📺 **Click to Watch on YouTube:**  
+<a href="https://youtu.be/GTbI-E3qnAM" target="_blank">
+  <img src="https://img.youtube.com/vi/VBNmNdyTt7U/hqdefault.jpg" alt="Watch the demo on YouTube">
+</a>
 
 > **In this demo:**  
 > • Lakeflow DAG execution (batch mode)  

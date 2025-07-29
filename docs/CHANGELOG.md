@@ -1,5 +1,14 @@
 # Kardiaflow Project — Changelog
 
+## 2025-07-28
+
+Refactored and documented kflow.
+
+## 2025-07-27
+
+Completed end-to-end DAG and Dashboard walkthrough showing how data flows through
+each medallion layer and into dashboards.
+
 ## 2025-07-26
 
 Worked on runtime dependency bootstrapping for ephemeral Databricks job clusters.

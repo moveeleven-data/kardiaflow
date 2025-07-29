@@ -1,4 +1,4 @@
-# 99_run_smoke.py
+# run_smoke.py
 # Orchestrator for KardiaFlow smoke tests:
 # - Installs the kflow package from DBFS
 # - Runs all Bronze, Silver, and Gold checks
@@ -11,15 +11,19 @@ import traceback
 from pyspark.sql import SparkSession, functions as F
 
 # Install the kflow package from shared DBFS libraries
-subprocess.check_call([
-    sys.executable,
-    "-m", "pip", "install",
-    "--no-deps", "--no-index",
-    "--find-links=/dbfs/Shared/libs",
-    "kflow"
-])
+subprocess.check_call(
+    [
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "--no-index",
+        "--find-links=/dbfs/Shared/libs",
+        "kflow"
+    ]
+)
 
-# Now import your smoke‑test modules from inside the kflow.tests package
 from .config import (
     RESULTS_TABLE,
     BRONZE,
@@ -29,20 +33,21 @@ from .config import (
     FAIL,
     ERROR
 )
-from .logging_utils   import LOGS, log
-from .bronze_checks   import check_bronze
-from .silver_checks   import check_silver_contract
-from .gold_checks     import check_gold_not_null
+from .logging_utils import LOGS, log
+from .bronze_checks import check_bronze
+from .silver_checks import check_silver_contract
+from .gold_checks   import check_gold_not_null
 
-# Create or reuse the Spark session
+# Create the Spark session. (needed to run via Lakeflow Jobs)
 spark = SparkSession.builder.getOrCreate()
 
 def ensure_results_table():
     """
-    Create the validation database and results table if they do not already exist.
+    Ensure the validation database and results table exist.
     """
     spark.sql("CREATE DATABASE IF NOT EXISTS kardia_validation")
-    spark.sql(f"""
+    spark.sql(
+        f"""
         CREATE TABLE IF NOT EXISTS {RESULTS_TABLE} (
             run_ts     TIMESTAMP,
             layer      STRING,
@@ -52,18 +57,18 @@ def ensure_results_table():
             status     STRING,
             message    STRING
         ) USING DELTA
-    """)
+        """
+    )
 
 def run_all_smoke_tests() -> int:
     """
-    Execute all Bronze, Silver, and Gold smoke tests and persist results.
+    Execute all Bronze, Silver, and Gold validations and persist results.
 
-    Returns:
-        int: 0 if all tests PASS; 1 if any FAIL or ERROR.
+    Return 0 if all tests pass, 1 if any fail or error.
     """
     ensure_results_table()
 
-    # --- Bronze tests ---
+    # Run Bronze-layer checks - Each table is paired with its primary key
     for table_name, pk in BRONZE:
         try:
             check_bronze(table_name, pk)
@@ -78,7 +83,7 @@ def run_all_smoke_tests() -> int:
                 message=error_message
             )
 
-    # --- Silver tests ---
+    # Run Silver-layer checks - Each table is mapped to a list of required columns
     for table_name, expected_cols in SILVER_CONTRACTS.items():
         try:
             check_silver_contract(table_name, expected_cols)
@@ -93,7 +98,8 @@ def run_all_smoke_tests() -> int:
                 message=error_message
             )
 
-    # --- Gold tests ---
+    # Run Gold-layer not-null validations
+    # Each table is paired with columns that must not contain null values
     for table_name, cols in GOLD_NOT_NULL.items():
         try:
             check_gold_not_null(table_name, cols)
@@ -108,17 +114,21 @@ def run_all_smoke_tests() -> int:
                 message=error_message
             )
 
-    # --- Persist results ---
+    # Write all collected logs to the results table
     results_df = spark.createDataFrame(LOGS)
     results_df.write.mode("append").saveAsTable(RESULTS_TABLE)
 
-    # --- Summarize and exit ---
+    # Summarize overall test results based on status counts
     failures = results_df.filter(F.col("status").isin(FAIL, ERROR)).count()
     summary = "FAIL" if failures > 0 else "PASS"
-    print(f"\n===== SMOKE TEST SUMMARY: {summary} =====")
+    print(f"\nSMOKE TEST SUMMARY: {summary}")
 
-    return 1 if failures > 0 else 0
+    if failures == 0:
+        return 0
+    else:
+        return 1
 
+# When run directly, execute all tests - useful for CI/CD
 if __name__ == "__main__":
     try:
         exit_code = run_all_smoke_tests()

@@ -103,7 +103,7 @@ databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
 
 > 💡 **Why DBFS?**  
 > It’s the simplest way to make local Python packages available to notebooks using `%pip install --no-index --find-links=...`.  
-> Compatible with cost-efficient DBR 13.3 LTS and avoids issues with workspace paths or job-level libraries.
+> Compatible with DBR 13.3 LTS and avoids issues with workspace paths or job-level libraries.
 
 ---
 

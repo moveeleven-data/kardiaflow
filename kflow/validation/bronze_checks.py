@@ -1,9 +1,5 @@
-# 10_bronze_checks.py
-# Bronze-layer validation for KardiaFlow smoke tests:
-# - Ensures row count > 0
-# - Verifies no duplicate PKs (with optional downstream suppression)
-# - Checks for null PKs
-# - Validates presence of _ingest_ts if column exists
+# bronze_checks.py
+# Validates Bronze tables for row count and PK uniqueness/nulls
 
 import traceback
 
@@ -12,36 +8,40 @@ from pyspark.sql import SparkSession, functions as F
 from .config import PASS, FAIL, SUPPRESS
 from .logging_utils import log
 
-# Create or reuse the Spark session
+# Create the Spark session. (needed to run via Lakeflow Jobs)
 spark = SparkSession.builder.getOrCreate()
 
 def check_bronze(table, pk):
     """
     Validate a Bronze table according to the following rules:
     1. row_count > 0
-    2. no duplicate primary keys (with suppression if configured)
+    2. no duplicate primary keys
     3. no null primary keys
-    4. valid _ingest_ts when present
+    4. valid _ingest_ts
     """
     layer = "BRONZE"
     df = spark.table(table)
-
-    # Compute metrics
     total_rows = df.count()
-    duplicate_count = (
-        df.groupBy(pk)
-          .count()
-          .filter("count > 1")
-          .count()
-    )
+
+    # Count how many times each primary key value appears
+    pk_counts = df.groupBy(pk).count()
+
+    # Filter to keep only keys that appear more than once
+    duplicated_keys = pk_counts.filter(F.col("count") > 1)
+
+    # Count how many unique primary key values are duplicated
+    duplicate_count = duplicated_keys.count()
+
+    # Count how many records have a null primary key
     null_count = df.filter(F.col(pk).isNull()).count()
 
-    # 1) Row count check
+    # 1. Row count check
     if total_rows > 0:
         row_status = PASS
     else:
         row_status = FAIL
 
+    # Log result in memory for later write to `kardia_validation.smoke_results`
     log(
         layer,
         table,
@@ -57,21 +57,33 @@ def check_bronze(table, pk):
     else:
         status = PASS
 
+    # Prepare a default log message for the duplicate check
     message = None
 
+    # If there are duplicate PKs AND the table is listed in the SUPPRESS registry,
+    # validate whether those duplicates are resolved downstream.
     if duplicate_count > 0 and table in SUPPRESS:
+
+        # Get the downstream table name and its PK from the SUPPRESS dictionary
         downstream_table, downstream_pk = SUPPRESS[table]
+
         try:
-            downstream_duplicates = (
-                spark.table(downstream_table)
-                     .groupBy(downstream_pk)
-                     .count()
-                     .filter("count > 1")
-                     .count()
-            )
+            ds_df = spark.table(downstream_table)
+
+            # Count how many times each downstream PK appears
+            ds_pk_counts = ds_df.groupBy(downstream_pk).count()
+
+            # Filter to keep only downstream PKs that appear more than once
+            duplicated_ds_keys = ds_pk_counts.filter(F.col("count") > 1)
+
+            # Count how many unique PKs are duplicated downstream
+            downstream_duplicates = duplicated_ds_keys.count()
+
+            # If no duplicates remain downstream, override FAIL status with PASS
             if downstream_duplicates == 0:
                 status = PASS
                 message = "duplicates suppressed downstream"
+
         except Exception:
             message = f"Suppression check failed: {traceback.format_exc()}"
 
@@ -84,7 +96,7 @@ def check_bronze(table, pk):
         message
     )
 
-    # 3) Null PK check
+    # 3. Null PK check
     if null_count == 0:
         null_status = PASS
     else:
@@ -98,7 +110,7 @@ def check_bronze(table, pk):
         null_status
     )
 
-    # 4) Ingest timestamp check
+    # 4. Ingest timestamp check
     if "_ingest_ts" in df.columns:
         max_ts = df.agg(F.max("_ingest_ts")).first()[0]
 

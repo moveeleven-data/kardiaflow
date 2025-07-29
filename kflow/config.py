@@ -1,65 +1,68 @@
 # src/kflow/config.py
-from typing import Final
+# Core configuration module for Kardiaflow pipeline
+# Defines constants for database names, change tracking, PHI masking
+# Builds standardized paths across pipeline layers
+
 from types import SimpleNamespace
+from typing import Final
+
 from pyspark.sql import SparkSession
 
-from kflow.adls import resolve_sas, set_sas
+from kflow.adls import RAW_BASE
 
-# ── Databases ────────────────────────────────────────────────────────────────
+# Database names
 BRONZE_DB:     Final = "kardia_bronze"
 SILVER_DB:     Final = "kardia_silver"
 GOLD_DB:       Final = "kardia_gold"
 VALIDATION_DB: Final = "kardia_validation"
 
-# ── CDF / masking ────────────────────────────────────────────────────────────
+# Change data config - Only rows with these change types will be preserved
 CHANGE_TYPES:  Final = ("insert", "update_postimage")
-PHI_COLS_MASK: Final = ["DEATHDATE", "SSN", "DRIVERS", "PASSPORT",
-                        "FIRST", "LAST", "BIRTHPLACE"]
 
-# ── ADLS account / secrets (raw zone) ────────────────────────────────────────
-ADLS_ACCOUNT:     Final = "kardiaadlsdemo"
-ADLS_SUFFIX:      Final = "core.windows.net"
-RAW_CONTAINER:    Final = "raw"
+# Columns considered sensitive and masked in the Silver layer
+PHI_COLS_MASK: Final = [
+    "DEATHDATE", "SSN", "DRIVERS", "PASSPORT",
+    "FIRST", "LAST", "BIRTHPLACE"
+]
 
-ADLS_SAS_SCOPE:   Final = "kardia"
-ADLS_SAS_KEYNAME: Final = "adls_raw_sas"
+# Path builders
+def raw_path(ds: str) -> str:
+    return f"{RAW_BASE}/{ds}/"
 
-RAW_BASE: Final = f"abfss://{RAW_CONTAINER}@{ADLS_ACCOUNT}.dfs.{ADLS_SUFFIX}"
+def bronze_table(ds: str) -> str:
+    return f"{BRONZE_DB}.bronze_{ds}"
 
-def ensure_adls_auth(sas: str | None = None) -> None:
-    """
-    Call once in any notebook/script that touches ADLS.
-    Resolution order:
-      1) explicit sas arg
-      2) Databricks secrets (dbutils)
-      3) env var KARDIA_ADLS_SAS
-    """
-    tok = resolve_sas(ADLS_SAS_SCOPE, ADLS_SAS_KEYNAME, sas)
-    if not tok:
-        raise RuntimeError(
-            "ensure_adls_auth() No SAS token found. Provide it via "
-            "`ensure_adls_auth(sas=...)`, Databricks secrets "
-            f"(scope='{ADLS_SAS_SCOPE}', key='{ADLS_SAS_KEYNAME}'), "
-            "or env var KARDIA_ADLS_SAS."
-        )
-    set_sas(ADLS_ACCOUNT, tok, suffix=ADLS_SUFFIX)
+def bronze_path(ds: str) -> str:
+    return f"dbfs:/kardia/bronze/bronze_{ds}"
 
-# ── Path builders ────────────────────────────────────────────────────────────
-def raw_path(ds: str)             -> str: return f"{RAW_BASE}/{ds}/"
-def bronze_table(ds: str)         -> str: return f"{BRONZE_DB}.bronze_{ds}"
-def bronze_path(ds: str)          -> str: return f"dbfs:/kardia/bronze/bronze_{ds}"
-def schema_path(ds: str)          -> str: return f"dbfs:/kardia/_schemas/{ds}"
-def checkpoint_path(name: str)    -> str: return f"dbfs:/kardia/_checkpoints/{name}"
-def quarantine_path(ds: str)      -> str: return f"dbfs:/kardia/_quarantine/raw/bad_{ds}"
-def silver_table(ds: str)         -> str: return f"{SILVER_DB}.silver_{ds}"
-def silver_path(ds: str)          -> str: return f"dbfs:/kardia/silver/silver_{ds}"
-def gold_table(name: str)         -> str: return f"{GOLD_DB}.{name}"
+def schema_path(ds: str) -> str:
+    return f"dbfs:/kardia/_schemas/{ds}"
+
+def checkpoint_path(name: str) -> str:
+    return f"dbfs:/kardia/_checkpoints/{name}"
+
+def quarantine_path(ds: str) -> str:
+    return f"dbfs:/kardia/_quarantine/raw/bad_{ds}"
+
+def silver_table(ds: str) -> str:
+    return f"{SILVER_DB}.silver_{ds}"
+
+def silver_path(ds: str) -> str:
+    return f"dbfs:/kardia/silver/silver_{ds}"
+
+def gold_table(name: str) -> str:
+    return f"{GOLD_DB}.{name}"
 
 def validation_summary_table(name: str) -> str:
     return f"{VALIDATION_DB}.{name}_summary"
 
-# ── Convenience bundlers ─────────────────────────────────────────────────────
+# Bundled path namespaces
 def bronze_paths(ds: str, checkpoint_suffix: str | None = None) -> SimpleNamespace:
+    """
+    Return a namespace with all paths related to a Bronze-layer dataset.
+
+    Includes raw input, table name, storage path, schema history, checkpoint, quarantine.
+    """
     cp = checkpoint_suffix or f"bronze_{ds}"
     return SimpleNamespace(
         db         = BRONZE_DB,
@@ -72,6 +75,11 @@ def bronze_paths(ds: str, checkpoint_suffix: str | None = None) -> SimpleNamespa
     )
 
 def silver_paths(ds: str, checkpoint_suffix: str | None = None) -> SimpleNamespace:
+    """
+    Return a namespace with all paths related to a Silver-layer dataset.
+
+    Includes table name, storage path, and checkpoint directory.
+    """
     cp = checkpoint_suffix or f"silver_{ds}"
     return SimpleNamespace(
         db         = SILVER_DB,
@@ -80,7 +88,12 @@ def silver_paths(ds: str, checkpoint_suffix: str | None = None) -> SimpleNamespa
         checkpoint = checkpoint_path(cp),
     )
 
-# ── Misc ─────────────────────────────────────────────────────────────────────
 def current_batch_id() -> str:
+    """
+    Return the current Databricks job run ID for traceability in audit columns.
+
+    Falls back to 'manual' if not executing within a job context.
+    Used in both streaming and batch pipelines to support data lineage and reproducibility.
+    """
     spark = SparkSession.builder.getOrCreate()
     return spark.conf.get("spark.databricks.job.runId", "manual")

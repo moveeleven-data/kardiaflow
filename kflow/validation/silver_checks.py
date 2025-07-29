@@ -1,13 +1,13 @@
-# 11_silver_checks.py
-# Silver-layer validation for KardiaFlow smoke tests:
-# - Checks that each Silver table contains its required columns
+# silver_checks.py
+# Ensures each Silver table adheres to its contract
+# This guards against schema drift and incomplete transformations
 
 from pyspark.sql import SparkSession
 
 from .config import PASS, FAIL
 from .logging_utils import log
 
-# Create or reuse the Spark session
+# Create the Spark session. (needed to run via Lakeflow Jobs)
 spark = SparkSession.builder.getOrCreate()
 
 def check_silver_contract(table, expected_cols):
@@ -27,19 +27,14 @@ def check_silver_contract(table, expected_cols):
     # Determine which expected columns are missing
     missing_cols = expected_cols - actual_cols
 
-    # Determine overall status
     if missing_cols:
         status = FAIL
-    else:
-        status = PASS
-
-    # Prepare an explanatory message if there are missing columns
-    if missing_cols:
         message = f"missing={sorted(missing_cols)}"
     else:
+        status = PASS
         message = None
 
-    # Log the result: count of missing columns, status, and message
+    # Log result in memory for later write to `kardia_validation.smoke_results`
     log(
         layer,
         table,

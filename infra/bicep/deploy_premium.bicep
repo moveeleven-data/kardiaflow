@@ -53,6 +53,10 @@ resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' = {
     managedResourceGroupId: subscriptionResourceId(
       'Microsoft.Resources/resourceGroups', managedRgName)
     publicNetworkAccess: 'Enabled'
+    // <-- prevent Unity Catalog (and its Access Connector) from ever being created
+    defaultCatalog: {
+      initialType: 'HiveMetastore'
+    }
     parameters: {
       enableNoPublicIp: { value: false }
     }

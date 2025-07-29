@@ -1,28 +1,25 @@
-# 01_logging_utils.py
-# Logging utilities for KardiaFlow smoke tests:
-# - LOGS: in-memory list of all test results
-# - log(): appends results and prints a summary line
+# logging_utils.py
+# Simple logger for KardiaFlow smoke tests
+# Tracks results in memory and prints readable status lines
 
 from .config import RUN_TS, PASS
 
-# A list to collect each test result as a dict.
-# Populated by log(), then written out in run_smoke.py.
+# List to hold all validation results for this run
 LOGS = []
-
 
 def log(layer, table, metric, value, status, message=None):
     """
-    Append a structured test result to LOGS and print a summary.
+    Add a test result to LOGS and print a summary line.
 
     Args:
-        layer (str): 'BRONZE', 'SILVER', or 'GOLD'
-        table (str): Table under test (e.g. 'kardia_bronze.bronze_claims')
-        metric (str): Metric name (e.g. 'row_count')
-        value: Measured value (e.g. 123 or timestamp)
-        status (str): PASS, FAIL, or ERROR
-        message (str, optional): Extra context or error details
+        layer (str): Pipeline stage being tested ('BRONZE', 'SILVER', or 'GOLD')
+        table (str): Full table name under validation (e.g. 'kardia_bronze.bronze_claims')
+        metric (str): Name of the check being performed (e.g. 'row_count')
+        value: Observed result of the check (e.g. 123, None, timestamp)
+        status (str): Outcome of the check ('PASS', 'FAIL', or 'ERROR')
+        message (str, optional): Optional explanation or error detail
     """
-    # Prepare the value for storage: keep None as None, else stringify
+    # Format the value as a string
     if value is None:
         value_str = None
     else:
