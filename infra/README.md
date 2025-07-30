@@ -47,7 +47,6 @@ az group create --name "$RG" --location eastus
 **3. Deploy infrastructure with Bicep (Databricks + ADLS)**
 
 ```bash
-# Option B – Premium (if needed for dashboards or Unity Catalog)
 az deployment group create \
   --resource-group "$RG" \
   --template-file infra/bicep/deploy_premium.bicep \

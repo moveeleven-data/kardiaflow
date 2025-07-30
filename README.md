@@ -80,6 +80,21 @@ Deploy the full Azure environment via:
 
 🔗 [`infra/README.md`](infra/README.md) — *Infrastructure Deployment Guide*
 
+
+> **Note:** KardiaFlow’s infrastructure is deployed manually via CLI.  
+> Since environments are spun up for testing and torn down frequently, CI/CD automation is unnecessary.  
+> The deployment remains reproducible through versioned scripts and configuration.
+
+---
+
+## Job Orchestration & Dashboards
+
+This repo includes JSON definitions for batch job creation, job reset, and dashboard import via the Databricks CLI.
+
+📂 [`pipelines/`](pipelines/) — *Databricks Jobs + Dashboards*
+
+> No secrets are embedded in these files. See the folder's [README](pipelines/README.md) for full usage.
+
 ---
 
 ## Databricks Summit 2025: How It Shaped Kardiaflow

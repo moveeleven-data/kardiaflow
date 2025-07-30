@@ -1,8 +1,26 @@
 # Kardiaflow Project — Changelog
 
+## 2025-07-31
+
+TO-DO:
+
+- Simple CI via github actions to run unit tests
+
+- Add to list of PHI columns: ADDRESS, DRIVERS, MAIDEN, PREFIX, SUFFIX
+
+ - Split Encounters into a standalone job to support toggleable batch/streaming
+ execution without blocking downstream tasks. Move Patients to a separate scheduled 
+ batch job, since it doesn't require streaming or frequent updates
+
+- Add notes during DAG in video for bronze silver gold
+
+- review silver and gold layers
+
+
 ## 2025-07-30
 
-Remove duplicate calls to addauditcolumns() in Bronze Encounters notebook.
+Removed duplicate calls to addauditcolumns() in Bronze Encounters notebook.
+Documented Bronze layer. Added readme to pipelines folder describing JSON job files.
 
 ## 2025-07-28
 
