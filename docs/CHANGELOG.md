@@ -1,5 +1,9 @@
 # Kardiaflow Project — Changelog
 
+## 2025-07-30
+
+Remove duplicate calls to addauditcolumns() in Bronze Encounters notebook.
+
 ## 2025-07-28
 
 Refactored and documented kflow.

@@ -19,17 +19,14 @@ ADLS_ACCOUNT:     Final = "kardiaadlsdemo"     # ADLS Gen2 storage account name
 ADLS_SUFFIX:      Final = "core.windows.net"   # DNS suffix for Azure Data Lake
 RAW_CONTAINER:    Final = "raw"                # Container for raw ingest files
 
-# SAS token is NOT hardcoded — it's resolved dynamically from Secret Scope.
-ADLS_SAS_SCOPE:   Final = "kardia"            # Databricks secret scope
-ADLS_SAS_KEYNAME: Final = "adls_raw_sas"      # Secret key holding SAS token
+# SAS token is not hardcoded — it's resolved dynamically from the secret scope.
+ADLS_SAS_SCOPE:   Final = "kardia"             # Databricks secret scope
+ADLS_SAS_KEYNAME: Final = "adls_raw_sas"       # Secret key holding SAS token
 
 # Constructed ABFS URI prefix for raw data files
 # Example resolved path: abfss://raw@kardiaadlsdemo.dfs.core.windows.net/feedback/
 RAW_BASE: Final = f"abfss://{RAW_CONTAINER}@{ADLS_ACCOUNT}.dfs.{ADLS_SUFFIX}"
 
-# ------------------------------------------------------------------------------
-# Utilities
-# ------------------------------------------------------------------------------
 
 def _get_dbutils():
     """
