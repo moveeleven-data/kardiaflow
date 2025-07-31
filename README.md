@@ -60,7 +60,7 @@ The following diagram illustrates the end-to-end data flow, including ingestion,
 Want to see Kardiaflow in action? This end-to-end video walkthrough shows how data flows through each medallion layer and into dashboards powered by Gold tables.
 
 📺 **Click to Watch on YouTube:**  
-<a href="https://youtu.be/GTbI-E3qnAM" target="_blank">
+<a href="https://youtu.be/NrAe37O4QSM" target="_blank">
   <img src="https://img.youtube.com/vi/VBNmNdyTt7U/hqdefault.jpg" alt="Watch the demo on YouTube">
 </a>
 

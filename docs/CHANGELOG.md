@@ -6,15 +6,15 @@ TO-DO:
 
 - Simple CI via github actions to run unit tests
 
-- Add to list of PHI columns: ADDRESS, DRIVERS, MAIDEN, PREFIX, SUFFIX
+- Added PHI columns: ADDRESS, DRIVERS, MAIDEN, PREFIX, SUFFIX, run full tests
 
  - Split Encounters into a standalone job to support toggleable batch/streaming
  execution without blocking downstream tasks. Move Patients to a separate scheduled 
  batch job, since it doesn't require streaming or frequent updates
 
-- Add notes during DAG in video for bronze silver gold
+- Verify new version of Kardiaflow demo is good
 
-- review silver and gold layers
+- review silver and gold layers and unit tests
 
 
 ## 2025-07-30

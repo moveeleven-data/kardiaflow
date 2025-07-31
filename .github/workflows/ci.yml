@@ -14,11 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java (for PySpark)
+      - name: Set up Java (for PySpark 4.x)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,9 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Install your package (this pulls delta-spark and pyspark 4.x)
           pip install -e .
-          # Test deps (adds 'mocker' fixture)
           pip install pytest pytest-mock
 
       - name: Run unit tests
