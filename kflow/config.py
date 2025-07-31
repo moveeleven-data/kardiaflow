@@ -8,7 +8,7 @@ from typing import Final
 
 from pyspark.sql import SparkSession
 
-from kflow.adls import RAW_BASE
+from kflow.adls import LAKE_BASE, RAW_BASE
 
 # Database names
 BRONZE_DB:     Final = "kardia_bronze"
@@ -25,21 +25,21 @@ PHI_COLS_MASK: Final = [
     "BIRTHPLACE", "ADDRESS", "MAIDEN", "PREFIX", "SUFFIX"
 ]
 
-# Unified ADLS base path for all Delta tables and streaming metadata.
-# Structure under RAW_BASE:
+# Unified ADLS base path for all Delta tables and pipeline metadata.
+# Layout under LAKE_ROOT:
 #   /kardia/
-#     ├─ bronze/bronze_*    - Bronze Delta tables
-#     ├─ silver/silver_*    - Silver Delta tables
-#     ├─ gold/              - CTAS target for Gold tables
-#     ├─ _schemas/          - Auto Loader schema evolution
-#     ├─ _checkpoints/      - Streaming checkpoints (CDF, joins)
-#     └─ _quarantine/       - Bad records from ingest
-LAKE_BASE: Final = f"{RAW_BASE}/kardia"
+#     ├─ bronze/bronze_*        - Bronze Delta tables (raw ingested data)
+#     ├─ silver/silver_*        - Silver Delta tables (cleaned, normalized)
+#     ├─ gold/                  - Gold layer (CTAS analytical tables)
+#     ├─ _schemas/              - Auto Loader schema history
+#     ├─ _checkpoints/          - Structured Streaming checkpoints
+#     └─ _quarantine/           - Bad records captured during ingest
+LAKE_ROOT: Final = f"{LAKE_BASE}/kardia"
 
 # DB-level default paths for managed Delta tables
-BRONZE_DB_LOCATION: Final = f"{LAKE_BASE}/bronze"
-SILVER_DB_LOCATION: Final = f"{LAKE_BASE}/silver"
-GOLD_DB_LOCATION:   Final = f"{LAKE_BASE}/gold"
+BRONZE_DB_LOCATION: Final = f"{LAKE_ROOT}/bronze"
+SILVER_DB_LOCATION: Final = f"{LAKE_ROOT}/silver"
+GOLD_DB_LOCATION:   Final = f"{LAKE_ROOT}/gold"
 
 # Path builders
 def raw_path(ds: str) -> str:
@@ -49,22 +49,22 @@ def bronze_table(ds: str) -> str:
     return f"{BRONZE_DB}.bronze_{ds}"
 
 def bronze_path(ds: str) -> str:
-    return f"{LAKE_BASE}/bronze/bronze_{ds}"
+    return f"{LAKE_ROOT}/bronze/bronze_{ds}"
 
 def schema_path(ds: str) -> str:
-    return f"{LAKE_BASE}/_schemas/{ds}"
+    return f"{LAKE_ROOT}/_schemas/{ds}"
 
 def checkpoint_path(name: str) -> str:
-    return f"{LAKE_BASE}/_checkpoints/{name}"
+    return f"{LAKE_ROOT}/_checkpoints/{name}"
 
 def quarantine_path(ds: str) -> str:
-    return f"{LAKE_BASE}/_quarantine/raw/bad_{ds}"
+    return f"{LAKE_ROOT}/_quarantine/bad_{ds}"
 
 def silver_table(ds: str) -> str:
     return f"{SILVER_DB}.silver_{ds}"
 
 def silver_path(ds: str) -> str:
-    return f"{LAKE_BASE}/silver/silver_{ds}"
+    return f"{LAKE_ROOT}/silver/silver_{ds}"
 
 def gold_table(name: str) -> str:
     return f"{GOLD_DB}.{name}"

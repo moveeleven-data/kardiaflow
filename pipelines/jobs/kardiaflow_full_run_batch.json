@@ -321,16 +321,22 @@
     {
       "job_cluster_key": "Kardia_Jobs_Cluster",
       "new_cluster": {
-        "cluster_name": "",
         "spark_version": "13.3.x-scala2.12",
         "node_type_id": "Standard_D4s_v3",
-        "spark_env_vars": {
-          "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
-        },
-        "data_security_mode": "DATA_SECURITY_MODE_DEDICATED",
-        "runtime_engine": "STANDARD",
-        "kind": "CLASSIC_PREVIEW",
-        "is_single_node": true
+
+        "num_workers": 0,
+        "custom_tags": { "ResourceClass": "SingleNode" },
+        "spark_conf": {
+          "spark.databricks.cluster.profile": "singleNode",
+          "spark.master": "local[*]",
+
+          "fs.azure.account.auth.type.kardiaadlsdemo.dfs.core.windows.net": "SAS",
+          "fs.azure.sas.token.provider.type.kardiaadlsdemo.dfs.core.windows.net":
+            "org.apache.hadoop.fs.azurebfs.sas.FixedSASTokenProvider",
+          "fs.azure.sas.fixed.token.kardiaadlsdemo.dfs.core.windows.net":
+            "{{secrets/kardia/adls_lake_sas}}",
+          "fs.azure.account.key.kardiaadlsdemo.dfs.core.windows.net": ""
+        }
       }
     }
   ],

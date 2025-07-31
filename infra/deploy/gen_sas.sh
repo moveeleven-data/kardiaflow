@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Generate a write‑enabled SAS token for the ADLS 'raw' container
-# and store it as a Databricks secret.
+# Generate an account-level SAS for kardiaadlsdemo
+# and store it in the Databricks secret scope ‹kardia› under key ‹adls_lake_sas›.
+
 set -euo pipefail
 
-# ───────────── 0. Locate .env & repo root ─────────────
-here="$(cd "$(dirname "$0")" && pwd)"       # …/infra/deploy
-infra_root="$here/.."                       # …/infra
-repo_root="$infra_root/.."                  # project root
-
+# ───────────── 0. Locate repo & .env ────────────────────────────────────────
+here="$(cd "$(dirname "$0")" && pwd)"      # …/infra/deploy
+infra_root="$here/.."                      # …/infra
 ENV_FILE="$infra_root/.env"
+
 [[ -f "$ENV_FILE" ]] || {
   echo "ERROR: .env not found at $ENV_FILE" >&2; exit 1; }
 
@@ -16,48 +16,40 @@ ENV_FILE="$infra_root/.env"
 source "$ENV_FILE"
 : "${DATABRICKS_PAT:?ERROR: Set DATABRICKS_PAT in infra/.env}"
 
-# ───────────── 1. Azure scope ─────────────
+# 1. Set Azure subscription
 az account set --subscription "$SUB"
 
-# ───────────── 2. Resolve Databricks URL ─────────────
+# 2. Resolve Databricks host & export creds
 DB_HOST="$(az deployment group show \
-  --resource-group "$RG" \
-  --name "$DEPLOY" \
-  --query 'properties.outputs.databricksUrl.value' -o tsv)"
+             -g "$RG" --name "$DEPLOY" \
+             --query 'properties.outputs.databricksUrl.value' -o tsv)"
 
 export DATABRICKS_HOST="https://${DB_HOST}"
 export DATABRICKS_TOKEN="$DATABRICKS_PAT"
-echo "Databricks host: $DATABRICKS_HOST"
 
-# ───────────── 3. Configure Databricks CLI ─────────────
-databricks configure --token \
-  --host  "$DATABRICKS_HOST" \
-  --token "$DATABRICKS_TOKEN" \
-  --profile "$PROFILE" >/dev/null
+# 3. Ensure secret scope exists (idempotent)
+databricks secrets create-scope "$SCOPE" \
+  --initial-manage-principal users 2>/dev/null || true
 
-# ───────────── 4. Create secret scope (idempotent) ─────────────
-databricks secrets create-scope "$PROFILE" \
-  --initial-manage-principal users \
-  --profile "$PROFILE" 2>/dev/null || true
-
-# ───────────── 5. Generate SAS token ─────────────
+# 4. Generate ACCOUNT-level SAS
 SAS_EXPIRY="$(date -u -d '+180 days' '+%Y-%m-%dT%H:%MZ' 2>/dev/null || \
-             gdate -u -d '+180 days' '+%Y-%m-%dT%H:%MZ')"
+              gdate -u -d '+180 days' '+%Y-%m-%dT%H:%MZ')"
 
-CONN_STR="$(az storage account show-connection-string \
-  --resource-group "$RG" \
-  --name "$ADLS" -o tsv)"
+ACCOUNT_SAS=$(
+  az storage account generate-sas \
+    --account-name "$ADLS" \
+    --https-only \
+    --expiry "$SAS_EXPIRY" \
+    --services bf \
+    --resource-types sco \
+    --permissions acdlrw \
+    -o tsv
+)
+ACCOUNT_SAS="${ACCOUNT_SAS#?}"
 
-RAW_SAS="$(az storage container generate-sas \
-  --connection-string "$CONN_STR" \
-  --name            "$CONT" \
-  --permissions     racwdl \
-  --expiry          "$SAS_EXPIRY" \
-  --https-only      -o tsv)"
 
-# ───────────── 6. Store SAS in Databricks ─────────────
-echo -n "$RAW_SAS" | databricks secrets put-secret \
-  "$PROFILE" adls_raw_sas \
-  --profile "$PROFILE"
+# 5. Store / overwrite the secret value
+databricks secrets put-secret "$SCOPE" adls_lake_sas \
+  --string-value "$ACCOUNT_SAS"
 
-echo "SAS stored in scope '$PROFILE' as key 'adls_raw_sas' (expires $SAS_EXPIRY UTC)"
+echo "Stored new account-level SAS in scope '$SCOPE'/adls_lake_sas (expires $SAS_EXPIRY UTC)"

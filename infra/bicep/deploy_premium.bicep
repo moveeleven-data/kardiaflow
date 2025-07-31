@@ -38,10 +38,10 @@ resource adlsBlob 'Microsoft.Storage/storageAccounts/blobServices@2024-01-01' = 
   properties: {}
 }
 
-resource adlsRaw 'Microsoft.Storage/storageAccounts/blobServices/containers@2024-01-01' = {
+resource adlsLake 'Microsoft.Storage/storageAccounts/blobServices/containers@2024-01-01' = {
   parent: adlsBlob
-  name: adlsRawContainerName
-  properties: {publicAccess: 'None'}
+  name: 'lake'
+  properties: { publicAccess: 'None' }
 }
 
 // ───────────── Databricks ─────────────

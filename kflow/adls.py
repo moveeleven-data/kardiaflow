@@ -1,6 +1,6 @@
 # src/kflow/adls.py
 # ADLS authentication and path configuration utilities
-# - Constructs the base ABFS path for raw data ingestion
+# - Constructs the base ABFS path for the data lake
 # - Resolves the SAS token securely at runtime using secrets
 # - Configures Spark to authenticate against ADLS Gen2 using that token
 
@@ -17,16 +17,17 @@ from pyspark.sql import SparkSession
 
 ADLS_ACCOUNT:     Final = "kardiaadlsdemo"     # ADLS Gen2 storage account name
 ADLS_SUFFIX:      Final = "core.windows.net"   # DNS suffix for Azure Data Lake
-RAW_CONTAINER:    Final = "raw"                # Container for raw ingest files
+LAKE_CONTAINER:   Final = "lake"               # Single lake container
 
 # SAS token is not hardcoded — it's resolved dynamically from the secret scope.
 ADLS_SAS_SCOPE:   Final = "kardia"             # Databricks secret scope
-ADLS_SAS_KEYNAME: Final = "adls_raw_sas"       # Secret key holding SAS token
+ADLS_SAS_KEYNAME: Final = "adls_lake_sas"      # Secret key holding SAS token
 
 # Constructed ABFS URI prefix for raw data files
-# Example resolved path: abfss://raw@kardiaadlsdemo.dfs.core.windows.net/feedback/
-RAW_BASE: Final = f"abfss://{RAW_CONTAINER}@{ADLS_ACCOUNT}.dfs.{ADLS_SUFFIX}"
+LAKE_BASE: Final = f"abfss://{LAKE_CONTAINER}@{ADLS_ACCOUNT}.dfs.{ADLS_SUFFIX}"
 
+# Folder for landing data
+RAW_BASE: Final = f"{LAKE_BASE}/kardia/raw"
 
 def _get_dbutils():
     """
