@@ -32,6 +32,7 @@ Run these from your local terminal in the project root. Make sure you're logged 
 
 ```bash
 source infra/.env
+az account set --subscription "$SUB"
 ```
 
 ---
@@ -55,32 +56,24 @@ az deployment group create \
 
 ---
 
-**4. Generate a Databricks Personal Access Token (PAT)**
+**4. Generate a Databricks Personal Access Token (PAT) in the UI**
 
-(Databricks UI → Settings → Developer → Generate New Token)
+(Settings → Developer → Generate New Token)
 
----
-
-**5. Add your PAT to .env as `DATABRICKS_PAT=your_token_here`**
+Add it to infra/.env as ```DATABRICKS_PAT=...```
 
 ---
 
-**6. Configure the Databricks CLI profile**
+**5. Authenticate once (now that PAT exists)**
 
 ```bash
-# ensure the file exists (empty)
-mkdir -p infra && : > infra/.databrickscfg
-
-# write only the 'kardia' profile into the project file
-url=$(az databricks workspace show -g "$RG" -n "$WORKSPACE" --query "workspaceUrl" -o tsv)
-databricks configure --profile "$PROFILE" --host "https://$url" --token <<< "${DATABRICKS_PAT}"$'\n'
+source infra/.env
+source infra/deploy/auth.sh
 ```
-
-If the CLI reports missing credentials, re-run `source infra/.env` to ensure environment variables are available.
 
 ---
 
-**7. Run gen_sas.sh to auto-generate and store the ADLS SAS token in Databricks**
+**6. Generate and store the ADLS SAS token in Databricks**
 
 ```bash
 infra/deploy/gen_sas.sh
@@ -88,31 +81,26 @@ infra/deploy/gen_sas.sh
 
 ---
 
-**8. Build and upload the wheel to DBFS**
+**7. Build and upload the wheel to DBFS**
 
 This installs the build tool, creates the .whl package from pyproject.toml, and uploads it to DBFS.
 
 ```bash
-# 1) Build the wheel
 python -m pip install --upgrade build
 python -m build
 WHL=$(ls dist/kflow-*-py3-none-any.whl | tail -n 1)
 
-# 2) Use the project-scoped config by setting env vars for each command
-DATABRICKS_CONFIG_FILE="$PWD/infra/.databrickscfg" \
-databricks -p kardia fs mkdirs dbfs:/Shared/libs
-
-DATABRICKS_CONFIG_FILE="$PWD/infra/.databrickscfg" \
-databricks -p kardia fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
+databricks fs mkdirs dbfs:/Shared/libs
+databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
 ```
 
 ---
 
-**9. Create or reset the batch job**
+**8. Create or reset the full run batch job**
 
 ```bash
 # To create from scratch
-databricks jobs create --json '@pipelines/jobs/kardiaflow_full_run_batch.json' --profile kardia
+databricks jobs create --json @pipelines/jobs/kardiaflow_full_run_batch.json
 ```
 
 ```bash
@@ -139,24 +127,20 @@ The teardown script script will:
 
 ### When to Build a New Wheel
 
-If you've made changes to the `kflow` package — such as editing any `.py` files inside the `kflow/` directory — follow these steps to deploy your updates:
+If you've made changes to the `kflow` package — such as editing any `.py` files inside the `kflow/` directory — 
+follow these steps to deploy your updates:
 
 1. Update the version number in `pyproject.toml`
 
 `version = "0.2.6"` → `version = "0.2.7"`
 
-
-2. Clean old build artifacts (recommended for a fresh build):
-
-```bash
-rm -rf dist/*
-```
-
-3. Rebuild and re-upload the new wheel:
+2. Rebuild and re-upload the new wheel:
 
 ```bash
-python -m build
-WHL=$(ls dist/kflow-*-py3-none-any.whl | tail -n 1)
+python -m build --wheel
+WHL=$(ls -t dist/kflow-*-py3-none-any.whl | head -1)
+
+databricks fs mkdirs dbfs:/Shared/libs
 databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
 ```
 
