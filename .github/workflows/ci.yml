@@ -28,8 +28,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          # Install your package (this pulls delta-spark and pyspark 4.x)
           pip install -e .
-          pip install pytest pyspark==3.5.1
+          # Test deps (adds 'mocker' fixture)
+          pip install pytest pytest-mock
 
       - name: Run unit tests
         run: |

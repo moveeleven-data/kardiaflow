@@ -105,3 +105,7 @@ Databricks Data + AI Summit. These sessions directly influenced Kardiaflow’s d
 You can read my full reflection on the summit and how each session impacted Kardiaflow’s architecture here:  
 
 👉 [`docs/summit_reflections.md`](docs/summit_reflections.md)
+
+---
+
+![CI](https://github.com/moveeleven-data/kardiaflow/actions/workflows/ci.yml/badge.svg)
