@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ "master", "main" ]
 
+# Ensure only the latest run for a given branch or PR is active
+# Cancel any in-progress duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,6 +33,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: |
+            pyproject.toml
 
       - name: Install dependencies
         run: |

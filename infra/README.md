@@ -68,6 +68,10 @@ az deployment group create \
 **6. Configure the Databricks CLI profile**
 
 ```bash
+# ensure the file exists (empty)
+mkdir -p infra && : > infra/.databrickscfg
+
+# write only the 'kardia' profile into the project file
 url=$(az databricks workspace show -g "$RG" -n "$WORKSPACE" --query "workspaceUrl" -o tsv)
 databricks configure --profile "$PROFILE" --host "https://$url" --token <<< "${DATABRICKS_PAT}"$'\n'
 ```
@@ -89,20 +93,18 @@ infra/deploy/gen_sas.sh
 This installs the build tool, creates the .whl package from pyproject.toml, and uploads it to DBFS.
 
 ```bash
+# 1) Build the wheel
 python -m pip install --upgrade build
 python -m build
-
-# pick the newest wheel
 WHL=$(ls dist/kflow-*-py3-none-any.whl | tail -n 1)
 
-# copy the versioned wheel to DBFS
-databricks fs mkdirs dbfs:/Shared/libs
-databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
-```
+# 2) Use the project-scoped config by setting env vars for each command
+DATABRICKS_CONFIG_FILE="$PWD/infra/.databrickscfg" \
+databricks -p kardia fs mkdirs dbfs:/Shared/libs
 
-> 💡 **Why DBFS?**  
-> It’s the simplest way to make local Python packages available to notebooks using `%pip install --no-index --find-links=...`.  
-> Compatible with DBR 13.3 LTS and avoids issues with workspace paths or job-level libraries.
+DATABRICKS_CONFIG_FILE="$PWD/infra/.databrickscfg" \
+databricks -p kardia fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
+```
 
 ---
 

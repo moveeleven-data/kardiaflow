@@ -1,5 +1,7 @@
 from types import SimpleNamespace
+
 from pyspark.sql import Row
+
 from kflow.validation import silver_checks, gold_checks
 from kflow.validation.logging_utils import LOGS
 from kflow.validation.config import FAIL, PASS
