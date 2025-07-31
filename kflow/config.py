@@ -21,8 +21,8 @@ CHANGE_TYPES:  Final = ("insert", "update_postimage")
 
 # Columns considered sensitive and masked in the Silver layer
 PHI_COLS_MASK: Final = [
-    "DEATHDATE", "SSN", "DRIVERS", "PASSPORT",
-    "FIRST", "LAST", "BIRTHPLACE"
+    "DEATHDATE", "SSN", "DRIVERS", "PASSPORT", "FIRST", "LAST",
+    "BIRTHPLACE", "ADDRESS", "MAIDEN", "PREFIX", "SUFFIX"
 ]
 
 # Path builders
