@@ -6,6 +6,8 @@ TO-DO:
 
 Added unit tests and integrated with Github Actions. Finalize video walkthrough
 for Kardiaflow full run demo. Added PHI columns: ADDRESS, MAIDEN, PREFIX, SUFFIX.
+Added a function in etl_utils.py in kflow to address edge case where Bronze notebooks
+read from empty folders and prevent job from failing.
 
  - Split Encounters into a standalone job to support toggleable batch/streaming
  execution without blocking downstream tasks. Move Patients to a separate scheduled 
