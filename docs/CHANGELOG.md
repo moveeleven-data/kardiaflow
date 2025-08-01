@@ -1,20 +1,32 @@
 # Kardiaflow Project — Changelog
 
-## 2025-08-01
+### 2025-08-01
 
-Resoled all errors related to switching Kardiaflow from SAS token authentication
-to OAuth. Ran the full batch pipeline end-to-end and verified everything works,
-from ingestion in ADLS raw zone to Gold layer. Documented unit tests. 
+#### KardiaFlow v2.0 Finalized
 
+KardiaFlow is now fully complete. This release focuses on authentication hardening, validation infrastructure, and pipeline modularity.
 
-TO-DO:
+---
 
- - Split Encounters into a standalone job to support toggleable batch/streaming
- execution without blocking downstream tasks. Move Patients to a separate scheduled 
- batch job, since it doesn't require streaming or frequent updates
+#### Key Changes Since v1.0
 
+**OAuth Authentication**  
+Replaced SAS token auth with service principal–based OAuth for all ADLS access. Secrets are stored in Databricks and injected at runtime.
 
-## 2025-07-31
+**Validation & CI**  
+- Added validation suite for Bronze, Silver, and Gold layers, with results logged to `kardia_validation.smoke_results` 
+  and executed post-pipeline via `99_run_smoke_job.ipynb`.  
+- Implemented unit tests for core `kflow` utilities.  
+- Integrated GitHub Actions for automated CI validation.
+
+**Pipeline Modularity**  
+- Split Encounters into a standalone job supporting batch or streaming execution.  
+- Moved Patients into its own scheduled job.  
+- Cleaned up dependency management and ensured wheel-based install for `kflow`.
+
+---
+
+### 2025-07-31
 
 Switched Kardiaflow's ADLS authentication method from SAS token to OAuth via a
 service principal. This involves creating a service principal, granting it
@@ -27,21 +39,21 @@ for Kardiaflow full run demo. Added PHI columns: ADDRESS, MAIDEN, PREFIX, SUFFIX
 Added a function in etl_utils.py in kflow to address edge case where Bronze notebooks
 read from empty folders and prevent job from failing.
 
-## 2025-07-30
+### 2025-07-30
 
 Removed duplicate calls to addauditcolumns() in Bronze Encounters notebook.
 Documented Bronze layer. Added readme to pipelines folder describing JSON job files.
 
-## 2025-07-28
+### 2025-07-28
 
 Refactored and documented kflow.
 
-## 2025-07-27
+### 2025-07-27
 
 Completed end-to-end DAG and Dashboard walkthrough showing how data flows through
 each medallion layer and into dashboards.
 
-## 2025-07-26
+### 2025-07-26
 
 Worked on runtime dependency bootstrapping for ephemeral Databricks job clusters.
 The process is tricky because these clusters don't retain state, so any custom packages
@@ -59,7 +71,7 @@ configuration. Updated the smoke test to add
 exception-safe handling to prevent false job failures. All stages passed validation,
 confirming full pipeline correctness and reproducibility.
 
-## 2025-07-25
+### 2025-07-25
 
 **KardiaFlow v1.0 Finalized**
 
@@ -76,9 +88,7 @@ The KardiaFlow pipeline is now complete.
 - Code modularization complete (`src/kflow/`), with utility functions for stream writes, display, validation, and 
   config.
 
-All scripts, notebooks, and infrastructure are now stable, teardown-safe, and cloud-native.
-
-## 2025-07-24
+### 2025-07-24
 
 Simplified the pipeline by removing all Qualiflow components and post-Bronze validation notebooks.  
 
@@ -88,7 +98,7 @@ Gold layers, with results written to the Delta table `kardia_validation.smoke_re
 Also migrated the `patients`, `encounters`, and `claims` datasets from DBFS to ADLS Gen2 to
 standardize all raw data sources on cloud-backed storage.
 
-## 2025-07-23
+### 2025-07-23
 
 Created `docs/qualiflow.md`, a formal specification for Qualiflow—a lightweight trust
 layer for datasets. It defines a structured trust summary (JSON) capturing lineage,
@@ -106,7 +116,7 @@ The SAS token generation script was updated to include write permissions to supp
 Switched the Bronze Feedback notebook to use COPY INTO instead of Auto Loader for
 incremental batch ingestion.
 
-## 2025-07-22
+### 2025-07-22
 
 **Major Refactor and Modularization**
 
@@ -128,7 +138,7 @@ incremental batch ingestion.
 
 Verified all changes work as expected end-to-end; pipelines works fine, gold tables produce meaningful results.
 
-## 2025-07-21
+### 2025-07-21
 
 Created three modules:
 - config.py centralizes all paths, table names, checkpoint locations,
@@ -140,7 +150,7 @@ Created .env file and removed hardcoded variables from infrastructure scripts.
 
 Standardized notebook output with color-coded summaries to improve readability.
 
-## 2025-07-20
+### 2025-07-20
 
 Implemented full feedback pipeline from raw JSONL in ADLS to Bronze (Auto Loader),
 Silver (batch append), and Gold (aggregated satisfaction metrics). Overhauled the Silver and Gold layers.
@@ -163,7 +173,7 @@ Deleted the device dataset. Replaced the feedback dataset with a provider-centri
 schema using provider_id as a clean foreign key to providers.ProviderID. Converted
 claims.csv to Parquet.
 
-## 2025-07-19
+### 2025-07-19
 
 Added ingestion tracking to validation notebooks by writing row counts and timestamps
 into a centralized kardia_meta.bronze_qc table. This metadata log supports simple
@@ -186,7 +196,7 @@ and sensitive to positional shifts. Always assume the schema is correct until
 proven otherwise, and perform all validation and cleaning downstream in code.
 Treat raw files as immutable assets.
 
-## 2025-07-18
+### 2025-07-18
 
 Updated Bronze notebooks to support Auto Loader ingestion for new file formats.
 Replaced raw ingestion types:
@@ -199,7 +209,7 @@ Refactored all notebooks in Patient/Encounter and Claim/Provider flows.
 
 Refined Silver logic to cleanse valid gender and birth year.
 
-## 2025-07-17
+### 2025-07-17
 
 Added a gen_sas.sh script that dynamically resolves the Databricks workspace URL,
 generates a 24-hour container-level SAS token for ADLS using the connection string,
@@ -216,7 +226,7 @@ claims and providers to verify row counts, uniqueness, and schema conformity aft
 ingestion. Confirmed the full claim and provider ingestion paths are completed and
 working end-to-end using Auto Loader with ADLS inputs and Delta Lake Bronze outputs.
 
-## 2025-07-16
+### 2025-07-16
 
 Fixed the SCD-2 process in Silver Providers by first closing current rows when tracked
 fields change, then inserting new or changed versions using Bronze _ingest_ts as the
@@ -227,7 +237,7 @@ In the claims Silver notebook, we added a foreachBatch setup that reads incremen
 from Bronze using CDF with availableNow. We changed the deduplication to use row_number()
 on ClaimID, and moved the merge logic into a clean upsert_to_silver function.
 
-## 2025-07-15
+### 2025-07-15
 
 Implemented and validated the full Silver and Gold layers of the claims and providers
 pipeline in Kardiaflow. The Silver layer includes a Type-1 upsert for claims using CDF
@@ -243,7 +253,7 @@ Replaced mixed PySpark and SQL logic with direct SQL statements for monthly enco
 rollups and QA views. The final pipeline now runs cleanly end to end, with all Gold
 layers rewritten in SQL.
 
-## 2025-07-14
+### 2025-07-14
 
 Removed all partitioning logic from Silver and Gold Encounters tables.
 
@@ -251,7 +261,7 @@ Despite switching to monthly partitioning on 07-13, further testing showed that
 even encounter_month produced dozens of small partitions under 1MB each, well
 below the recommended 1GB target. Overpartitioning lead to slower queries.
 
-## 2025-07-13
+### 2025-07-13
 
 Revised the partitioning strategy for the Silver Encounters table:
 
@@ -263,7 +273,7 @@ pipeline using the complete datasets (~0.25 GB each).
 The START_DATE column was removed from the Silver Encounters schema and all
 downstream logic, as it is no longer in use.
 
-## 2025-07-12
+### 2025-07-12
 
 Added and validated the full ingestion flow for provider and claim data in the
 Bronze layer. A bootstrap notebook was created to initialize the raw directory
@@ -282,13 +292,13 @@ results to kardia_bronze.bronze_claims.
 
 Verified that both Bronze tables ingested data and display expected row counts.
 
-## 2025-07-11
+### 2025-07-11
 
 Removed unused .withWatermark("EVENT_TS", "1 day") from the Silver Encounters
 stream since the query is stateless. Added a 2-year filter on START_DATE in the
 Gold aggregation to enable partition pruning.
 
-## 2025-07-10
+### 2025-07-10
 
 Replaced the static read of the silver_encounters table with a streaming read
 using spark.readStream.table. Switched the write logic from batch .write.mode("overwrite") to a
@@ -311,7 +321,7 @@ run. The change enables downstream consumers to read from a table instead of a v
 simplifying integration. The two QA tables (gold_encounters_missing_patient and
 gold_patients_no_encounter) were left as batch jobs.
 
-## 2025-07-09
+### 2025-07-09
 
 Updated the lineage diagram to include a legend for ingestion and transformation types.
 Finalized the providers flow: source data will be stored in Postgres, read via JDBC into
@@ -326,7 +336,7 @@ a view-only approach. Documented all patients and encounters notebooks.
 
 Verified entire end-to-end Patients + Encounters pipeline.
 
-## 2025-07-08
+### 2025-07-08
 
 Refactored the Gold-layer logic to simplify the demo.
 The KPI for monthly encounter volume is now surfaced through a view-only
@@ -340,7 +350,7 @@ never appear in the encounters fact table. To further streamline the code,
 previously included partitioning and broadcast join logic were removed, along
 with an unused checkpoint path in `03_silver_patients_encounters_join.ipynb`.
 
-## 2025-07-07
+### 2025-07-07
 
 Removed unused cost-related fields (TOTAL_CLAIM_COST, BASE_ENCOUNTER_COST) from
 the Silver encounters stream and dropped the claim_cost metric from the Gold
@@ -382,7 +392,7 @@ scripts to ensure historical CSV files are ingested on first run.
 Also updated the schema path in Bronze scripts to use bronze_encounters,
 aligning it with the naming conventions used elsewhere in the project.
 
-## 2025-07-06
+### 2025-07-06
 
 Fixed an issue in the Silver merge logic by
 replacing a .dropDuplicates(["ID"]) with a deterministic approach that explicitly
@@ -400,7 +410,7 @@ Removed `.option("cloudFiles.includeExistingFiles", "true")` from Bronze
 ingestion scripts. When using `trigger(availableNow=True)`, Auto Loader already
 processes all existing files at startup, making the option redundant.
 
-## 2025-07-05
+### 2025-07-05
 
 Refactored the Silver encounters pipeline to preserve all unique `EncounterID` rows
 by removing unnecessary deduplication logic. Added `.withColumnRenamed("DATE", "START_DATE")`
@@ -408,7 +418,7 @@ for clarity and used `.partitionBy("START_DATE")` in the writeStream. Also enabl
 schema evolution with `.option("mergeSchema", "true")` to support nullable column
 additions during testing.
 
-## 2025-07-04
+### 2025-07-04
 
 Refactored Bronze ingestion and validation scripts for clarity and consistency.
 Converted `claims_10.csv` to Avro to give the claims pipeline an explicitly typed,
@@ -425,7 +435,7 @@ and `"false"` for `header` and `inferSchema`. Replaced inline SQL with `F.expr()
 for improved readability in Spark queries. Improved variable and path naming
 for clarity across the Bronze ingestion scripts.
 
-## 2025-07-02
+### 2025-07-02
 
 Refactored all scripts in the Patients and Encounters flow to improve
 maintainability and prepare for DLT migration. Enabled continuous streaming
@@ -435,7 +445,7 @@ Finalized ETL logic across Bronze, Silver, and Gold layers, and resolved a bug
 in Silver Patients where an incorrect variable was used in CDF version tracking.
 Revalidated the full pipeline to confirm correctness.
 
-## 2025-06-30 — Implemented Encounters Flow and Integrated with Patients
+### 2025-06-30 — Implemented Encounters Flow and Integrated with Patients
 
 Added and seeded a new raw landing folder (/kardia/raw/encounters/) with a 10-row
 CSV for validation. Created an Auto Loader stream for kardia_bronze.bronze_encounters
@@ -452,7 +462,7 @@ Validated full pipeline behavior across both flows: raw-to-Gold completes within
 
 The patients + encounters pipeline now matches the intended design and is fully operational.
 
-## 2025-06-29
+### 2025-06-29
 
 Completed the patients branch of the Kardiaflow pipeline.  
 * Created dedicated landing folders (`dbfs:/kardia/raw/patients/`, `…/encounters/`) plus shared roots for schema tracking (`/kardia/_schemas/`) and stream checkpoints (`/kardia/_checkpoints/`).  
@@ -473,7 +483,7 @@ With schema roots, checkpoints, and reusable notebook patterns in place, the pip
 4. Re-run the Silver notebook to transform only new CDF changes, deduplicate, and mask PHI.
 5. Refresh Gold KPI views from the updated Silver table.
 
-## 2025-06-24
+### 2025-06-24
 
 Successfully implemented the full end-to-end ETL pipeline for the `patients`
 flow in Databricks. This includes raw data validation, Bronze Delta ingestion
@@ -483,7 +493,7 @@ Databricks-only deployment, and a scheduled job with four ordered tasks was
 configured and verified. Using temp view in Gold layer for cost-effective
 dashboarding.
 
-## 2025-06-23
+### 2025-06-23
 
 Raw -> Gold View Pipeline Complete (in local Dev)
 
@@ -496,7 +506,7 @@ correctness, uniqueness), and we capped the workflow by creating a Gold-layer
 KPI view (`vw_gender_breakdown`) using Delta SQL over a temp view. The pipeline
 runs seamlessly in both local and Databricks environments.
 
-## 2025-06-22
+### 2025-06-22
 
 Completed Phase 1 and began Phase 2 of Kardiaflow by deploying safe,
 cost-controlled infrastructure and validating an initial data pipeline run.
@@ -520,7 +530,7 @@ Linked the Databricks workspace to GitHub via Repos, committed the notebook,
 and pulled changes locally in PyCharm. All steps support reproducibility,
 fast iteration, and teardown-safe development.
 
-## 2025-06-04
+### 2025-06-04
 
 After uncovering substantial and silently accumulating costs tied to ADLS Gen2
 transaction billing, NAT Gateway persistence, and unremovable infrastructure
@@ -545,7 +555,7 @@ simulation or short-lived, controlled sessions. This phase will prioritize
 operational reversibility and explicit cost boundaries, instilling best practices
 for cloud-native data engineering without risk of recurrence.
 
-## 2025-06-03
+### 2025-06-03
 
 Developed and tested Azure Data Factory (ADF) copy pipelines to move data from
 multiple source systems (Oracle, PostgreSQL, MongoDB) into raw landing zones in
@@ -577,7 +587,7 @@ Parquet format, partitioned by `final_patient_ID` and `encounter_DATE`. Verified
 data output by successfully writing 5000 rows, ensuring data quality and
 preparing for future processing steps.
 
-## Changelog – 2025-06-02
+### 2025-06-02
 
 - Set up and tested all data connections needed for Azure Data Factory to move
   data between systems.
@@ -593,7 +603,7 @@ preparing for future processing steps.
   for security.
 - Verified that all connections worked by running tests in the ADF user interface.
 
-## 2025-06-01
+### 2025-06-01
 
 Resolved Oracle XE ingestion failures on `encounters.csv` (~1.5M rows) due to
 index space exhaustion in the default `SYSTEM` tablespace. Created a dedicated
@@ -618,9 +628,7 @@ to confirm ingestion integrity across all systems. Ran cross-database row
 counts, sampled data, and checked for anomalies in `patients`, `claims`,
 and `feedback`. All counts and structures verified.
 
----
-
-## 2025-05-30
+### 2025-05-30
 
 Today focused on the ingestion and validation of the synthetic EHR patient
 dataset into Oracle XE. I developed and finalized a robust Python script
@@ -638,9 +646,7 @@ Critical data quality safeguards were implemented within the pipeline:
 
 Performance-wise, the script successfully ingested over **133,000** patient records while skipping a small subset (~72 rows) due to data violations—these were logged for future inspection.
 
----
-
-## 2025-05-29
+### 2025-05-29
 
 Today marked the foundational setup of the Kardiaflow project’s infrastructure and datasets. An Azure account was created and provisioned with both **Azure Data Factory** and **Azure Databricks**, using the East US region to avoid quota limitations. These services will form the backbone of our orchestration and transformation layers.
 
