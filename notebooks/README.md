@@ -6,18 +6,21 @@ This project ingests synthetic healthcare data into a Databricks Lakehouse using
 - **Encounters & Patients** — clinical events and demographics  
 - **Claims, Providers & Feedback** — billing, metadata, and satisfaction
 
-Test files are manually uploaded to **ADLS Gen2**, where they are automatically
-discovered by Auto Loader pipelines.
+Test files are uploaded to **ADLS Gen2** in `/lake/{raw | providers | claims | feedback | patients}` folders, where 
+they are picked up by Auto Loader pipelines.
+
+All files are uploaded to **Azure Data Lake Storage Gen2 (ADLS)** under `/lake/kardia/...` paths, accessed via **OAuth2 
+service principal authentication**.
 
 ### Raw File Paths
 
-| Dataset     | Raw Path                                                    | Format  |
-|-------------|-------------------------------------------------------------|---------|
-| Patients    | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/patients/` | CSV     |
-| Encounters  | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/encounters/`| Avro    |
-| Claims      | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/claims/`   | Parquet |
-| Providers   | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/providers/`| TSV     |
-| Feedback    | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/feedback/` | JSONL   |
+| Dataset     | ADLS Path                                                | Format  |
+|-------------|----------------------------------------------------------|---------|
+| Patients    | `abfss://lake@<storage>.dfs.core.windows.net/patients/`  | CSV     |
+| Encounters  | `abfss://lake@<storage>.dfs.core.windows.net/encounters/` | Avro    |
+| Claims      | `abfss://lake@<storage>.dfs.core.windows.net/claims/`     | Parquet |
+| Providers   | `abfss://lake@<storage>.dfs.core.windows.net/providers/`  | TSV     |
+| Feedback    | `abfss://lake@<storage>.dfs.core.windows.net/feedback/`   | JSONL   |
 
 ---
 
@@ -39,6 +42,11 @@ Auto Loader is used for structured formats like CSV, Parquet, and TSV where incr
 | Providers   | TSV      | Auto Loader  | `kardia_bronze.bronze_providers`  |
 | Feedback    | JSONL    | COPY INTO    | `kardia_bronze.bronze_feedback`   |
 
+All Bronze tables include:
+
+- Audit columns: `_ingest_ts`, `_source_file`, `_batch_id`
+- Schema enforcement + CDF (Change Data Feed) enabled
+
 ---
 
 ## Silver Transformation
@@ -46,8 +54,7 @@ Auto Loader is used for structured formats like CSV, Parquet, and TSV where incr
 Silver notebooks apply:
 
 - **Deduplication** and **SCD logic**  
-- **PHI masking**  
-- **Stream-static joins**
+- **PHI masking**
 
 | Dataset     | Method               | Silver Table                        |
 |-------------|----------------------|-------------------------------------|
@@ -82,40 +89,23 @@ Gold notebooks generate business-level aggregations for analytics and dashboards
 
 ## Validation
 
-All data quality checks are handled by a self-contained test suite anchored by `run_smoke.py` inside the `kflow.validation` module.  
-It performs smoke tests across the Bronze, Silver, and Gold layers using only Spark and Delta Lake — no third-party test libraries required.
+Validation logic is built into `kflow.validation`, invoked via `run_smoke.py`. Results are written to 
+`kardia_validation.smoke_results`.
 
-- **Bronze:** Verifies that each table contains at least one row, the primary key is non-null and unique (with optional downstream suppression), and `_ingest_ts` is populated if present.  
-- **Silver:** Validates that all required columns are present in each table based on predefined schema contracts.  
-- **Gold:** Confirms that specified business-critical columns (e.g., `patient_id`, `avg_score`) contain no nulls.  
-- **Results:** All test outcomes are appended to the Delta table `kardia_validation.smoke_results`, with fields: `run_ts`, `layer`, `table_name`, `metric`, `value`, `status`, and `message`.
-
----
-
-## Streaming Mode: `mode=demo` vs `mode=live`
-
-This project supports two streaming modes, controlled by a parameter named `mode`.
-
-| Mode   | Behavior                                    | Use Case              |
-|--------|---------------------------------------------|------------------------|
-| batch  | Reads all available data and stops          | For demos and CI runs |
-| stream | Streams run in continuous 30s micro-batches | For realism or testing |
+- **Bronze:** Row counts, PK nulls/dupes, `_ingest_ts`
+- **Silver:** Schema contract compliance
+- **Gold:** Not-null critical fields
 
 ---
 
-### How it works
+## Streaming Modes
 
-The `mode` parameter is passed to specific **Encounters** tasks in the job. Depending on the value:
+The **Encounters pipeline** supports runtime switching between batch and stream:
 
-- In `mode=batch`, streaming notebooks use `trigger(availableNow=True)` and **exit automatically** after processing 
-  existing data. This allows the full job to finish cleanly.
-- In `mode=stream`, they use `trigger(processingTime="30 seconds")` and stay running continuously.
-
-Checkpoint paths are also suffixed with the mode (`.../batch` or `.../stream`) to keep state isolated.
-
----
-
-### Affected Tasks
+| Mode   | Behavior                                      |
+|--------|-----------------------------------------------|
+| `batch`| One-time read of all available data           |
+| `stream`| Continuous micro-batches every 30 seconds    |
 
 Only the **Encounters pipeline** supports this parameter:
 

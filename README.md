@@ -5,9 +5,8 @@
 Kardiaflow simulates a real-world healthcare data pipeline built on Azure Databricks and Delta Lake. It demonstrates a 
 modular, streaming-capable ETL architecture that handles structured (CSV, Avro, TSV) and semi-structured (JSON) healthcare datasets using a medallion design pattern.
 
-The pipeline ingests raw files into Bronze Delta tables using Auto Loader, applies data masking and CDC logic in the Silver layer with Delta Change Data Feed (CDF), and materializes analytics-ready Gold views for reporting and dashboards.
-
-
+The pipeline ingests raw files into Bronze Delta tables using Auto Loader, applies data masking and CDC logic in the 
+Silver layer with Delta Change Data Feed (CDF), and materializes analytics-ready Gold views for reporting and dashboards. All data is persisted to Azure Data Lake Storage using OAuth-based authentication. 
 
 ## Architecture Overview
 
@@ -40,6 +39,7 @@ The following diagram illustrates the end-to-end data flow, including ingestion,
 
 **Automated Data Validation**  
 &nbsp;&nbsp;&nbsp;&nbsp;• `99_smoke_checks.py` tests row counts, nulls, duplicates, and schema contracts  
+&nbsp;&nbsp;&nbsp;&nbsp;• Unit tests cover critical Spark utilities and ADLS authentication logic
 &nbsp;&nbsp;&nbsp;&nbsp;• Logs results to Delta for auditing and observability  
 
 

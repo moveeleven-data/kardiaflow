@@ -1,5 +1,13 @@
 # Kardiaflow Project — Changelog
 
+## 2025-08-01
+
+TO-DO:
+
+ - Split Encounters into a standalone job to support toggleable batch/streaming
+ execution without blocking downstream tasks. Move Patients to a separate scheduled 
+ batch job, since it doesn't require streaming or frequent updates
+
 ## 2025-07-31
 
 Switched Kardiaflow's ADLS authentication method from SAS token to OAuth via a
@@ -12,13 +20,6 @@ Added unit tests and integrated with Github Actions. Finalize video walkthrough
 for Kardiaflow full run demo. Added PHI columns: ADDRESS, MAIDEN, PREFIX, SUFFIX.
 Added a function in etl_utils.py in kflow to address edge case where Bronze notebooks
 read from empty folders and prevent job from failing.
-
-TO-DO:
-
- - Split Encounters into a standalone job to support toggleable batch/streaming
- execution without blocking downstream tasks. Move Patients to a separate scheduled 
- batch job, since it doesn't require streaming or frequent updates
-
 
 ## 2025-07-30
 
