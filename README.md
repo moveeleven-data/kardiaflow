@@ -39,7 +39,7 @@ The following diagram illustrates the end-to-end data flow, including ingestion,
 
 **Automated Data Validation**  
 &nbsp;&nbsp;&nbsp;&nbsp;• `99_smoke_checks.py` tests row counts, nulls, duplicates, and schema contracts  
-&nbsp;&nbsp;&nbsp;&nbsp;• Unit tests cover critical Spark utilities and ADLS authentication logic
+&nbsp;&nbsp;&nbsp;&nbsp;• Unit tests cover kflow validation module
 &nbsp;&nbsp;&nbsp;&nbsp;• Logs results to Delta for auditing and observability  
 
 
