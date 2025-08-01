@@ -49,7 +49,7 @@ Audit metadata (`_ingest_ts`, `_source_file`, `_batch_id`) is preserved across a
 
 The Silver layer powers Gold KPIs including:
 
-- `gold_claim_anomalies`
+- `gold_claim_metrics`
 - `gold_provider_rolling_spend`
 - `gold_feedback_metrics`
 

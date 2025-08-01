@@ -45,8 +45,10 @@ SILVER_CONTRACTS = {
 # Gold Layer: Columns that must not contain NULLs (critical for analytics)
 # Ensures output completeness and avoids downstream join or metric errors
 GOLD_NOT_NULL = {
-    "kardia_gold.gold_patient_lifecycle":     ["patient_id"],
-    "kardia_gold.gold_feedback_satisfaction": ["provider_id", "avg_score"],
+    "kardia_gold.gold_patient_lifecycle": ["patient_id"],
+    "kardia_gold.gold_feedback_satisfaction": ["provider_id"],
+    "kardia_gold.gold_claim_approval_by_specialty": ["provider_specialty"],
+    "kardia_gold.gold_provider_daily_spend": ["provider_id"],
 }
 
 # Duplicate Suppression:

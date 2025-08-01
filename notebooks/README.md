@@ -81,9 +81,9 @@ Gold notebooks generate business-level aggregations for analytics and dashboards
 | Table Name                    | Description                                                  |
 |------------------------------|--------------------------------------------------------------|
 | `gold_patient_lifecycle`     | Visit intervals, patient lifespan, new/returning flags       |
-| `gold_claim_anomalies`       | Approval rates, denials, high-cost procedures               |
-| `gold_provider_rolling_spend`| Daily spend and 7-day rolling KPIs for provider payments     |
-| `gold_feedback_metrics`      | Satisfaction tags, comment analysis, sentiment scoring       |
+| `gold_claim_metrics`       | Approval rates, denials, high‑cost procedures and rapid‑fire claims               |
+| `gold_provider_rolling_spend`| Daily spend and 7‑day rolling KPIs for provider payments     |
+| `gold_feedback_metrics`      | Satisfaction, tag analysis and encounter match KPIs       |
 
 ---
 

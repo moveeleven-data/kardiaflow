@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 # Fully tear down the Kardiaflow development environment in a safe order.
 #
-# This specific sequence avoids dependency and deletion issues:
+# This sequence avoids dependency and deletion issues:
+# - Workspace must be deleted first to lift system deny assignment on the managed RG.
+# - Access connectors must be deleted after revoking RBAC to avoid lingering identities or errors.
+# - Managed and main RGs are deleted last to ensure all dependent resources are fully cleaned up.
 #
-# 1. Delete Databricks workspace
-#    - Releases the control plane and ensures access connectors are no longer in use.
-#
-# 2. Remove RBAC from access connectors
-#    - Clears role assignments to prevent permission errors during deletion.
-#
-# 3. Delete all Databricks access connectors (main + managed RGs)
-#    - Required before deleting their resource groups.
-#
-# 4. Delete managed resource group
-#    - Holds Databricks-managed infra; only safe to delete after connector cleanup.
-#
-# 5. Delete main resource group
-#    - Removed last to ensure no remaining dependencies exist.
+# 1. Delete Databricks workspace             - ensures access connectors are no longer in use.
+# 2. Remove RBAC from access connectors      - clears role assignments to prevent permission errors during deletion.
+# 3. Delete all Databricks access connectors - required before deleting their resource groups.
+# 4. Delete managed resource group           - only safe to delete after connector cleanup.
+# 5. Delete main resource group              - removed last to ensure no remaining dependencies exist.
 
 set -euo pipefail
 
@@ -28,7 +22,8 @@ here="$(cd "$(dirname "$0")" && pwd)"
 infra_root="$here/.."
 env_file="$infra_root/.env"
 
-[[ -f "$env_file" ]] && source "$env_file"
+[[ -f "$env_file" ]] && # shellcheck source=/dev/null
+source "$env_file"
 
 : "${RG:?Set RG in infra/.env}"
 : "${WORKSPACE:?Set WORKSPACE in infra/.env}"
@@ -48,9 +43,33 @@ az extension add -n databricks -y >/dev/null 2>&1 || az extension update -n data
 # -------------------------------------------------
 
 rg_exists()       { [[ "$(az group exists --name "$1" -o tsv 2>/dev/null)" == "true" ]]; }
-ws_exists()       { az databricks workspace show -g "$RG" -n "$WORKSPACE" &>/dev/null; }
-remove_rg_locks() { az lock list --resource-group "$1" -o tsv --query "[].id" | xargs -r -L1 az lock delete --ids; }
-wait_until_gone() { local rg="$1"; for _ in {1..90}; do rg_exists "$rg" || return 0; sleep 10; done; return 1; }
+ws_exists()       { az databricks workspace show -g "$RG" -n "$WORKSPACE" >/dev/null 2>&1; }
+remove_rg_locks() { az lock list --resource-group "$1" -o tsv --query "[].id" 2>/dev/null | xargs -r -L1 az lock delete --ids >/dev/null 2>&1; }
+
+# Robust wait: loop until the workspace 404s (there is no 'az databricks workspace wait --deleted')
+wait_ws_deleted() {
+  local tries=0 max_tries=180
+  while (( tries < max_tries )); do
+    if ! az databricks workspace show -g "$RG" -n "$WORKSPACE" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 10
+    ((tries++))
+  done
+  return 1
+}
+
+wait_rg_deleted() {
+  local rg="$1" tries=0 max_tries=180
+  while (( tries < max_tries )); do
+    if ! rg_exists "$rg"; then
+      return 0
+    fi
+    sleep 10
+    ((tries++))
+  done
+  return 1
+}
 
 # -------------------------------------------------
 # 4. Attempt to discover managed RG if not supplied
@@ -59,36 +78,35 @@ wait_until_gone() { local rg="$1"; for _ in {1..90}; do rg_exists "$rg" || retur
 discover_managed_rg() {
   local id ac_rg sa_rg
 
-  # 1. Try the workspace's managedResourceGroupId property
+  # 1) From workspace property
   if ws_exists; then
-    id="$(az databricks workspace show -g "$RG" -n "$WORKSPACE" \
-          --query 'managedResourceGroupId' -o tsv 2>/dev/null || true)"
-    [[ -n "$id" ]] && { echo "${id##*/}"; return; }
+    id="$(az databricks workspace show -g "$RG" -n "$WORKSPACE" --query 'managedResourceGroupId' -o tsv 2>/dev/null || true)"
+    if [[ -n "$id" ]]; then
+      echo "${id##*/}"
+      return
+    fi
   fi
 
-  # 2. Conventional managed RG name
+  # 2) Conventional name
   if rg_exists "${WORKSPACE}-managed"; then
     echo "${WORKSPACE}-managed"
     return
   fi
 
-  # 3. Use the access connector RG if there's exactly one
-  ac_rg="$(az resource list --resource-type Microsoft.Databricks/accessConnectors \
-          -o tsv --query "[].resourceGroup" 2>/dev/null | sort -u || true)"
-  if [[ -n "$ac_rg" && "$(wc -l <<< "$ac_rg")" -eq 1 ]]; then
+  # 3) Single access connector RG heuristic
+  ac_rg="$(az resource list --resource-type Microsoft.Databricks/accessConnectors -o tsv --query "[].resourceGroup" 2>/dev/null | sort -u || true)"
+  if [[ -n "$ac_rg" && "$(wc -l <<<"$ac_rg")" -eq 1 ]]; then
     echo "$ac_rg"
     return
   fi
 
-  # 4. Use the storage account RG if there's exactly one matching dbstorage pattern
-  sa_rg="$(az storage account list -o tsv \
-          --query "[?contains(name,'dbstorage')].resourceGroup" 2>/dev/null | sort -u || true)"
-  if [[ -n "$sa_rg" && "$(wc -l <<< "$sa_rg")" -eq 1 ]]; then
+  # 4) Single dbstorage* SA RG heuristic
+  sa_rg="$(az storage account list -o tsv --query "[?contains(name,'dbstorage')].resourceGroup" 2>/dev/null | sort -u || true)"
+  if [[ -n "$sa_rg" && "$(wc -l <<<"$sa_rg")" -eq 1 ]]; then
     echo "$sa_rg"
     return
   fi
 
-  # 5. Not found
   echo ""
 }
 
@@ -96,26 +114,18 @@ discover_managed_rg() {
 # 5. Remove all RBAC roles for connector identity
 # -------------------------------------------------
 
-# Remove all role assignments from the managed identity of a given access connector.
-# This effectively strips its RBAC permissions before the connector itself is deleted.
 strip_connector_rbac() {
   local id="$1"
-
-  # Get the principalId of the connector's system-assigned identity.
   local principal
   principal="$(az resource show --ids "$id" --query "identity.principalId" -o tsv 2>/dev/null || true)"
-  # If no identity is present, nothing to do.
   [[ -z "$principal" ]] && return 0
 
-  # List all role assignment IDs for that principal.
   local ra_ids
   ra_ids="$(az role assignment list --assignee "$principal" -o tsv --query "[].id" 2>/dev/null || true)"
-
-  # Delete each role assignment to revoke all granted roles.
   if [[ -n "$ra_ids" ]]; then
     while IFS= read -r rid; do
       [[ -n "$rid" ]] && az role assignment delete --ids "$rid" >/dev/null 2>&1 || true
-    done <<< "$ra_ids"
+    done <<<"$ra_ids"
   fi
 }
 
@@ -123,53 +133,55 @@ strip_connector_rbac() {
 # 6. Delete Databricks access connectors in a resource group
 # -----------------------------------------------------------
 
-# For each connector:
-#   1. Revoke its RBAC by stripping its managed identity role assignments.
-#   2. Delete the connector using the dedicated CLI; fall back to generic resource deletion on failure.
 delete_access_connectors_in_rg() {
   local rg="$1"
+  [[ -z "$rg" ]] && return 0
+  rg_exists "$rg" || return 0
 
-  # No-op if rg is empty or does not exist.
-  [[ -n "$rg" ]] && rg_exists "$rg" || return 0
-
-  # List access connector IDs in this resource group.
   local ids
   ids="$(az databricks access-connector list -g "$rg" --query "[].id" -o tsv 2>/dev/null || true)"
   [[ -z "$ids" ]] && return 0
 
-  echo "Deleting access connectors in RG '$rg'"
-
+  echo "Deleting access connectors in RG '$rg'..."
   while IFS= read -r id; do
     [[ -z "$id" ]] && continue
-
-    # Revoke RBAC from the connector's managed identity.
     strip_connector_rbac "$id"
 
-    # Resolve the connector name so we can call the dedicated delete command.
     local name
     name="$(az resource show --ids "$id" --query name -o tsv 2>/dev/null || true)"
     if [[ -n "$name" ]]; then
-      # Attempt deletion via Databricks CLI; if that fails, fallback to generic resource delete.
       az databricks access-connector delete -g "$rg" -n "$name" --yes >/dev/null 2>&1 \
         || az resource delete --ids "$id" >/dev/null 2>&1 || true
     fi
-  done <<< "$ids"
+  done <<<"$ids"
+}
+
+# -----------------------------------------------------------
+# 7. Delete storage accounts in a resource group (best-effort)
+# -----------------------------------------------------------
+
+delete_storage_accounts_in_rg() {
+  local rg="$1"
+  [[ -z "$rg" ]] && return 0
+  rg_exists "$rg" || return 0
+
+  az storage account list -g "$rg" -o tsv --query "[].name" 2>/dev/null | while IFS= read -r sa; do
+    [[ -z "$sa" ]] && continue
+    echo "Deleting storage account '$sa' in RG '$rg'..."
+    az storage account delete -g "$rg" -n "$sa" --yes >/dev/null 2>&1 || true
+  done
 }
 
 # ----------------------------------------------
-# 7. Begin teardown execution
+# 8. Begin teardown execution
 # ----------------------------------------------
 
 echo "Teardown: RG=$RG WORKSPACE=$WORKSPACE"
 
-# ------------------------------------------------------------------------
-# 8. Discover the managed resource group used by the Databricks workspace.
-# ------------------------------------------------------------------------
-
-if [[ -z "$MANAGED_RG" ]]; then
+# Discover managed RG if not provided
+if [[ -z "${MANAGED_RG:-}" ]]; then
   MANAGED_RG="$(discover_managed_rg || true)"
 fi
-
 echo "Discovered MANAGED_RG=${MANAGED_RG:-<unknown>}"
 
 # ----------------------------------------------
@@ -178,53 +190,49 @@ echo "Discovered MANAGED_RG=${MANAGED_RG:-<unknown>}"
 
 if ws_exists; then
   echo "Deleting Databricks workspace '$WORKSPACE'..."
-  az databricks workspace delete -g "$RG" -n "$WORKSPACE" --yes || true
-
-  # Wait up to ~15 minutes for control-plane delete to propagate
-  for _ in {1..90}; do
-    if ! ws_exists; then
-      echo "Workspace deleted."
-      break
-    fi
-    sleep 10
-  done
+  az databricks workspace delete -g "$RG" -n "$WORKSPACE" --yes >/dev/null 2>&1 || true
+  # Wait until the workspace truly disappears (lifts deny assignments on managed RG)
+  if ! wait_ws_deleted; then
+    echo "WARNING: timed out waiting for workspace deletion; continuing..."
+  fi
 fi
 
+# ----------------------------------------------
+# 10. Remove access connectors (main + managed RGs)
+# ----------------------------------------------
 
-# 9. Remove access connectors (main + managed RGs)
 delete_access_connectors_in_rg "$RG"
-delete_access_connectors_in_rg "$MANAGED_RG"
+delete_access_connectors_in_rg "${MANAGED_RG:-}"
 
 # ----------------------------------------------
-# 10. Remove access connectors from both RGs
+# 11. Proactively delete storage accounts (incl. dbstorage* and ADLS)
 # ----------------------------------------------
 
-if [[ -n "$MANAGED_RG" && "$(rg_exists "$MANAGED_RG")" == "true" ]]; then
+delete_storage_accounts_in_rg "${MANAGED_RG:-}"
+delete_storage_accounts_in_rg "$RG"
+
+# ----------------------------------------------
+# 12. Delete managed resource group
+# ----------------------------------------------
+
+if [[ -n "${MANAGED_RG:-}" ]] && rg_exists "$MANAGED_RG"; then
   echo "Deleting managed RG '$MANAGED_RG'..."
   remove_rg_locks "$MANAGED_RG" || true
-
-  # Clear lingering dbstorage accounts proactively
-  az storage account list -g "$MANAGED_RG" -o tsv --query "[].name" 2>/dev/null | while read -r sa; do
-    [[ -n "$sa" ]] && az storage account delete -g "$MANAGED_RG" -n "$sa" --yes || true
-  done
-
-  az group delete --name "$MANAGED_RG" --yes --no-wait || true
-
-  if ! wait_until_gone "$MANAGED_RG"; then
+  az group delete --name "$MANAGED_RG" --yes --no-wait >/dev/null 2>&1 || true
+  if ! wait_rg_deleted "$MANAGED_RG"; then
     echo "WARNING: Managed RG '$MANAGED_RG' still present; check locks or protection policies."
   fi
 fi
 
 # ----------------------------------------------
-# 12. Delete main resource group
+# 13. Delete main resource group
 # ----------------------------------------------
 
 if rg_exists "$RG"; then
   echo "Deleting main RG '$RG'..."
   remove_rg_locks "$RG" || true
-  az group delete --name "$RG" --yes --no-wait || true
-
-  if ! wait_until_gone "$RG"; then
+  az group delete --name "$RG" --yes --no-wait >/dev/null 2>&1 || true
+  if ! wait_rg_deleted "$RG"; then
     echo "WARNING: RG '$RG' still present; check locks or protection policies."
   fi
 fi
