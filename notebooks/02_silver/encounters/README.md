@@ -36,7 +36,7 @@ Encounters tables support both batch and streaming modes, controlled via a `mode
 
 The silver_patients table masks sensitive fields:
 
-`first`, `last`, `ssn`, `drivers`, `passport`, `birthplace`
+`first`, `last`, `ssn`, `drivers`, `passport`, `birthplace`, `address`, `prefix`, `suffix`, `maiden`
 
 These columns are explicitly nulled at write time to prevent exposure.
 
@@ -44,4 +44,4 @@ These columns are explicitly nulled at write time to prevent exposure.
 
 ## Output Format
 
-All Silver tables are Delta Lake managed and optimized for downstream Gold KPIs, joining, and analytics. Streaming logic ensures updates are applied incrementally, with schema evolution support.
+External Delta tables in ADLS

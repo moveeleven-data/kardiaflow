@@ -8,6 +8,8 @@ TO-DO:
  execution without blocking downstream tasks. Move Patients to a separate scheduled 
  batch job, since it doesn't require streaming or frequent updates
 
+- document unit tests
+
 ## 2025-07-31
 
 Switched Kardiaflow's ADLS authentication method from SAS token to OAuth via a

@@ -26,13 +26,5 @@ This layer aggregates lifecycle metrics for individual patients based on encount
 ## Source
 
 - Table: `silver_encounters_enriched`  
-- Trigger: Full snapshot overwrite (daily), fast for small datasets  
-  - In production, switch to `foreachBatch + MERGE` for incremental updates
-
----
-
-## Use Cases
-
-- Track patient engagement patterns  
-- Segment populations by age and visit frequency  
-- Feed downstream cost, risk, or care pathway models
+- Trigger: Full snapshot overwrite (daily), fast for small datasets. Can switch to `foreachBatch + MERGE` for 
+  incremental updates.

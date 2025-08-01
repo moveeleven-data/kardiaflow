@@ -10,8 +10,8 @@ columns enabled. Configuration paths and settings are managed via `kflow.config.
 
 | Dataset    | Source Location                                                | Format | Loader Type     | Bronze Table                   |
 |------------|----------------------------------------------------------------|--------|------------------|--------------------------------|
-| Patients   | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/patients/`   | CSV    | Auto Loader      | `kardia_bronze.bronze_patients`  |
-| Encounters | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/encounters/` | Avro   | Auto Loader      | `kardia_bronze.bronze_encounters` |
+| Patients   | `abfss://lake@<storage>.dfs.core.windows.net/patients/`   | CSV    | Auto Loader      | `kardia_bronze.bronze_patients`  |
+| Encounters | `abfss://lake@<storage>.dfs.core.windows.net/encounters/` | Avro   | Auto Loader      | `kardia_bronze.bronze_encounters` |
 
 ---
 

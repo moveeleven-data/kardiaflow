@@ -6,11 +6,11 @@ Transforms raw Bronze data into refined, analytics-ready Delta tables using cons
 
 ## Transformation Logic
 
-| Dataset   | Method      | Output Table                       |
-|-----------|-------------|------------------------------------|
-| Claims    | SCD Type 1  | `kardia_silver.silver_claims`      |
-| Providers | SCD Type 2  | `kardia_silver.silver_providers`   |
-| Feedback  | Append-only | `kardia_silver.silver_feedback`    |
+| Dataset   | Method       | Output Table                       |
+|-----------|--------------|------------------------------------|
+| Claims    | SCD Type 1   | `kardia_silver.silver_claims`      |
+| Providers | SCD Type 2   | `kardia_silver.silver_providers`   |
+| Feedback  | MERGE Insert | `kardia_silver.silver_feedback`    |
 
 - **Claims**: Latest state per `claim_id`, derived from Bronze CDF with upserts by version.
 - **Providers**: Tracks full historical change with close-old / insert-new logic by `provider_id`.
@@ -39,7 +39,7 @@ All enriched views:
 |-----------|------------------|--------------------------------------|
 | Claims    | `availableNow`   | SCD1 merge by `claim_id`             |
 | Providers | Snapshot Compare | SCD2 merge by `provider_id`          |
-| Feedback  | Batch append     | Insert-only dedupe by `feedback_id`  |
+| Feedback  | MERGE Insert     | Insert-only dedupe by `feedback_id`  |
 
 Audit metadata (`_ingest_ts`, `_source_file`, `_batch_id`) is preserved across all tables.
 

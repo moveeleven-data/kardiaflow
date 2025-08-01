@@ -142,6 +142,36 @@ The teardown script script will:
 
 ---
 
+### To test locally:
+
+**1. Create a Workspace Files folder:
+
+```bash
+dbutils.fs.mkdirs("file:/Workspace/Shared/libs")
+```
+
+**2. Copy your wheel from DBFS to Workspace Files (allowed on Shared UC):**
+
+```bash
+dbutils.fs.cp(
+    "dbfs:/Shared/libs/kflow-0.4.3-py3-none-any.whl",
+    "file:/Workspace/Shared/libs/kflow-0.4.3-py3-none-any.whl"
+)
+```
+
+**3. Install the wheel on the cluster**
+
+Navigate to Cluster → Libraries → Install New → Python Whl → Workspace
+
+Path: Workspace:/Shared/libs/kflow-0.4.3-py3-none-any.whl
+
+Restart cluster when prompted.
+
+**When testing locally, remember to comment out `%pip install -q --no-deps --no-index --find-links=/dbfs/Shared/libs 
+kflow`**
+
+---
+
 ### When to Build a New Wheel
 
 If you've made changes to the `kflow` package — such as editing any `.py` files inside the `kflow/` directory — 

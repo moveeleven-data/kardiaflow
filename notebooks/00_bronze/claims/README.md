@@ -12,16 +12,17 @@ driven by `kflow.config.bronze_paths()`.
 
 | Dataset   | Source Location                                                   | Format    | Loader Type | Bronze Table                     |
 |-----------|--------------------------------------------------------------------|-----------|-------------|----------------------------------|
-| Claims    | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/claims/`         | Parquet   | Auto Loader | `kardia_bronze.bronze_claims`    |
-| Providers | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/providers/`      | TSV       | Auto Loader | `kardia_bronze.bronze_providers` |
-| Feedback  | `abfss://raw@kardiaadlsdemo.dfs.core.windows.net/feedback/`       | JSONL     | COPY INTO   | `kardia_bronze.bronze_feedback`  |
+| Claims    | `abfss://lake@<storage>.dfs.core.windows.net/claims/`         | Parquet   | Auto Loader | `kardia_bronze.bronze_claims`    |
+| Providers | `abfss://lake@<storage>.dfs.core.windows.net/providers/`      | TSV       | Auto Loader | `kardia_bronze.bronze_providers` |
+| Feedback  | `abfss://lake@<storage>.dfs.core.windows.net/feedback/`       | JSONL     | COPY INTO   | `kardia_bronze.bronze_feedback`  |
 
 ---
 
 ## Loader Strategy
 
 - Auto Loader is used for structured tabular datasets (CSV, TSV, Parquet) with known schemas and expected evolution over time. It supports incremental ingestion, schema tracking, and CDF compatibility, making it ideal for operational datasets like Claims and Providers.
-- COPY INTO is used for semistructured formats like JSONL, where ingestion requires SQL-based projection, type coercion, and conditional field handling. Feedback records include optional fields (e.g., `tags`, `metadata`, `source`), making COPY INTO better suited for schema-on-read with runtime control.
+- COPY INTO is used because Feedback arrives in small, asynchronous batches. Patients and Providers may arrive 
+  continuously or in date partitions, making Auto Loader’s checkpointing a better fit for those datasets.
 
 ---
 
@@ -32,7 +33,7 @@ driven by `kflow.config.bronze_paths()`.
 - Auto Loader in `availableNow` mode for batch-style ingestion  
 - Schema evolution enabled where supported  
 - Config-driven checkpointing, bad record paths, and schema storage  
-- Explicit schema enforcement for TSV/JSONL (Parquet uses embedded schema)
+- Explicit schema enforcement for flat files only CSV/TSV/JSONL (Parquet/Avro uses embedded schema)
 
 ---
 

@@ -42,11 +42,3 @@ Trigger: Snapshot overwrite
 
 Source: `silver_claims_enriched`  
 Trigger: Snapshot overwrite
-
----
-
-## Execution Pattern
-
-All Gold tables are fully rebuilt on each run (e.g. via `CREATE OR REPLACE TABLE`). This design favors clarity, supports daily refreshes, and is performant due to modest data volume.
-
-Windowing, grouping, and join logic are localized to each notebook and aligned with the business questions driving each KPI set.
