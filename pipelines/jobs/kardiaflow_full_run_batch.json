@@ -323,27 +323,11 @@
       "new_cluster": {
         "spark_version": "13.3.x-scala2.12",
         "node_type_id": "Standard_D4s_v3",
-
         "num_workers": 0,
         "custom_tags": { "ResourceClass": "SingleNode" },
         "spark_conf": {
           "spark.databricks.cluster.profile": "singleNode",
-          "spark.master": "local[*]",
-
-          "fs.azure.account.auth.type.kardiaadlsdemo.dfs.core.windows.net":
-            "OAuth",
-
-          "fs.azure.account.oauth.provider.type.kardiaadlsdemo.dfs.core.windows.net":
-            "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
-
-          "fs.azure.account.oauth2.client.id.kardiaadlsdemo.dfs.core.windows.net":
-            "{{secrets/kardia/sp_client_id}}",
-
-          "fs.azure.account.oauth2.client.secret.kardiaadlsdemo.dfs.core.windows.net":
-            "{{secrets/kardia/sp_client_secret}}",
-
-          "fs.azure.account.oauth2.client.endpoint.kardiaadlsdemo.dfs.core.windows.net":
-            "https://login.microsoftonline.com/15668640-472d-4df0-ae11-7dd7884ca296/oauth2/token"
+          "spark.master": "local[*]"
         }
       }
     }

@@ -56,15 +56,7 @@ az deployment group create \
 
 ---
 
-**4. Create service-principal & capture its three values: client_id, client_secret, tenant_id**
-
-```bash
-bash infra/deploy/create_sp.sh
-```
-
----
-
-**5. Generate a Databricks Personal Access Token (PAT) in the UI**
+**4. Generate a Databricks Personal Access Token in the UI**
 
 (Settings → Developer → Generate New Token)
 
@@ -72,17 +64,31 @@ Add it to infra/.env as ```DATABRICKS_PAT=...```
 
 ---
 
-**6. Authenticate the Databricks CLI and upload the SP secrets**
+**5. Authenticate the Databricks CLI (required to write secrets)**
 
 ```bash
+# (auth.sh sets DATABRICKS_HOST and DATABRICKS_TOKEN using PAT)
 source infra/.env
 source infra/deploy/auth.sh
-
-# store SP creds in the existing 'kardia' secret-scope
-databricks secrets put-secret kardia sp_client_id     --string-value "<client_id>"
-databricks secrets put-secret kardia sp_client_secret --string-value "<client_secret>"
-databricks secrets put-secret kardia sp_tenant_id     --string-value "<tenant_id>"
 ```
+
+NOTE: Secret scopes and storing secrets in them do **not** incur Databricks billing charges.
+
+---
+
+**6. Ensure/create the service principal, grant RBAC, rotate the secret, and sync to Databricks**
+
+```bash
+bash infra/deploy/ensure_sp.sh --rotate
+```
+
+NOTE:
+ensure_sp.sh is idempotent (it reuses the existing SP by name unless it’s absent
+or you explicitly pass --rotate). So you are not accumulating many unused SPs.
+
+Creating an Azure AD application / service principal, assigning it roles
+(e.g., “Storage Blob Data Contributor”), and rotating its secret do **not** incur
+Azure billing charges.
 
 ---
 
@@ -101,38 +107,27 @@ databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
 
 ---
 
-**7. Create Source and Medallion layer folders in ADLS**
+**(First Run Only) Execute `/notebooks/99_utilities/bootstrap_dir.ipynb`**
 
-```bash
-# Create Medallion layer folders
-databricks fs mkdirs  \
- "abfss://lake@${ADLS}.dfs.core.windows.net/kardia/bronze" \
- "abfss://lake@${ADLS}.dfs.core.windows.net/kardia/silver" \
- "abfss://lake@${ADLS}.dfs.core.windows.net/kardia/gold"
- 
-# (Optional) Create source folders:
-for d in encounters claims patients providers feedback; do
-  databricks fs mkdirs "abfss://lake@${ADLS}.dfs.core.windows.net/$d"
-done
-```
+Ensures source and medallion folders exist and seeds sample files.
 
 ---
 
-**9. Create or reset the full run batch job**
+**8. Create or reset the full run batch job**
 
 ```bash
-# To create from scratch
+# Create
 databricks jobs create --json @pipelines/jobs/kardiaflow_full_run_batch.json
 ```
 
 ```bash
-# To reset with a new wheel or config
+# Reset
 databricks jobs reset --json @pipelines/jobs/reset_kardiaflow_full_run_batch.json
 ```
 
 ---
 
-**10. Tear down all provisioned resources**
+**9. Tear down all provisioned resources**
 
 ```bash
 ./infra/deploy/teardown.sh
