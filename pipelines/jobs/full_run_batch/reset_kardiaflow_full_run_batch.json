@@ -222,7 +222,7 @@
         "webhook_notifications": {}
       },
       {
-        "task_key": "Gold_Claim_Anomalies",
+        "task_key": "Gold_Claim_Metrics",
         "depends_on": [
           {
             "task_key": "Silver_Enriched_Claims"
@@ -230,7 +230,7 @@
         ],
         "run_if": "ALL_SUCCESS",
         "notebook_task": {
-          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_claim_anomalies",
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/03_gold/claims/gold_claim_metrics",
           "source": "WORKSPACE"
         },
         "job_cluster_key": "Kardia_Jobs_Cluster",
@@ -296,7 +296,7 @@
         "task_key": "Kardia_Smoke_Tests",
         "depends_on": [
           {
-            "task_key": "Gold_Claim_Anomalies"
+            "task_key": "Gold_Claim_Metrics"
           },
           {
             "task_key": "Gold_Feedback_Metrics"
@@ -309,8 +309,9 @@
           }
         ],
         "run_if": "ALL_SUCCESS",
-        "spark_python_task": {
-          "python_file": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/04_tests/kardia_smoke_tests.py"
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/matthew.databrickslab2@outlook.com/kardiaflow/notebooks/04_tests/run_validation",
+          "source": "WORKSPACE"
         },
         "job_cluster_key": "Kardia_Jobs_Cluster",
         "timeout_seconds": 0,
@@ -324,22 +325,21 @@
         "new_cluster": {
           "spark_version": "13.3.x-scala2.12",
           "node_type_id": "Standard_D4s_v3",
-          "spark_env_vars": {
-            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
-          },
-          "data_security_mode": "DATA_SECURITY_MODE_DEDICATED",
-          "runtime_engine": "STANDARD",
-          "kind": "CLASSIC_PREVIEW",
-          "is_single_node": true
+          "num_workers": 0,
+          "custom_tags": { "ResourceClass": "SingleNode" },
+          "spark_conf": {
+            "spark.databricks.cluster.profile": "singleNode",
+            "spark.master": "local[*]"
+          }
         }
       }
     ],
     "queue": {
       "enabled": true
     },
-    "performance_target": "STANDARD",
     "run_as": {
       "user_name": "matthew.databrickslab2@outlook.com"
-    }
+    },
+    "performance_target": "STANDARD"
   }
 }

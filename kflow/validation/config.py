@@ -1,26 +1,22 @@
 # config.py
-# Configuration for KardiaFlow smoke tests:
-# - Defines test status constants and run timestamp
-# - Declares table-level test contracts for Bronze, Silver, and Gold layers
-# - Controls duplicate suppression logic for primary key validation
+# Configuration for Kardiaflow smoke tests
+#
+# - Test status constants and run timestamp
+# - Table-level validation contracts for Bronze, Silver, and Gold layers
+# - Optional suppression logic for primary key duplication checks
 from datetime import datetime
 
-# -------------------------------------------------------------------------
-# Status constants for test outcomes
-# -------------------------------------------------------------------------
+# Constants for test status outcomes
 PASS  = "PASS"
 FAIL  = "FAIL"
 ERROR = "ERROR"
 
-# -------------------------------------------------------------------------
-# Results table location and current run timestamp
-# -------------------------------------------------------------------------
-RESULTS_TABLE = "kardia_validation.smoke_results"
-RUN_TS = datetime.utcnow()  # Timestamp applied to all log records
+# Global config for this smoke test run
+RESULTS_TABLE = "kardia_validation.smoke_results" # Output table for all test results
+RUN_TS = datetime.utcnow()  # UTC timestamp for this run (applied to all log records)
 
-# -------------------------------------------------------------------------
-# Bronze-layer test contract: (table_name, primary_key)
-# -------------------------------------------------------------------------
+# Bronze Layer: List of (table_name, primary_key) tuples
+# Used for row count, PK uniqueness, and null PK checks
 BRONZE = [
     ("kardia_bronze.bronze_claims",     "ClaimID"),
     ("kardia_bronze.bronze_feedback",   "feedback_id"),
@@ -29,9 +25,8 @@ BRONZE = [
     ("kardia_bronze.bronze_patients",   "ID"),
 ]
 
-# -------------------------------------------------------------------------
-# Silver-layer test contract: required column sets per table
-# -------------------------------------------------------------------------
+# Silver Layer: Expected column sets per table (schema contracts)
+# Ensures no expected columns are missing (guards against schema drift)
 SILVER_CONTRACTS = {
     "kardia_silver.silver_claims": {
         "claim_id", "patient_id", "provider_id", "claim_amount",
@@ -47,19 +42,17 @@ SILVER_CONTRACTS = {
     },
 }
 
-# -------------------------------------------------------------------------
-# Gold-layer test contract: columns that must not contain nulls
-# -------------------------------------------------------------------------
+# Gold Layer: Columns that must not contain NULLs (critical for analytics)
+# Ensures output completeness and avoids downstream join or metric errors
 GOLD_NOT_NULL = {
     "kardia_gold.gold_patient_lifecycle":     ["patient_id"],
     "kardia_gold.gold_feedback_satisfaction": ["provider_id", "avg_score"],
 }
 
-# -------------------------------------------------------------------------
-# Downstream duplicate suppression map:
-# If a Bronze table has duplicates, but the related Silver table does not,
-# treat the test as a PASS.
-# -------------------------------------------------------------------------
+# Duplicate Suppression:
+# Allow a Bronze table to pass the "duplicate PK" check if the downstream
+# Silver table contains no duplicates for the mapped key. Useful in cases
+# where upstream duplicates are known but resolved later in the pipeline.
 SUPPRESS = {
     "kardia_bronze.bronze_patients": ("kardia_silver.silver_patients", "id")
 }

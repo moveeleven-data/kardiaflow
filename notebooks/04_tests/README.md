@@ -1,44 +1,30 @@
-# Smoke Test Suite for KardiaFlow
+# KardiaFlow Smoke Tests
 
-Runs end‑to‑end smoke tests on the Bronze, Silver and Gold Delta tables in Kardiaflow pipeline.
+End-to-end checks for Bronze, Silver, and Gold tables after each pipeline run.
 
-All test records are appended to the Delta table kardia_validation.smoke_results with columns:
+Results are written to:  
+**`kardia_validation.smoke_results`**
 
-> run_ts | layer | table_name | metric | value | status | message
-
-Each row shows what was tested and whether it passed, failed or errored.
+| Column      | Description                        |
+|-------------|------------------------------------|
+| `run_ts`    | Timestamp of test run              |
+| `layer`     | `BRONZE`, `SILVER`, or `GOLD`      |
+| `table_name`| Full Delta table name              |
+| `metric`    | Validation type (e.g. `row_count`) |
+| `value`     | Observed value                     |
+| `status`    | `PASS`, `FAIL`, or `ERROR`         |
+| `message`   | Optional notes / error details     |
 
 ---
 
-## File overview
+## What It Checks
 
-- `config.py`  
-  Defines test status constants (`PASS`, `FAIL`, `ERROR`), sets the run timestamp, declares Bronze/Silver/Gold table contracts, and manages the downstream duplicate suppression map.
+- **Bronze:**  
+  - Rows > 0  
+  - No null or duplicate PKs (unless suppressed)
 
+- **Silver:**  
+  - All expected columns are present
 
-- `logging_utils.py`  
-  Maintains an in-memory `LOGS` list and provides the `log()` function to record and print structured test results.
-
-
-- `bronze_checks.py`  
-  Validates Bronze tables by checking:  
-  1. Row count > 0  
-  2. No duplicate primary keys (with optional suppression)  
-  3. No null primary keys  
-  4. Valid `_ingest_ts` column if present
-
-
-- `silver_checks.py`  
-  Ensures each Silver table includes all expected columns defined in the contract.
-
-
-- `gold_checks.py`  
-  Verifies that specified Gold-layer columns contain no `NULL` values.
-
-
-- `run_smoke.py`  
-  Defines the `run_all_smoke_tests()` entrypoint and orchestrates the suite by:
-  1. Installing the `kflow` wheel from DBFS (which contains the `kflow.validation` test module)  
-  2. Invoking `run_all_smoke_tests()` to run Bronze, Silver, and Gold checks  
-  3. Writing the in‑memory `LOGS` list into the Delta table `kardia_validation.smoke_results`  
-  4. Printing a PASS/FAIL summary to stdout
+- **Gold:**  
+  - Critical columns are non-null

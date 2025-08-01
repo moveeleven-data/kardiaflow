@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-# Build kflow wheel and push it to /Workspace/Shared/libs
+# Build kflow wheel and upload it to /Workspace/Shared/libs in the Databricks workspace
+
 set -euo pipefail
 
-# ───────────── 0. Locate .env & repo root ─────────────
-here="$(cd "$(dirname "$0")" && pwd)"       # …/infra/deploy
-infra_root="$here/.."                       # …/infra
-repo_root="$infra_root/.."                  # project root
+# 1. Set working directories and verify required .env config
+here="$(cd "$(dirname "$0")" && pwd)"   # …/infra/deploy
+infra_root="$here/.."                   # …/infra
+repo_root="$infra_root/.."              # project root
 cd "$repo_root"
 
 ENV_FILE="$infra_root/.env"
 [[ -f "$ENV_FILE" ]] || {
   echo "ERROR: .env not found at $ENV_FILE" >&2; exit 1; }
 
-# shellcheck source=/dev/null
+# Load Databricks token from .env
 source "$ENV_FILE"
 : "${DATABRICKS_PAT:?ERROR: Set DATABRICKS_PAT in infra/.env}"
 
-# ───────────── 1. Resolve kflow version ─────────────
+
+# 2. Read the current kflow version from pyproject.toml
 KFLOW_VER="$(python - <<'PY'
 import sys, pathlib
 if sys.version_info >= (3, 11):
@@ -30,7 +32,8 @@ PY
 )"
 wheel_glob="dist/kflow-${KFLOW_VER}-py3-none-any.whl"
 
-# ───────────── 2. Build wheel ─────────────
+
+# 3. Build the wheel file using setuptools
 python -m pip install --quiet --upgrade build setuptools wheel
 python -m build --wheel >/dev/null
 
@@ -40,7 +43,8 @@ python -m build --wheel >/dev/null
 wheel_path="$(ls $wheel_glob | head -1)"
 wheel_name="$(basename "$wheel_path")"
 
-# ───────────── 3. Databricks auth ─────────────
+
+# 4. Authenticate with Databricks CLI using values from the deployment output
 DB_HOST="$(az deployment group show \
   --resource-group "$RG" \
   --name "$DEPLOY" \
@@ -54,7 +58,8 @@ databricks configure --token \
   --token "$DATABRICKS_TOKEN" \
   --profile "$PROFILE" >/dev/null
 
-# ───────────── 4. Upload wheel ─────────────
+
+# 5. Upload the wheel to Databricks Workspace under /Workspace/Shared/libs
 WS_DEST_DIR="/Workspace/Shared/libs"
 WS_DEST_PATH="${WS_DEST_DIR}/${wheel_name}"
 

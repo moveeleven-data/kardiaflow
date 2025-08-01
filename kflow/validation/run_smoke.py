@@ -24,6 +24,7 @@ subprocess.check_call(
     ]
 )
 
+from ..auth_adls import ensure_adls_oauth
 from .config import (
     RESULTS_TABLE,
     BRONZE,
@@ -40,6 +41,11 @@ from .gold_checks   import check_gold_not_null
 
 # Create the Spark session. (needed to run via Lakeflow Jobs)
 spark = SparkSession.builder.getOrCreate()
+
+spark.sql("USE CATALOG hive_metastore")
+
+# Configure ABFS OAuth
+ensure_adls_oauth(validate_path="")
 
 def ensure_results_table():
     """

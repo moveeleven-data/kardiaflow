@@ -2,13 +2,17 @@
 
 ## 2025-08-01
 
+Resoled all errors related to switching Kardiaflow from SAS token authentication
+to OAuth. Ran the full batch pipeline end-to-end and verified everything works,
+from ingestion in ADLS raw zone to Gold layer. Documented unit tests. 
+
+
 TO-DO:
 
  - Split Encounters into a standalone job to support toggleable batch/streaming
  execution without blocking downstream tasks. Move Patients to a separate scheduled 
  batch job, since it doesn't require streaming or frequent updates
 
-- document unit tests
 
 ## 2025-07-31
 

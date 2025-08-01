@@ -15,7 +15,7 @@ _CONTAINER:     Final = "lake"
 
 # Root URIs
 LAKE_BASE: Final = f"abfss://{_CONTAINER}@{_ADLS_ACCOUNT}.dfs.{_ADLS_SUFFIX}"
-RAW_BASE:  Final = LAKE_BASE                       # raw datasets live directly here
+RAW_BASE:  Final = f"{LAKE_BASE}/source"           # raw datasets live directly here
 LAKE_ROOT: Final = f"{LAKE_BASE}/kardia"           # medallion layers
 
 # Database names
