@@ -8,7 +8,15 @@ from typing import Final
 
 from pyspark.sql import SparkSession
 
-from kflow.adls import LAKE_BASE, RAW_BASE
+# Static ADLS identifiers
+_ADLS_ACCOUNT:  Final = "kardiaadlsdemo"
+_ADLS_SUFFIX:   Final = "core.windows.net"
+_CONTAINER:     Final = "lake"
+
+# Root URIs
+LAKE_BASE: Final = f"abfss://{_CONTAINER}@{_ADLS_ACCOUNT}.dfs.{_ADLS_SUFFIX}"
+RAW_BASE:  Final = LAKE_BASE                       # raw datasets live directly here
+LAKE_ROOT: Final = f"{LAKE_BASE}/kardia"           # medallion layers
 
 # Database names
 BRONZE_DB:     Final = "kardia_bronze"
@@ -25,52 +33,17 @@ PHI_COLS_MASK: Final = [
     "BIRTHPLACE", "ADDRESS", "MAIDEN", "PREFIX", "SUFFIX"
 ]
 
-# Unified ADLS base path for all Delta tables and pipeline metadata.
-# Layout under LAKE_ROOT:
-#   /kardia/
-#     ├─ bronze/bronze_*        - Bronze Delta tables (raw ingested data)
-#     ├─ silver/silver_*        - Silver Delta tables (cleaned, normalized)
-#     ├─ gold/                  - Gold layer (CTAS analytical tables)
-#     ├─ _schemas/              - Auto Loader schema history
-#     ├─ _checkpoints/          - Structured Streaming checkpoints
-#     └─ _quarantine/           - Bad records captured during ingest
-LAKE_ROOT: Final = f"{LAKE_BASE}/kardia"
+# Path helpers
+def raw_path(ds: str)      -> str: return f"{RAW_BASE}/{ds}/"
+def bronze_table(ds: str)  -> str: return f"{BRONZE_DB}.bronze_{ds}"
+def silver_table(ds: str)  -> str: return f"{SILVER_DB}.silver_{ds}"
 
-# DB-level default paths for managed Delta tables
-BRONZE_DB_LOCATION: Final = f"{LAKE_ROOT}/bronze"
-SILVER_DB_LOCATION: Final = f"{LAKE_ROOT}/silver"
-GOLD_DB_LOCATION:   Final = f"{LAKE_ROOT}/gold"
+def bronze_path(ds: str)   -> str: return f"{LAKE_ROOT}/bronze/bronze_{ds}"
+def silver_path(ds: str)   -> str: return f"{LAKE_ROOT}/silver/silver_{ds}"
 
-# Path builders
-def raw_path(ds: str) -> str:
-    return f"{RAW_BASE}/{ds}/"
-
-def bronze_table(ds: str) -> str:
-    return f"{BRONZE_DB}.bronze_{ds}"
-
-def bronze_path(ds: str) -> str:
-    return f"{LAKE_ROOT}/bronze/bronze_{ds}"
-
-def schema_path(ds: str) -> str:
-    return f"{LAKE_ROOT}/_schemas/{ds}"
-
-def checkpoint_path(name: str) -> str:
-    return f"{LAKE_ROOT}/_checkpoints/{name}"
-
-def quarantine_path(ds: str) -> str:
-    return f"{LAKE_ROOT}/_quarantine/bad_{ds}"
-
-def silver_table(ds: str) -> str:
-    return f"{SILVER_DB}.silver_{ds}"
-
-def silver_path(ds: str) -> str:
-    return f"{LAKE_ROOT}/silver/silver_{ds}"
-
-def gold_table(name: str) -> str:
-    return f"{GOLD_DB}.{name}"
-
-def validation_summary_table(name: str) -> str:
-    return f"{VALIDATION_DB}.{name}_summary"
+def schema_path(ds: str)   -> str: return f"{LAKE_ROOT}/_schemas/{ds}"
+def checkpoint_path(tag)   -> str: return f"{LAKE_ROOT}/_checkpoints/{tag}"
+def quarantine_path(ds: str)-> str: return f"{LAKE_ROOT}/_quarantine/bad_{ds}"
 
 # Bundled path namespaces
 def bronze_paths(ds: str, checkpoint_suffix: str | None = None) -> SimpleNamespace:

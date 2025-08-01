@@ -1,6 +1,6 @@
 ## Pipelines
 
-Orchestration and visualization assets for **KardiaFlow**. This folder enables full demo runs, streaming ingestion, and modular job scheduling without modifying notebooks.
+Orchestration and visualization assets for **KardiaFlow**. This folder enables full demo runs, streaming ingestion, and job scheduling without modifying notebooks.
 
 ### Contents
 

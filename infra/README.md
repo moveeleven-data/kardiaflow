@@ -56,7 +56,15 @@ az deployment group create \
 
 ---
 
-**4. Generate a Databricks Personal Access Token (PAT) in the UI**
+**4. Create service-principal & capture its three values: client_id, client_secret, tenant_id**
+
+```bash
+bash infra/deploy/create_sp.sh
+```
+
+---
+
+**5. Generate a Databricks Personal Access Token (PAT) in the UI**
 
 (Settings → Developer → Generate New Token)
 
@@ -64,24 +72,21 @@ Add it to infra/.env as ```DATABRICKS_PAT=...```
 
 ---
 
-**5. Authenticate once (now that PAT exists)**
+**6. Authenticate the Databricks CLI and upload the SP secrets**
 
 ```bash
 source infra/.env
 source infra/deploy/auth.sh
+
+# store SP creds in the existing 'kardia' secret-scope
+databricks secrets put-secret kardia sp_client_id     --string-value "<client_id>"
+databricks secrets put-secret kardia sp_client_secret --string-value "<client_secret>"
+databricks secrets put-secret kardia sp_tenant_id     --string-value "<tenant_id>"
 ```
 
 ---
 
-**6. Generate and store the ADLS SAS token in Databricks**
-
-```bash
-infra/deploy/gen_sas.sh
-```
-
----
-
-**7. Build and upload the wheel to DBFS**
+**7. Build kflow wheel and push to DBFS**
 
 This installs the build tool, creates the .whl package from pyproject.toml, and uploads it to DBFS.
 
@@ -96,13 +101,24 @@ databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
 
 ---
 
-**7. Create Medallion Layer Folders**
+**7. Create Source and Medallion layer folders in ADLS**
 
-Run ```notebooks/99_utilities/bootstrap_dir_adls.ipynb``` to create /kardia/{bronze,silver,gold} in ADLS:
+```bash
+# Create Medallion layer folders
+databricks fs mkdirs  \
+ "abfss://lake@${ADLS}.dfs.core.windows.net/kardia/bronze" \
+ "abfss://lake@${ADLS}.dfs.core.windows.net/kardia/silver" \
+ "abfss://lake@${ADLS}.dfs.core.windows.net/kardia/gold"
+ 
+# (Optional) Create source folders:
+for d in encounters claims patients providers feedback; do
+  databricks fs mkdirs "abfss://lake@${ADLS}.dfs.core.windows.net/$d"
+done
+```
 
 ---
 
-**8. Create or reset the full run batch job**
+**9. Create or reset the full run batch job**
 
 ```bash
 # To create from scratch
@@ -116,7 +132,7 @@ databricks jobs reset --json @pipelines/jobs/reset_kardiaflow_full_run_batch.jso
 
 ---
 
-**9. Tear down all provisioned resources**
+**10. Tear down all provisioned resources**
 
 ```bash
 ./infra/deploy/teardown.sh

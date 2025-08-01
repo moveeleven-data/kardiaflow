@@ -2,18 +2,22 @@
 
 ## 2025-07-31
 
-TO-DO:
+Switched Kardiaflow's ADLS authentication method from SAS token to OAuth via a
+service principal. This involves creating a service principal, granting it
+Storage Blob Contributor access on the ADLS account and storing its client_id,
+client_secret, and tenant_id in the Databricks secret scope so Spark can authenticate
+using OAuth for file operations.
 
 Added unit tests and integrated with Github Actions. Finalize video walkthrough
 for Kardiaflow full run demo. Added PHI columns: ADDRESS, MAIDEN, PREFIX, SUFFIX.
 Added a function in etl_utils.py in kflow to address edge case where Bronze notebooks
 read from empty folders and prevent job from failing.
 
+TO-DO:
+
  - Split Encounters into a standalone job to support toggleable batch/streaming
  execution without blocking downstream tasks. Move Patients to a separate scheduled 
  batch job, since it doesn't require streaming or frequent updates
-
-- review silver and gold layers and unit tests
 
 
 ## 2025-07-30
