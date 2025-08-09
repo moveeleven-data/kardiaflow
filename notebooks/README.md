@@ -1,22 +1,14 @@
-# Kardiaflow: Unified Health Data Pipeline
+# Kardiaflow Databricks Notebooks
 
-This project ingests synthetic healthcare data into a Databricks Lakehouse using
-**Delta Lake**, **Auto Loader**, and a **medallion architecture**. It supports two core domains:
+This directory contains the Databricks notebooks that implement Kardiaflow’s **Bronze**, **Silver**, **Gold**, and **validation** layers (with optional streaming for Encounters).
 
-- **Encounters & Patients** — clinical events and demographics  
-- **Claims, Providers & Feedback** — billing, metadata, and satisfaction
+The sections below provide a dataset-by-dataset breakdown of how each notebook processes data through the medallion architecture.
 
-Test files are uploaded to **ADLS Gen2** in `/lake/{raw | providers | claims | feedback | patients}` folders, where 
-they are picked up by Auto Loader pipelines.
+### Raw input paths
 
-All files are uploaded to **Azure Data Lake Storage Gen2 (ADLS)** under `/lake/kardia/...` paths, accessed via **OAuth2 
-service principal authentication**.
-
-### Raw File Paths
-
-| Dataset     | ADLS Path                                                | Format  |
-|-------------|----------------------------------------------------------|---------|
-| Patients    | `abfss://lake@<storage>.dfs.core.windows.net/patients/`  | CSV     |
+| Dataset     | ADLS Path                                                 | Format  |
+|------------ |-----------------------------------------------------------|---------|
+| Patients    | `abfss://lake@<storage>.dfs.core.windows.net/patients/`   | CSV     |
 | Encounters  | `abfss://lake@<storage>.dfs.core.windows.net/encounters/` | Avro    |
 | Claims      | `abfss://lake@<storage>.dfs.core.windows.net/claims/`     | Parquet |
 | Providers   | `abfss://lake@<storage>.dfs.core.windows.net/providers/`  | TSV     |
@@ -26,13 +18,13 @@ service principal authentication**.
 
 ## Bronze Ingestion
 
-Raw files are ingested into **Bronze Delta tables** using **Auto Loader** (or **COPY INTO** for JSONL formats). Each table includes:
+Raw files are ingested into **Bronze** Delta tables under the `kardia_bronze` schema. **Auto Loader** is used for structured tabular datasets (CSV, TSV, Parquet, Avro), while **COPY INTO** is used for the semi-structured JSONL **Feedback** dataset where SQL projection, casting, and optional fields are required. Paths, checkpoints, and schemas are driven by `kflow.config.bronze_paths()`.
 
-Auto Loader is used for structured formats like CSV, Parquet, and TSV where incremental discovery and schema evolution are important. In contrast, COPY INTO is used for the semistructured JSONL Feedback data, where SQL-based projection, type coercion, and optional field handling are required during load.
-
-- Audit columns: `_ingest_ts`, `_source_file`
-- Change Data Feed (CDF) enabled
-- Partitioning and schema enforcement
+- **Change Data Feed (CDF)** enabled on all Bronze tables  
+- **Audit columns**: `_ingest_ts`, `_source_file`, `_batch_id`  
+- **Auto Loader** for batch-style runs (Encounters can also run in streaming mode)  
+- **Schema handling**: explicit schema for CSV/TSV/JSONL; Parquet/Avro rely on embedded schema
+- **Config-driven** checkpoint, bad-record, and schema storage locations
 
 | Dataset     | Format   | Loader       | Bronze Table                      |
 |-------------|----------|--------------|-----------------------------------|
@@ -42,19 +34,11 @@ Auto Loader is used for structured formats like CSV, Parquet, and TSV where incr
 | Providers   | TSV      | Auto Loader  | `kardia_bronze.bronze_providers`  |
 | Feedback    | JSONL    | COPY INTO    | `kardia_bronze.bronze_feedback`   |
 
-All Bronze tables include:
-
-- Audit columns: `_ingest_ts`, `_source_file`, `_batch_id`
-- Schema enforcement + CDF (Change Data Feed) enabled
-
 ---
 
 ## Silver Transformation
 
-Silver notebooks apply:
-
-- **Deduplication** and **SCD logic**  
-- **PHI masking**
+Silver notebooks apply deduplication, SCD logic, and PHI masking
 
 | Dataset     | Method               | Silver Table                        |
 |-------------|----------------------|-------------------------------------|
@@ -89,43 +73,26 @@ Gold notebooks generate business-level aggregations for analytics and dashboards
 
 ## Validation
 
-Validation logic is built into `kflow.validation`, invoked via `run_smoke.py`. Results are written to 
-`kardia_validation.smoke_results`.
+Data quality checks in `kflow.validation` can be run via `run_smoke.py`, with results stored in the `kardia_validation.smoke_results` Delta table.  
 
-- **Bronze:** Row counts, PK nulls/dupes, `_ingest_ts`
-- **Silver:** Schema contract compliance
-- **Gold:** Not-null critical fields
+- **Bronze layer** – Checks row counts, primary key nulls/duplicates, and `_ingest_ts` values.  
+- **Silver layer** – Validates schema contract compliance.  
+- **Gold layer** – Ensures critical fields are not null.  
 
 ---
 
 ## Streaming Modes
 
-The **Encounters pipeline** supports runtime switching between batch and stream:
+The Encounters pipeline supports batch or streaming, controlled by a `mode` task parameter. If `mode` is omitted, it runs in batch.
 
-| Mode   | Behavior                                      |
-|--------|-----------------------------------------------|
-| `batch`| One-time read of all available data           |
-| `stream`| Continuous micro-batches every 30 seconds    |
+| Mode     | Behavior                                      |
+|----------|-----------------------------------------------|
+| `batch`  | One-time read of all available data           |
+| `stream` | Continuous micro-batches every ~30 seconds    |
 
-Only the **Encounters pipeline** supports this parameter:
+`mode` applies only to Encounters tasks: `bronze_encounters_autoloader`, `silver_encounters_scd1`, and `z_silver_encounters_enriched`. All other datasets (Patients, Claims, Providers, Feedback) always run in batch.
 
-- `bronze_encounters_autoloader`
-- `silver_encounters_scd1`
-- `z_silver_encounters_enriched`
+### Set the mode (Jobs UI)
 
-All other datasets (Patients, Claims, Providers, Feedback) run in batch mode and are unaffected.
-
----
-
-### How to set it
-
-In the Databricks Job UI:
-
-1. Open the job `KardiaFlow_Demo_FullRun`
-2. For each Encounters-related task, add a parameter:
-
-> Key: mode
-
-> Value: batch or stream
-
-You can leave the parameter out for batch tasks — they will ignore it.
+Open kardiaflow_encounters → select an Encounters task → **Edit** → add parameter `mode` with value `batch` or 
+`stream`.

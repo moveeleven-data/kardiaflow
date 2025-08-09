@@ -54,6 +54,8 @@ az deployment group create \
   --name "$DEPLOY"
 ```
 
+Resource creation typically completes in about five minutes.
+
 ---
 
 **4. Generate a Databricks Personal Access Token in the UI**
@@ -107,13 +109,13 @@ databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
 
 ---
 
-**(First Run Only) Execute `/notebooks/99_utilities/bootstrap_dir.ipynb`**
+**Execute `/notebooks/99_utilities/bootstrap_dir.ipynb`**
 
 Ensures source and medallion folders exist and seeds sample files.
 
 ---
 
-**8. Create or reset the full run batch job**
+**8. Create (or reset) the full run batch job**
 
 ```bash
 # Create
@@ -125,9 +127,11 @@ databricks jobs create --json @pipelines/jobs/kardiaflow_full_run_batch.json
 databricks jobs reset --json @pipelines/jobs/reset_kardiaflow_full_run_batch.json
 ```
 
+Once created, you can launch this job from the Databricks Jobs UI at any time. In the UI, select the job, click Run now, and monitor its tasks in real time. You can adjust parameters there — for example, set mode=stream for the Encounters pipeline.
+
 ---
 
-**9. Tear down all provisioned resources**
+**Tear down all provisioned resources**
 
 ```bash
 ./infra/deploy/teardown.sh
@@ -135,16 +139,17 @@ databricks jobs reset --json @pipelines/jobs/reset_kardiaflow_full_run_batch.jso
 
 The teardown script script will:
 
-- Deletes the Databricks workspace (automatically removes the managed RG)
-- Deletes the main resource group (kardia-rg-dev)
+- Delete the Databricks workspace (automatically removes the managed RG)
+- Delete the main resource group (kardia-rg-dev)
 - Print a confirmation message
-- Resources disappear within 2–5 minutes.
+
+Resources disappear within 2–5 minutes.
 
 ---
 
 ### To test locally:
 
-**1. Create a Workspace Files folder:
+**1. Create a Workspace Files folder:**
 
 ```bash
 dbutils.fs.mkdirs("file:/Workspace/Shared/libs")
@@ -165,10 +170,10 @@ Navigate to Cluster → Libraries → Install New → Python Whl → Workspace
 
 Path: Workspace:/Shared/libs/kflow-0.4.3-py3-none-any.whl
 
-Restart cluster when prompted.
+Restart cluster.
 
-**When testing locally, remember to comment out `%pip install -q --no-deps --no-index --find-links=/dbfs/Shared/libs 
-kflow`**
+**When testing locally, comment out `%pip install -q --no-deps --no-index --find-links=/dbfs/Shared/libs 
+kflow`**.
 
 ---
 
@@ -177,11 +182,11 @@ kflow`**
 If you've made changes to the `kflow` package — such as editing any `.py` files inside the `kflow/` directory — 
 follow these steps to deploy your updates:
 
-1. Update the version number in `pyproject.toml`
+**1. Update the version number in `pyproject.toml`**
 
 `version = "0.2.6"` → `version = "0.2.7"`
 
-2. Rebuild and re-upload the new wheel:
+**2. Rebuild and re-upload the new wheel:**
 
 ```bash
 python -m build --wheel

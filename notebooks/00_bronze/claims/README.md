@@ -21,8 +21,8 @@ driven by `kflow.config.bronze_paths()`.
 ## Loader Strategy
 
 - Auto Loader is used for structured tabular datasets (CSV, TSV, Parquet) with known schemas and expected evolution over time. It supports incremental ingestion, schema tracking, and CDF compatibility, making it ideal for operational datasets like Claims and Providers.
-- COPY INTO is used because Feedback arrives in small, asynchronous batches. Patients and Providers may arrive 
-  continuously or in date partitions, making Auto Loader’s checkpointing a better fit for those datasets.
+- COPY INTO is used because Feedback arrives in small, asynchronous batches. Since Patients and Providers may arrive 
+  continuously, making Auto Loader’s checkpointing a better fit for those datasets.
 
 ---
 
