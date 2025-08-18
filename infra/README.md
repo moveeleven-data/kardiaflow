@@ -74,7 +74,7 @@ source infra/.env
 source infra/deploy/auth.sh
 ```
 
-NOTE: Secret scopes and storing secrets in them do **not** incur Databricks billing charges.
+NOTE: Secret scopes and storing secrets in them do not incur Databricks billing charges.
 
 ---
 
