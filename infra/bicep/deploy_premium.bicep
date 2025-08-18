@@ -28,6 +28,8 @@ resource adls 'Microsoft.Storage/storageAccounts@2024-01-01' = {
     allowBlobPublicAccess: false
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
+    // For the Kardiaflow demo, I am leaving the public endpoint enabled.
+    // In a hardened setup this should be set to 'Disabled'.
     publicNetworkAccess: 'Enabled'
   }
 }
@@ -52,8 +54,12 @@ resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' = {
   properties: {
     managedResourceGroupId: subscriptionResourceId(
       'Microsoft.Resources/resourceGroups', managedRgName)
+    // For the Kardiaflow demo, I am leaving the public endpoint enabled.
+    // In a hardened setup this should be set to 'Disabled'.
     publicNetworkAccess: 'Enabled'
-    // <-- prevent Unity Catalog (and its Access Connector) from ever being created
+
+    // Use the legacy Hive metastore only.
+    // This prevents Unity Catalog (and its Access Connector) from being created.
     defaultCatalog: {
       initialType: 'HiveMetastore'
     }

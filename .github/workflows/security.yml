@@ -1,0 +1,28 @@
+name: security-min
+on:
+  pull_request:
+  push:
+    branches: [main, master, develop]
+
+jobs:
+  quick-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Secrets scan (informational)
+      - name: Secrets scan (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      # IaC scan of Bicep (informational)
+      - name: IaC misconfigs (Checkov on Bicep)
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra/bicep
+          framework: bicep
+          quiet: true
+          soft_fail: true
+          skip_check: CKV_AZURE_35,CKV_AZURE_59,CKV_AZURE_206,CKV2_AZURE_48,CKV_AZURE_158
