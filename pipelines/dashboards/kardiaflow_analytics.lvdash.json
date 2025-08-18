@@ -1,0 +1,539 @@
+{
+  "datasets": [
+    {
+      "name": "160f07d7",
+      "displayName": "ds_patient_lifecycle_summary",
+      "queryLines": [
+        "SELECT COUNT(DISTINCT patient_id) AS patients,\r\n",
+        "       SUM(CASE WHEN classification = 'new' THEN 1 ELSE 0 END) AS new_pts,\r\n",
+        "       SUM(CASE WHEN classification = 'returning' THEN 1 ELSE 0 END) AS returning_pts\r\n",
+        "FROM kardia_gold.gold_patient_lifecycle;"
+      ]
+    },
+    {
+      "name": "5b1c8420",
+      "displayName": "ds_gold_provider_7d_spend",
+      "queryLines": [
+        "SELECT\r\n",
+        "  spend_date AS date,\r\n",
+        "  ROUND(SUM(rolling_7d_spend), 2) AS total_rolling_7d_spend\r\n",
+        "FROM kardia_gold.gold_provider_7d_spend\r\n",
+        "WHERE spend_date >= DATE_SUB(CURRENT_DATE(), 60)\r\n",
+        "GROUP BY spend_date\r\n",
+        "ORDER BY date;"
+      ]
+    },
+    {
+      "name": "4a2b4ec8",
+      "displayName": "ds_denial_rate_by_specialty",
+      "queryLines": [
+        "SELECT COALESCE(provider_specialty, 'Unknown') AS specialty,\r\n",
+        "       ROUND(100.0 * (1.0 - (CAST(approved_count AS DOUBLE) / NULLIF(total_claims, 0))), 2) AS denial_rate_pct,\r\n",
+        "       total_claims\r\n",
+        "FROM kardia_gold.gold_claim_approval_by_specialty\r\n",
+        "WHERE total_claims > 0\r\n",
+        "ORDER BY denial_rate_pct DESC, total_claims DESC\r\n",
+        "LIMIT 7;"
+      ]
+    },
+    {
+      "name": "ba186e63",
+      "displayName": "ds_feedback_rate_per_encounter",
+      "queryLines": [
+        "WITH\r\n",
+        "feedback_with_visit AS (\r\n",
+        "  SELECT COUNT(*) AS feedback_count\r\n",
+        "  FROM kardia_silver.silver_feedback_enriched\r\n",
+        "  WHERE visit_id IS NOT NULL\r\n",
+        "),\r\n",
+        "encounter_count AS (\r\n",
+        "  SELECT COUNT(DISTINCT encounter_id) AS total_encounters\r\n",
+        "  FROM kardia_silver.silver_encounters_enriched\r\n",
+        ")\r\n",
+        "SELECT\r\n",
+        "  e.total_encounters,\r\n",
+        "  f.feedback_count AS feedback_submissions_with_visit,\r\n",
+        "  ROUND(100.0 * f.feedback_count / e.total_encounters, 2) AS feedback_response_rate_percent\r\n",
+        "FROM feedback_with_visit f, encounter_count e;"
+      ]
+    },
+    {
+      "name": "b825c72a",
+      "displayName": "ds_feedback_tag_summary",
+      "queryLines": [
+        "SELECT * FROM kardia_gold.gold_feedback_tag_analysis LIMIT 10;"
+      ]
+    },
+    {
+      "name": "64971ab9",
+      "displayName": "ds_qa_layer_status",
+      "queryLines": [
+        "WITH latest_run AS (\r\n",
+        "  SELECT MAX(run_ts) AS run_ts\r\n",
+        "  FROM kardia_validation.smoke_results\r\n",
+        "),\r\n",
+        "status_counts AS (\r\n",
+        "  SELECT layer, status, COUNT(*) AS count\r\n",
+        "  FROM kardia_validation.smoke_results\r\n",
+        "  WHERE run_ts = (SELECT run_ts FROM latest_run)\r\n",
+        "  GROUP BY layer, status\r\n",
+        "),\r\n",
+        "layer_summary AS (\r\n",
+        "  SELECT layer,\r\n",
+        "         COALESCE(MAX(CASE WHEN status = 'PASS'  THEN count END), 0) AS pass_count,\r\n",
+        "         COALESCE(MAX(CASE WHEN status = 'FAIL'  THEN count END), 0) AS fail_count,\r\n",
+        "         COALESCE(MAX(CASE WHEN status = 'ERROR' THEN count END), 0) AS error_count\r\n",
+        "  FROM status_counts\r\n",
+        "  GROUP BY layer\r\n",
+        ")\r\n",
+        "SELECT layer, pass_count, fail_count, error_count,\r\n",
+        "       CASE WHEN fail_count + error_count = 0 THEN 'PASS' ELSE 'ISSUES DETECTED' END AS qa_status\r\n",
+        "FROM layer_summary\r\n",
+        "ORDER BY CASE layer WHEN 'BRONZE' THEN 1 WHEN 'SILVER' THEN 2 WHEN 'GOLD' THEN 3 ELSE 4 END;"
+      ]
+    },
+    {
+      "name": "7a9d2412",
+      "displayName": "ds_satisfaction_score_by_provider_specialty",
+      "queryLines": [
+        "SELECT\r\n",
+        "  COALESCE(provider_specialty, 'Unknown') AS specialty,\r\n",
+        "  ROUND(AVG(CAST(satisfaction_score AS DOUBLE)), 2) AS avg_satisfaction_score,\r\n",
+        "  COUNT(*) AS feedback_count\r\n",
+        "FROM kardia_silver.silver_feedback_enriched\r\n",
+        "WHERE satisfaction_score IS NOT NULL\r\n",
+        "GROUP BY COALESCE(provider_specialty, 'Unknown')\r\n",
+        "HAVING COUNT(*) >= 5\r\n",
+        "ORDER BY avg_satisfaction_score DESC;"
+      ]
+    },
+    {
+      "name": "5796e997",
+      "displayName": "ds_avg_satisfaction_by_provider_location",
+      "queryLines": [
+        "SELECT\r\n",
+        "  provider_location,\r\n",
+        "  COUNT(*) AS feedback_count,\r\n",
+        "  ROUND(AVG(CAST(satisfaction_score AS DOUBLE)), 2) AS avg_score\r\n",
+        "FROM kardia_silver.silver_feedback_enriched\r\n",
+        "WHERE provider_location IS NOT NULL AND TRIM(provider_location) <> '' AND satisfaction_score IS NOT NULL\r\n",
+        "GROUP BY provider_location\r\n",
+        "HAVING COUNT(*) >= 5\r\n",
+        "ORDER BY feedback_count DESC;"
+      ]
+    },
+    {
+      "name": "aa24d532",
+      "displayName": "ds_top_ten_providers_by_claims_paid",
+      "queryLines": [
+        "SELECT\r\n",
+        "  provider_id,\r\n",
+        "  COALESCE(provider_specialty, 'Unknown') AS provider_specialty,\r\n",
+        "  ROUND(SUM(CASE WHEN claim_status = 'Approved' THEN claim_amount ELSE 0 END), 2) AS total_paid_usd\r\n",
+        "FROM kardia_silver.silver_claims_enriched\r\n",
+        "GROUP BY provider_id, COALESCE(provider_specialty, 'Unknown')\r\n",
+        "ORDER BY total_paid_usd DESC\r\n",
+        "LIMIT 10;"
+      ]
+    },
+    {
+      "name": "4513f871",
+      "displayName": "ds_most_frequent_test_failures",
+      "queryLines": [
+        "WITH latest_run AS (\r\n",
+        "  SELECT MAX(run_ts) AS run_ts FROM kardia_validation.smoke_results\r\n",
+        ")\r\n",
+        "SELECT CASE WHEN status IN ('FAIL','ERROR') THEN status ELSE 'PASS' END AS metric,\r\n",
+        "       COUNT(*) AS failure_count\r\n",
+        "FROM kardia_validation.smoke_results\r\n",
+        "WHERE run_ts = (SELECT run_ts FROM latest_run)\r\n",
+        "GROUP BY CASE WHEN status IN ('FAIL','ERROR') THEN status ELSE 'PASS' END\r\n",
+        "HAVING metric IN ('FAIL','ERROR')\r\n",
+        "ORDER BY failure_count DESC;"
+      ]
+    },
+    {
+      "name": "3dba8410",
+      "displayName": "ds_qa_volume_vs_failures",
+      "queryLines": [
+        "WITH latest_run AS (\r\n",
+        "  SELECT MAX(run_ts) AS run_ts FROM kardia_validation.smoke_results\r\n",
+        "),\r\n",
+        "layer_counts AS (\r\n",
+        "  SELECT layer,\r\n",
+        "         COUNT(*) AS row_count,\r\n",
+        "         SUM(CASE WHEN status IN ('FAIL','ERROR') THEN 1 ELSE 0 END) AS fail_count\r\n",
+        "  FROM kardia_validation.smoke_results\r\n",
+        "  WHERE run_ts = (SELECT run_ts FROM latest_run)\r\n",
+        "  GROUP BY layer\r\n",
+        ")\r\n",
+        "SELECT * FROM layer_counts;"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "1d425808",
+      "displayName": "Claims and Provider Trends",
+      "layout": [
+        {
+          "widget": {
+            "name": "1e7edab2",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Claims & Provider Trends — Spend, Denials, and Utilization Patterns"
+              ]
+            }
+          },
+          "position": { "x": 0, "y": 0, "width": 6, "height": 2 }
+        },
+        {
+          "widget": {
+            "name": "ae2399d0",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5b1c8420",
+                  "fields": [
+                    { "name": "daily(date)", "expression": "DATE_TRUNC(\"DAY\", `date`)" },
+                    { "name": "sum(total_rolling_7d_spend)", "expression": "SUM(`total_rolling_7d_spend`)" }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": { "fieldName": "daily(date)", "scale": { "type": "temporal" }, "displayName": "Claim Date" },
+                "y": { "fieldName": "sum(total_rolling_7d_spend)", "scale": { "type": "quantitative" }, "displayName": "Total Claims Paid" }
+              },
+              "frame": { "title": "7-Day Rolling Total of Insurance Claim Payments to All Providers (USD)", "showTitle": true }
+            }
+          },
+          "position": { "x": 0, "y": 2, "width": 6, "height": 6 }
+        },
+        {
+          "widget": {
+            "name": "404e4e9c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "4a2b4ec8",
+                  "fields": [
+                    { "name": "specialty", "expression": "`specialty`" },
+                    { "name": "avg(denial_rate_pct)", "expression": "AVG(`denial_rate_pct`)" }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": { "fieldName": "specialty", "scale": { "type": "categorical", "sort": { "by": "y-reversed" } }, "displayName": "specialty" },
+                "y": { "fieldName": "avg(denial_rate_pct)", "scale": { "type": "quantitative" }, "displayName": "Average denial_rate_pct" }
+              },
+              "frame": { "title": "Claim Denial Rate by Specialty", "showTitle": true },
+              "mark": { "colors": [ { "themeColorType": "visualizationColors", "position": 3 }, { "themeColorType": "visualizationColors", "position": 2 } ] }
+            }
+          },
+          "position": { "x": 0, "y": 8, "width": 3, "height": 5 }
+        },
+        {
+          "widget": {
+            "name": "d74ef497",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "aa24d532",
+                  "fields": [
+                    { "name": "provider_id", "expression": "`provider_id`" },
+                    { "name": "provider_specialty", "expression": "`provider_specialty`" },
+                    { "name": "total_paid_usd", "expression": "`total_paid_usd`" }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  { "fieldName": "provider_id", "type": "string", "displayAs": "string", "visible": true, "order": 100000, "title": "provider_id", "alignContent": "left", "displayName": "provider_id" },
+                  { "fieldName": "provider_specialty", "type": "string", "displayAs": "string", "visible": true, "order": 100001, "title": "provider_specialty", "alignContent": "left", "displayName": "provider_specialty" },
+                  { "fieldName": "total_paid_usd", "numberFormat": "0.00", "type": "float", "displayAs": "number", "visible": true, "order": 100002, "title": "total_paid_usd", "alignContent": "right", "displayName": "total_paid_usd" }
+                ]
+              },
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false
+            }
+          },
+          "position": { "x": 3, "y": 8, "width": 3, "height": 5 }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "f8187fe2",
+      "displayName": "Patient Experience",
+      "layout": [
+        {
+          "widget": {
+            "name": "fcaabb49",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Patient Experience Insights — Satisfaction by Specialty & Location, Participation, and Tag Trends"
+              ]
+            }
+          },
+          "position": { "x": 0, "y": 0, "width": 6, "height": 2 }
+        },
+        {
+          "widget": {
+            "name": "895e1355",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "7a9d2412",
+                  "fields": [
+                    { "name": "specialty", "expression": "`specialty`" },
+                    { "name": "avg(avg_satisfaction_score)", "expression": "AVG(`avg_satisfaction_score`)" }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": { "fieldName": "specialty", "scale": { "type": "categorical", "sort": { "by": "y-reversed" } }, "displayName": "Provider Specialty" },
+                "y": { "fieldName": "avg(avg_satisfaction_score)", "scale": { "type": "quantitative" }, "displayName": "Patient Satisfaction" }
+              },
+              "frame": { "title": "Average Satisfaction Score by Specialty", "showTitle": true }
+            }
+          },
+          "position": { "x": 0, "y": 2, "width": 3, "height": 6 }
+        },
+        {
+          "widget": {
+            "name": "a6903961",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5796e997",
+                  "fields": [
+                    { "name": "avg_score", "expression": "`avg_score`" },
+                    { "name": "provider_location", "expression": "`provider_location`" }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": { "fieldName": "avg_score", "scale": { "type": "quantitative" }, "displayName": "Average Satisfaction" },
+                "color": { "fieldName": "provider_location", "scale": { "type": "categorical" }, "displayName": "Provider Location" },
+                "label": { "show": true }
+              },
+              "frame": { "title": "Average Satisfaction Score by Provider Location", "showTitle": true, "showDescription": false }
+            }
+          },
+          "position": { "x": 3, "y": 2, "width": 3, "height": 7 }
+        },
+        {
+          "widget": {
+            "name": "ad07e136",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ba186e63",
+                  "fields": [
+                    { "name": "avg(feedback_response_rate_percent)", "expression": "AVG(`feedback_response_rate_percent`)" }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": { "fieldName": "avg(feedback_response_rate_percent)", "displayName": "Average feedback_response_rate_percent" }
+              },
+              "frame": { "title": "Feedback Participation Rate After Visits", "showTitle": true }
+            }
+          },
+          "position": { "x": 3, "y": 9, "width": 2, "height": 2 }
+        },
+        {
+          "widget": {
+            "name": "47404d6d",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b825c72a",
+                  "fields": [
+                    { "name": "tag", "expression": "`tag`" },
+                    { "name": "feedback_count", "expression": "`feedback_count`" },
+                    { "name": "avg_score", "expression": "`avg_score`" }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  { "fieldName": "tag", "type": "string", "displayAs": "string", "visible": true, "order": 100000, "title": "Feedback Topic", "alignContent": "left", "displayName": "tag" },
+                  { "fieldName": "feedback_count", "numberFormat": "0", "type": "integer", "displayAs": "number", "visible": true, "order": 100001, "title": "# of Mentions", "alignContent": "right", "displayName": "feedback_count" },
+                  { "fieldName": "avg_score", "numberFormat": "0.00", "type": "float", "displayAs": "number", "visible": true, "order": 100002, "title": "Avg Satisfaction (1–5)", "alignContent": "right", "displayName": "avg_score" }
+                ]
+              },
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false,
+              "frame": { "title": "What Patients Are Saying: Feedback Tag Insights", "showTitle": true }
+            }
+          },
+          "position": { "x": 0, "y": 8, "width": 3, "height": 4 }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "453aaaad",
+      "displayName": "Data Quality Summary",
+      "layout": [
+        {
+          "widget": {
+            "name": "4cf1fbb3",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Data Quality Summary – Validation Status by Pipeline Layer"
+              ]
+            }
+          },
+          "position": { "x": 0, "y": 0, "width": 6, "height": 2 }
+        },
+        {
+          "widget": {
+            "name": "2d46e609",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "64971ab9",
+                  "fields": [
+                    { "name": "layer", "expression": "`layer`" },
+                    { "name": "pass_count", "expression": "`pass_count`" },
+                    { "name": "qa_status", "expression": "`qa_status`" }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  { "fieldName": "layer", "type": "string", "displayAs": "string", "visible": true, "order": 100000, "title": "Medallion Layer", "alignContent": "left", "displayName": "layer" },
+                  { "fieldName": "pass_count", "numberFormat": "0", "type": "integer", "displayAs": "number", "visible": true, "order": 100001, "title": "Passed Tests", "alignContent": "right", "displayName": "pass_count" },
+                  { "fieldName": "qa_status", "type": "string", "displayAs": "string", "visible": true, "order": 100004, "title": "QA Status", "alignContent": "left", "displayName": "qa_status" }
+                ]
+              },
+              "invisibleColumns": [
+                { "name": "fail_count", "type": "integer", "displayAs": "number", "order": 100002, "title": "fail_count" },
+                { "name": "error_count", "type": "integer", "displayAs": "number", "order": 100003, "title": "error_count" }
+              ],
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false,
+              "frame": { "title": "Latest QA Results by Medallion Layer", "showTitle": true }
+            }
+          },
+          "position": { "x": 0, "y": 8, "width": 3, "height": 4 }
+        },
+        {
+          "widget": {
+            "name": "8b41cc66",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "4513f871",
+                  "fields": [
+                    { "name": "sum(failure_count)", "expression": "SUM(`failure_count`)" },
+                    { "name": "metric", "expression": "`metric`" }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": { "fieldName": "sum(failure_count)", "scale": { "type": "quantitative" }, "displayName": "Failures" },
+                "color": { "fieldName": "metric", "scale": { "type": "categorical" }, "displayName": "metric" },
+                "label": { "show": true }
+              },
+              "frame": { "title": "Failure Types Detected in Latest QA Run", "showTitle": true }
+            }
+          },
+          "position": { "x": 3, "y": 2, "width": 3, "height": 10 }
+        },
+        {
+          "widget": {
+            "name": "7c146686",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3dba8410",
+                  "fields": [
+                    { "name": "row_count", "expression": "`row_count`" },
+                    { "name": "fail_count", "expression": "`fail_count`" }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": { "fieldName": "row_count", "scale": { "type": "quantitative" }, "displayName": "Total Checks" },
+                "y": { "fieldName": "fail_count", "scale": { "type": "quantitative" }, "displayName": "Failures" }
+              },
+              "frame": { "showTitle": true, "title": "QA Check Volume vs. Failures (Latest Run)" }
+            }
+          },
+          "position": { "x": 0, "y": 2, "width": 3, "height": 6 }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": { "theme": { "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED" } }
+}

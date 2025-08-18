@@ -1,23 +1,38 @@
 name: security-min
+run-name: "Security - ${{ github.ref_name }} (${{ github.event_name }})"
+
+# Run security checks on pushes/PRs to master
 on:
-  pull_request:
   push:
-    branches: [main, master, develop]
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+# Only keep the latest run per branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only permissions
+permissions:
+  contents: read
 
 jobs:
   quick-sanity:
     runs-on: ubuntu-latest
     steps:
+      # Fetch repo content
       - uses: actions/checkout@v4
 
-      # Secrets scan (informational)
+      # Run secrets scan
       - name: Secrets scan (Gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      # IaC scan of Bicep (informational)
+      # Run IaC misconfiguration scan against Bicep templates
       - name: IaC misconfigs (Checkov on Bicep)
         uses: bridgecrewio/checkov-action@v12
         with:

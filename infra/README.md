@@ -8,7 +8,7 @@ This folder contains the infrastructure-as-code (IaC) scripts for deploying and 
 
 KardiaFlow is designed for use with a **Databricks Premium-tier workspace**, enabling support for dashboards and future extensibility.
 
-> 💡 **Note:**  
+> **Note:**  
 > KardiaFlow does **not** use Unity Catalog or Delta Live Tables (DLT).  
 > It relies on Delta Lake, Auto Loader, and Databricks Jobs for portability and low cost.
 
