@@ -1,4 +1,4 @@
-# gold_checks.py
+# kflow/validation/gold_checks.py
 # Ensures Gold-layer columns contain no NULL values
 
 from pyspark.sql import SparkSession, functions as F

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Build kflow wheel and publish to Workspace, plus a stable requirements file (Workspace).
+# infra/deploy/publish_kflow.sh
+# Build kflow wheel and upload to Databricks Workspace.
+# Export a pinned requirements file for Workspace jobs.
+# Requires infra/.env and a configured Databricks CLI.
 
 set -euo pipefail
 

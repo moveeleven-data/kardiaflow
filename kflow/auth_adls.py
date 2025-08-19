@@ -1,4 +1,4 @@
-# src/kflow/auth_adls.py
+# kflow/auth_adls.py
 # ADLS Gen2 OAuth setup for ABFS on Databricks (idempotent per session)
 
 from __future__ import annotations

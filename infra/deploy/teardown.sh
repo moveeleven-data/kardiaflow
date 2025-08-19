@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Fully tear down the Kardiaflow development environment in a safe order.
+# infra/deploy/teardown.sh
+# Tear down the KardiaFlow dev environment in safe order.
 #
 # This sequence avoids dependency and deletion issues:
 # - Workspace must be deleted first to lift system deny assignment on the managed RG.
@@ -14,9 +15,8 @@
 
 set -euo pipefail
 
-# -------------------------------------------------
+
 # 1. Load environment and resolve paths
-# -------------------------------------------------
 
 here="$(cd "$(dirname "$0")" && pwd)"
 infra_root="$here/.."
@@ -32,15 +32,13 @@ MANAGED_RG="${MANAGED_RG:-}"
 
 [[ -n "$SUB" ]] && az account set --subscription "$SUB" >/dev/null
 
-# -------------------------------------------------
+
 # 2. Ensure Databricks CLI extension exists
-# -------------------------------------------------
 
 az extension add -n databricks -y >/dev/null 2>&1 || az extension update -n databricks -y >/dev/null 2>&1
 
-# -------------------------------------------------
+
 # 3. Define helper functions
-# -------------------------------------------------
 
 rg_exists()       { [[ "$(az group exists --name "$1" -o tsv 2>/dev/null)" == "true" ]]; }
 ws_exists()       { az databricks workspace show -g "$RG" -n "$WORKSPACE" >/dev/null 2>&1; }
@@ -71,14 +69,13 @@ wait_rg_deleted() {
   return 1
 }
 
-# -------------------------------------------------
+
 # 4. Attempt to discover managed RG if not supplied
-# -------------------------------------------------
 
 discover_managed_rg() {
   local id ac_rg sa_rg
 
-  # 1) From workspace property
+  # a. From workspace property
   if ws_exists; then
     id="$(az databricks workspace show -g "$RG" -n "$WORKSPACE" --query 'managedResourceGroupId' -o tsv 2>/dev/null || true)"
     if [[ -n "$id" ]]; then
@@ -87,20 +84,20 @@ discover_managed_rg() {
     fi
   fi
 
-  # 2) Conventional name
+  # b. Conventional name
   if rg_exists "${WORKSPACE}-managed"; then
     echo "${WORKSPACE}-managed"
     return
   fi
 
-  # 3) Single access connector RG heuristic
+  # c. Single access connector RG heuristic
   ac_rg="$(az resource list --resource-type Microsoft.Databricks/accessConnectors -o tsv --query "[].resourceGroup" 2>/dev/null | sort -u || true)"
   if [[ -n "$ac_rg" && "$(wc -l <<<"$ac_rg")" -eq 1 ]]; then
     echo "$ac_rg"
     return
   fi
 
-  # 4) Single dbstorage* SA RG heuristic
+  # d. Single dbstorage* SA RG heuristic
   sa_rg="$(az storage account list -o tsv --query "[?contains(name,'dbstorage')].resourceGroup" 2>/dev/null | sort -u || true)"
   if [[ -n "$sa_rg" && "$(wc -l <<<"$sa_rg")" -eq 1 ]]; then
     echo "$sa_rg"
@@ -110,9 +107,8 @@ discover_managed_rg() {
   echo ""
 }
 
-# -------------------------------------------------
+
 # 5. Remove all RBAC roles for connector identity
-# -------------------------------------------------
 
 strip_connector_rbac() {
   local id="$1"
@@ -129,9 +125,8 @@ strip_connector_rbac() {
   fi
 }
 
-# -----------------------------------------------------------
+
 # 6. Delete Databricks access connectors in a resource group
-# -----------------------------------------------------------
 
 delete_access_connectors_in_rg() {
   local rg="$1"
@@ -156,9 +151,8 @@ delete_access_connectors_in_rg() {
   done <<<"$ids"
 }
 
-# -----------------------------------------------------------
+
 # 7. Delete storage accounts in a resource group (best-effort)
-# -----------------------------------------------------------
 
 delete_storage_accounts_in_rg() {
   local rg="$1"
@@ -172,9 +166,8 @@ delete_storage_accounts_in_rg() {
   done
 }
 
-# ----------------------------------------------
+
 # 8. Begin teardown execution
-# ----------------------------------------------
 
 echo "Teardown: RG=$RG WORKSPACE=$WORKSPACE"
 
@@ -184,9 +177,8 @@ if [[ -z "${MANAGED_RG:-}" ]]; then
 fi
 echo "Discovered MANAGED_RG=${MANAGED_RG:-<unknown>}"
 
-# ----------------------------------------------
+
 # 9. Delete Databricks workspace (control plane)
-# ----------------------------------------------
 
 if ws_exists; then
   echo "Deleting Databricks workspace '$WORKSPACE'..."
@@ -197,23 +189,20 @@ if ws_exists; then
   fi
 fi
 
-# ----------------------------------------------
+
 # 10. Remove access connectors (main + managed RGs)
-# ----------------------------------------------
 
 delete_access_connectors_in_rg "$RG"
 delete_access_connectors_in_rg "${MANAGED_RG:-}"
 
-# ----------------------------------------------
-# 11. Proactively delete storage accounts (incl. dbstorage* and ADLS)
-# ----------------------------------------------
+
+# 11. Proactively delete storage accounts
 
 delete_storage_accounts_in_rg "${MANAGED_RG:-}"
 delete_storage_accounts_in_rg "$RG"
 
-# ----------------------------------------------
+
 # 12. Delete managed resource group
-# ----------------------------------------------
 
 if [[ -n "${MANAGED_RG:-}" ]] && rg_exists "$MANAGED_RG"; then
   echo "Deleting managed RG '$MANAGED_RG'..."
@@ -224,9 +213,8 @@ if [[ -n "${MANAGED_RG:-}" ]] && rg_exists "$MANAGED_RG"; then
   fi
 fi
 
-# ----------------------------------------------
+
 # 13. Delete main resource group
-# ----------------------------------------------
 
 if rg_exists "$RG"; then
   echo "Deleting main RG '$RG'..."

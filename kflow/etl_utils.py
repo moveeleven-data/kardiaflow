@@ -1,4 +1,4 @@
-# src/kflow/etl_utils.py
+# kflow/etl_utils.py
 # Utility function for DataFrame enrichment during ingestion
 # Adds standard audit columns: ingestion timestamp, source file path, batch ID
 

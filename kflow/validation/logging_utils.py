@@ -1,4 +1,4 @@
-# logging_utils.py
+# kflow/validation/logging_utils.py
 # Simple logger for KardiaFlow smoke tests
 # Tracks results in memory and prints readable status lines
 

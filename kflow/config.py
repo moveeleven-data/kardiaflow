@@ -1,4 +1,4 @@
-# src/kflow/config.py
+# kflow/config.py
 # Core configuration module for Kardiaflow pipeline
 # Defines constants for database names, change tracking, PHI masking
 # Builds standardized paths across pipeline layers
@@ -16,7 +16,7 @@ _CONTAINER:     Final = "lake"
 # Single base URI for the ADLS Gen2 container (public)
 _CONTAINER_URI: Final = f"abfss://{_CONTAINER}@{_ADLS_ACCOUNT}.dfs.{_ADLS_SUFFIX}"
 
-# Layer root directories
+# Medallion layer root directories
 GOLD_DIR: Final = f"{_CONTAINER_URI}/kardia/gold"
 
 # Database names
@@ -48,11 +48,7 @@ def quarantine_path(ds: str)-> str: return f"{_CONTAINER_URI}/kardia/_quarantine
 
 # Bundled path namespaces
 def bronze_paths(ds: str, checkpoint_suffix: str | None = None) -> SimpleNamespace:
-    """
-    Return a namespace with all paths related to a Bronze-layer dataset.
-
-    Includes raw input, table name, storage path, schema history, checkpoint, quarantine.
-    """
+    """ Return a namespace with all paths related to a Bronze-layer dataset. """
     cp = checkpoint_suffix or f"bronze_{ds}"
     return SimpleNamespace(
         db         = BRONZE_DB,
@@ -79,7 +75,6 @@ def current_batch_id() -> str:
     Return the current Databricks job run ID for traceability in audit columns.
 
     Falls back to 'manual' if not executing within a job context.
-    Used in both streaming and batch pipelines to support data lineage and reproducibility.
     """
     spark = SparkSession.builder.getOrCreate()
     return spark.conf.get("spark.databricks.job.runId", "manual")

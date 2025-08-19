@@ -1,4 +1,4 @@
-# run_smoke.py
+# kflow/validation/run_smoke.py
 # Orchestrator for KardiaFlow smoke tests:
 # - Installs the kflow package from DBFS
 # - Runs all Bronze, Silver, and Gold checks

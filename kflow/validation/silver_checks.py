@@ -1,4 +1,4 @@
-# silver_checks.py
+# kflow/validation/silver_checks.py
 # Ensures each Silver table adheres to its contract
 # This guards against schema drift and incomplete transformations
 

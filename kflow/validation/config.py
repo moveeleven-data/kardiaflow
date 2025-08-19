@@ -1,4 +1,4 @@
-# config.py
+# kflow/validation/config.py
 # Configuration for Kardiaflow smoke tests
 #
 # - Test status constants and run timestamp

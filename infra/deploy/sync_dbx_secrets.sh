@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# sync_dbx_secrets.sh — Create scope if missing, upsert SP creds.
+# infra/deploy/sync_dbx_secrets.sh
+# Ensure Databricks secret scope exists and upsert SP credentials.
+# Inputs: SCOPE, TENANT_ID, CLIENT_ID, CLIENT_SECRET (env).
 
 set -euo pipefail
 

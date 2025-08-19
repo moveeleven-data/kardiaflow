@@ -1,4 +1,4 @@
-# display_utils.py
+# kflow/display_utils.py
 # Utilities to inspect Delta table history.
 
 from pyspark.sql import SparkSession
