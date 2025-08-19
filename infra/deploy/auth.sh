@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
-# Authenticate Databricks CLI using environment variables from .env
-# Minimal, source-safe version (no vibe-code).
+# Authenticate Databricks CLI via env + Azure, safe to `source`.
 
-# Keep unset-var checking simple: we won't use `set -e` so sourcing can't kill your shell.
+# Do not use `set -e` in a script meant to be sourced.
 set -u -o pipefail
+
+# Load env
+here="$(cd "$(dirname "$0")" && pwd)"
+infra_root="$here/.."
+ENV_FILE="$infra_root/.env"
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "ERROR: .env not found at $ENV_FILE" >&2
+  return 1 2>/dev/null || exit 1
+fi
+# shellcheck disable=SC1090
+source "$ENV_FILE"
 
 # Required vars
 if [ -z "${DATABRICKS_PAT:-}" ] || [ -z "${RG:-}" ] || [ -z "${WORKSPACE:-}" ]; then

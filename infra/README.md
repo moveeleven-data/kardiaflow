@@ -68,9 +68,9 @@ Add it to infra/.env as ```DATABRICKS_PAT=...```
 
 **5. Authenticate the Databricks CLI (required to write secrets)**
 
+Set DATABRICKS_HOST and DATABRICKS_TOKEN using PAT.
+
 ```bash
-# (auth.sh sets DATABRICKS_HOST and DATABRICKS_TOKEN using PAT)
-source infra/.env
 source infra/deploy/auth.sh
 ```
 
@@ -94,17 +94,20 @@ Azure billing charges.
 
 ---
 
-**7. Build kflow wheel and push to DBFS**
+**7. Build and publish kflow wheel (DBFS + Workspace)**
 
-This installs the build tool, creates the .whl package from pyproject.toml, and uploads it to DBFS.
+Publishes a versioned wheel and refreshes a stable requirements file at dbfs:/Shared/libs/kflow-requirements.txt.
 
 ```bash
-python -m pip install --upgrade build
-python -m build
-WHL=$(ls dist/kflow-*-py3-none-any.whl | tail -n 1)
+bash infra/deploy/build_push_kflow.sh
+```
 
-databricks fs mkdirs dbfs:/Shared/libs
-databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
+Ensure every task in the job has the stable requirements library:
+
+```json
+"libraries": [
+  { "requirements": "dbfs:/Shared/libs/kflow-requirements.txt" }
+]
 ```
 
 ---
@@ -119,12 +122,12 @@ Ensures source and medallion folders exist and seeds sample files.
 
 ```bash
 # Create
-databricks jobs create --json @pipelines/jobs/kardiaflow_full_run_batch.json
+databricks jobs create --json @pipelines/jobs/full_run_batch/kardiaflow_full_run_batch.json
 ```
 
 ```bash
 # Reset
-databricks jobs reset --json @pipelines/jobs/reset_kardiaflow_full_run_batch.json
+databricks jobs reset --json @pipelines/jobs/full_run_batch/reset_kardiaflow_full_run_batch.json
 ```
 
 Once created, you can launch this job from the Databricks Jobs UI at any time. In the UI, select the job, click Run now, and monitor its tasks in real time. You can adjust parameters there — for example, set mode=stream for the Encounters pipeline.
@@ -147,40 +150,9 @@ Resources disappear within 2–5 minutes.
 
 ---
 
-### To test locally:
-
-**1. Create a Workspace Files folder:**
-
-```bash
-dbutils.fs.mkdirs("file:/Workspace/Shared/libs")
-```
-
-**2. Copy your wheel from DBFS to Workspace Files (allowed on Shared UC):**
-
-```bash
-dbutils.fs.cp(
-    "dbfs:/Shared/libs/kflow-0.4.3-py3-none-any.whl",
-    "file:/Workspace/Shared/libs/kflow-0.4.3-py3-none-any.whl"
-)
-```
-
-**3. Install the wheel on the cluster**
-
-Navigate to Cluster → Libraries → Install New → Python Whl → Workspace
-
-Path: Workspace:/Shared/libs/kflow-0.4.3-py3-none-any.whl
-
-Restart cluster.
-
-**When testing locally, comment out `%pip install -q --no-deps --no-index --find-links=/dbfs/Shared/libs 
-kflow`**.
-
----
-
 ### When to Build a New Wheel
 
-If you've made changes to the `kflow` package — such as editing any `.py` files inside the `kflow/` directory — 
-follow these steps to deploy your updates:
+If you change any code under kflow/, bump the version in pyproject.toml, then republish:
 
 **1. Update the version number in `pyproject.toml`**
 
@@ -189,14 +161,10 @@ follow these steps to deploy your updates:
 **2. Rebuild and re-upload the new wheel:**
 
 ```bash
-python -m build --wheel
-WHL=$(ls -t dist/kflow-*-py3-none-any.whl | head -1)
-
-databricks fs mkdirs dbfs:/Shared/libs
-databricks fs cp "$WHL" dbfs:/Shared/libs/ --overwrite
+bash infra/deploy/build_push_kflow.sh
 ```
 
-This ensures all notebooks and job runs use the latest version and prevents caching issues with `%pip`.
+Jobs pick up the new wheel automatically via the stable requirements file—no changes to job JSON or notebooks.
 
 ---
 

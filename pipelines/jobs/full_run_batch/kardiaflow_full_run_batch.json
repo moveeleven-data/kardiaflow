@@ -16,6 +16,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -31,6 +34,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -43,6 +49,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -55,6 +64,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -67,6 +79,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -84,6 +99,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -104,6 +122,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -121,6 +142,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -138,6 +162,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -161,6 +188,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -178,6 +208,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -195,6 +228,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -215,6 +251,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -232,6 +271,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -249,6 +291,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -269,6 +314,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -286,6 +334,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -312,6 +363,9 @@
         "source": "WORKSPACE"
       },
       "job_cluster_key": "Kardia_Jobs_Cluster",
+      "libraries": [
+        { "requirements": "/Workspace/Shared/libs/kflow-requirements.txt" }
+      ],
       "timeout_seconds": 0,
       "email_notifications": {},
       "webhook_notifications": {}
@@ -321,14 +375,15 @@
     {
       "job_cluster_key": "Kardia_Jobs_Cluster",
       "new_cluster": {
-        "spark_version": "13.3.x-scala2.12",
-        "node_type_id": "Standard_D4s_v3",
-        "num_workers": 0,
-        "custom_tags": { "ResourceClass": "SingleNode" },
+        "spark_version": "15.4.x-scala2.12",
         "spark_conf": {
-          "spark.databricks.cluster.profile": "singleNode",
           "spark.master": "local[*]"
-        }
+        },
+        "node_type_id": "Standard_D4s_v3",
+        "enable_elastic_disk": true,
+        "data_security_mode": "SINGLE_USER",
+        "kind": "CLASSIC_PREVIEW",
+        "is_single_node": true
       }
     }
   ],
