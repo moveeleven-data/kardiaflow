@@ -1,9 +1,9 @@
-# tests/test_bronze_checks.py
-# Unit test for the Bronze-level validation check.
-# Covers:
-# - Null primary key detection
-# - Duplicate primary key detection
-# - Presence of valid _ingest_ts timestamps
+"""Kardiaflow tests - Bronze checks
+
+Validates null/duplicate primary keys and _ingest_ts presence.
+"""
+
+from __future__ import annotations
 
 from datetime import datetime
 from pyspark.sql import Row
@@ -14,28 +14,27 @@ from kflow.validation.logging_utils import LOGS
 
 
 def test_bronze_checks_counts_and_statuses(spark, monkeypatch, clear_logs):
-    """
-    Verifies that the Bronze check detects:
-    - One null primary key
-    - One duplicate primary key
-    - Valid _ingest_ts values on all rows
-    """
+    """Verify the Bronze check sees one null PK, one duplicate PK, and valid _ingest_ts."""
 
     # Create test rows simulating Bronze table contents
-    row1 = Row(ID=None, _ingest_ts=datetime.utcnow())  # null ID
-    row2 = Row(ID=1,    _ingest_ts=datetime.utcnow())  # valid
-    row3 = Row(ID=1,    _ingest_ts=datetime.utcnow())  # duplicate ID
-    row4 = Row(ID=2,    _ingest_ts=datetime.utcnow())  # valid
+    rows = [
+        Row(ID=None, _ingest_ts=datetime.utcnow()),
+        Row(ID=1,    _ingest_ts=datetime.utcnow()),
+        Row(ID=1,    _ingest_ts=datetime.utcnow()),
+        Row(ID=2,    _ingest_ts=datetime.utcnow()),
+    ]
+    test_df = spark.createDataFrame(rows)
 
-    test_rows = [row1, row2, row3, row4]
-    test_df = spark.createDataFrame(test_rows)
+    # Stub SparkSession in bronze_checks to return the test DataFrame
+    # Return the test_df regardless of table name
+    class _StubSession:
+            def table(self, _): return test_df
+    class _Builder:
+            def getOrCreate(self): return _StubSession()
 
-    # Stub SparkSession in bronze_checks to return our test DataFrame
-    class SparkStub:
-        def table(self, _):
-            return test_df
-
-    monkeypatch.setattr(bronze_checks, "spark", SparkStub())
+    # Make the module build our stub session instead of a real SparkSession
+    from types import SimpleNamespace
+    monkeypatch.setattr(bronze_checks, "SparkSession", SimpleNamespace(builder=_Builder()))
 
     # Run the Bronze-level check on test data
     bronze_checks.check_bronze("kardia_bronze.bronze_patients", "ID")
@@ -52,7 +51,7 @@ def test_bronze_checks_counts_and_statuses(spark, monkeypatch, clear_logs):
     null_pk_status = log_by_metric["null_pk_count"]["status"]
     ts_status = log_by_metric["max__ingest_ts"]["status"]
 
-    assert row_count_status == PASS          # Non-zero row count
-    assert dup_pk_status == FAIL             # Duplicate ID=1
-    assert null_pk_status == FAIL            # One null ID
-    assert ts_status == PASS                 # All rows have _ingest_ts
+    assert row_count_status == PASS  # Non-zero row count
+    assert dup_pk_status == FAIL     # Duplicate ID=1
+    assert null_pk_status == FAIL    # One null ID
+    assert ts_status == PASS         # All rows have _ingest_ts

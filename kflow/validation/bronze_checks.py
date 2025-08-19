@@ -1,24 +1,28 @@
 # kflow/validation/bronze_checks.py
-# Validates Bronze tables for row count and PK uniqueness/nulls
+"""Kardiaflow validations - Bronze checks.
 
-import traceback
+Validates row count, primary key uniqueness/non-null, and presence of an
+_ingest_ts. Results are recorded via kflow.validation.logging_utils.log.
+"""
+
+from __future__ import annotations
 
 from pyspark.sql import SparkSession, functions as F
+import traceback
 
-from .config import PASS, FAIL, SUPPRESS
-from .logging_utils import log
+from kflow.validation.config import PASS, FAIL, SUPPRESS
+from kflow.validation.logging_utils import log
 
-# Create the Spark session. (needed to run via Lakeflow Jobs)
-spark = SparkSession.builder.getOrCreate()
 
 def check_bronze(table, pk):
-    """
-    Validate a Bronze table according to the following rules:
+    """Validate a Bronze table according to the following rules:
+
     1. row_count > 0
     2. no duplicate primary keys
     3. no null primary keys
     4. valid _ingest_ts
     """
+    spark = SparkSession.builder.getOrCreate()
     layer = "BRONZE"
     df = spark.table(table)
     total_rows = df.count()
@@ -51,7 +55,7 @@ def check_bronze(table, pk):
         "row_count == 0"
     )
 
-    # 2) Duplicate PK check (with optional downstream suppression)
+    # 2. Duplicate PK check (with optional downstream suppression)
     if duplicate_count > 0:
         status = FAIL
     else:

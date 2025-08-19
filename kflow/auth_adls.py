@@ -1,46 +1,28 @@
 # kflow/auth_adls.py
-# ADLS Gen2 OAuth setup for ABFS on Databricks (idempotent per session)
+"""Kardiaflow - ADLS Gen2 OAuth on Databricks.
+
+Configures Spark to access ADLS Gen2 using a service principal (OAuth).
+This function:
+  - Reads client credentials from a Databricks secret scope
+  - Writes OAuth configuration to spark.hadoop.* (the settings ABFS/Hive read)
+  - Removes any SharedKey/SAS leftovers that might override OAuth
+"""
 
 from __future__ import annotations
-
-from typing import Optional
 from pyspark.sql import SparkSession
 
 
 def ensure_adls_oauth(
     *,
     account: str = "kardiaadlsdemo",
-    container: str = "lake",
-    tenant_secret_scope: str = "kardia",
-    tenant_secret_key: str = "sp_tenant_id",
-    client_id_secret_scope: str = "kardia",
-    client_id_secret_key: str = "sp_client_id",
-    client_secret_scope: str = "kardia",
+    scope: str = "kardia",
+    tenant_key: str = "sp_tenant_id",
+    client_id_key: str = "sp_client_id",
     client_secret_key: str = "sp_client_secret",
-    validate_path: Optional[str] = "",  # default: container root
-) -> str:
-    """
-    Configure this Spark session to access ADLS Gen2 (ABFS) via SPN OAuth.
-    Secrets come from a Databricks scope. Optionally validate by listing a path.
-    Safe to call multiple times. Returns the base abfss:// URI.
-
-    Args:
-        account: Storage account name (without domain).
-        container: ADLS container name.
-        tenant_secret_scope: Secret scope containing the AAD tenant id.
-        tenant_secret_key: Secret key for the AAD tenant id.
-        client_id_secret_scope: Secret scope containing the service principal client id.
-        client_id_secret_key: Secret key for the service principal client id.
-        client_secret_scope: Secret scope containing the service principal client secret.
-        client_secret_key: Secret key for the service principal client secret.
-        validate_path: Optional path (relative to the container) to list for validation.
-
-    Returns:
-        The ABFSS base URI, e.g. "abfss://lake@<account>.dfs.core.windows.net".
-    """
+) -> None:
     spark = SparkSession.builder.getOrCreate()
 
-    # dbutils handle (works in jobs and notebooks)
+    # Load service principal credentials (tenant, client ID, secret) from a Databricks secret scope
     try:
         from pyspark.dbutils import DBUtils
         dbu = DBUtils(spark)
@@ -49,50 +31,56 @@ def ensure_adls_oauth(
     if dbu is None:
         raise RuntimeError("dbutils is not available; run on a Databricks cluster.")
 
-    # secret helper: fetch or fail
-    def _secret(scope: str, key: str) -> str:
-        val = dbu.secrets.get(scope=scope, key=key)  # type: ignore[attr-defined]
-        if not val or not val.strip():
-            raise ValueError(f"Secret '{scope}/{key}' is empty or missing.")
-        return val.strip()
+    def _secret(k: str) -> str:
+        v = dbu.secrets.get(scope=scope, key=k)  # type: ignore[attr-defined]
+        if not v or not v.strip():
+            raise ValueError(f"Secret '{scope}/{k}' is empty or missing.")
+        return v.strip()
 
-    tenant_id = _secret(tenant_secret_scope, tenant_secret_key)
-    client_id = _secret(client_id_secret_scope, client_id_secret_key)
-    client_secret = _secret(client_secret_scope, client_secret_key)
+    tenant_id     = _secret(tenant_key)
+    client_id     = _secret(client_id_key)
+    client_secret = _secret(client_secret_key)
 
     host = f"{account}.dfs.core.windows.net"
-    cfg = "fs.azure.account"
+    base = "fs.azure.account"
 
-    # OAuth credentials for ABFS
-    spark.conf.set(f"{cfg}.auth.type.{host}", "OAuth")
-    spark.conf.set(
-        f"{cfg}.oauth.provider.type.{host}",
-        "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+    # Also grab the live Hadoop conf (used by driver FS ops)
+    hconf = spark.sparkContext._jsc.hadoopConfiguration()
+
+    # 1) Write OAuth to BOTH spark.hadoop.* (what Hive/ABFS read) and live Hadoop conf
+    oauth = {
+        f"{base}.auth.type.{host}": "OAuth",
+        f"{base}.oauth.provider.type.{host}": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+        f"{base}.oauth2.client.id.{host}": client_id,
+        f"{base}.oauth2.client.secret.{host}": client_secret,
+        f"{base}.oauth2.client.endpoint.{host}": f"https://login.microsoftonline.com/{tenant_id}/oauth2/token",
+    }
+    for k, v in oauth.items():
+        spark.conf.set(f"spark.hadoop.{k}", v)
+        try:
+            hconf.set(k, v)
+        except Exception:
+            pass
+
+    # 2) Remove SharedKey/SAS on both layers so nothing overrides OAuth
+    bad = (
+        f"{base}.key",
+        f"{base}.key.{host}",
+        f"{base}.sas.token.provider.type",
+        f"{base}.sas.token.provider.type.{host}",
+        f"{base}.sas.fixed.token",
+        f"{base}.sas.fixed.token.{host}",
     )
-    spark.conf.set(f"{cfg}.oauth2.client.id.{host}", client_id)
-    spark.conf.set(f"{cfg}.oauth2.client.secret.{host}", client_secret)
-    # ABFS expects AAD v1 token endpoint
-    spark.conf.set(
-        f"{cfg}.oauth2.client.endpoint.{host}",
-        f"https://login.microsoftonline.com/{tenant_id}/oauth2/token",
-    )
+    for k in bad:
+        for name in (k, f"spark.hadoop.{k}"):
+            try:
+                spark.conf.unset(name)
+            except Exception:
+                pass
+        try:
+            hconf.unset(k)
+        except Exception:
+            pass
 
-    # Clear any shared-key auth to avoid conflicts
-    spark.conf.set(f"{cfg}.key.{host}", "")
-
-    base = f"abfss://{container}@{host}"
-
-    # Validate by listing root or a child path
-    path = base if validate_path in (None, "", "/") else f"{base}/{validate_path.lstrip('/')}"
-    try:
-        dbu.fs.ls(path)  # type: ignore[attr-defined]
-    except Exception as e:
-        hint = (
-            "ADLS OAuth validation failed.\n"
-            "- Check tenant/client id/client secret in the Databricks scope.\n"
-            "- Ensure the SPN has 'Storage Blob Data Contributor' on the account.\n"
-            f"- Tried to list: {path}"
-        )
-        raise RuntimeError(f"{hint}\nUnderlying error: {e}") from e
-
-    return base
+    # 3) Reset cached FileSystem clients so the new config is used immediately
+    spark.sparkContext._jvm.org.apache.hadoop.fs.FileSystem.closeAll()

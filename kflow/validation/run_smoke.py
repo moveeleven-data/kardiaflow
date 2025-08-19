@@ -1,56 +1,32 @@
 # kflow/validation/run_smoke.py
-# Orchestrator for KardiaFlow smoke tests:
-# - Installs the kflow package from DBFS
-# - Runs all Bronze, Silver, and Gold checks
-# - Persists results to Delta and prints a summary
+"""Kardiaflow validations — smoke test runner.
 
-import sys
-import subprocess
-import traceback
+Runs Bronze, Silver, and Gold checks, persists results to Delta, and prints a
+PASS/FAIL summary.
+"""
+
+from __future__ import annotations
 
 from pyspark.sql import SparkSession, functions as F
+import traceback
 
-# Install the kflow package from shared DBFS libraries
-subprocess.check_call(
-    [
-        sys.executable,
-        "-m",
-        "pip",
-        "install",
-        "--no-deps",
-        "--no-index",
-        "--find-links=/dbfs/Shared/libs",
-        "kflow"
-    ]
-)
-
-from ..auth_adls import ensure_adls_oauth
-from .config import (
-    RESULTS_TABLE,
+from kflow.auth_adls import ensure_adls_oauth
+from kflow.validation.config import (
     BRONZE,
-    SILVER_CONTRACTS,
-    GOLD_NOT_NULL,
-    PASS,
+    ERROR,
     FAIL,
-    ERROR
+    GOLD_NOT_NULL,
+    RESULTS_TABLE,
+    SILVER_CONTRACTS
 )
-from .logging_utils import LOGS, log
-from .bronze_checks import check_bronze
-from .silver_checks import check_silver_contract
-from .gold_checks   import check_gold_not_null
+from kflow.validation.bronze_checks import check_bronze
+from kflow.validation.gold_checks import check_gold_not_null
+from kflow.validation.logging_utils import LOGS, log
+from kflow.validation.silver_checks import check_silver_contract
 
-# Create the Spark session. (needed to run via Lakeflow Jobs)
-spark = SparkSession.builder.getOrCreate()
 
-spark.sql("USE CATALOG hive_metastore")
-
-# Configure ABFS OAuth
-ensure_adls_oauth(validate_path="")
-
-def ensure_results_table():
-    """
-    Ensure the validation database and results table exist.
-    """
+def _ensure_results_table(spark: SparkSession) -> None:
+    """Create the database/table used to store validation results if missing."""
     spark.sql("CREATE DATABASE IF NOT EXISTS kardia_validation")
     spark.sql(
         f"""
@@ -66,80 +42,65 @@ def ensure_results_table():
         """
     )
 
+
 def run_all_smoke_tests() -> int:
-    """
-    Execute all Bronze, Silver, and Gold validations and persist results.
+    """Execute all validations and persist results. Returns 0 on success, 1 otherwise."""
+    spark = SparkSession.builder.getOrCreate()
 
-    Return 0 if all tests pass, 1 if any fail or error.
-    """
-    ensure_results_table()
+    # Catalog selection
+    spark.sql("USE CATALOG hive_metastore")
 
-    # Run Bronze-layer checks - Each table is paired with its primary key
+    # Configure ABFS OAuth (validates container root by default).
+    ensure_adls_oauth()
+
+    _ensure_results_table(spark)
+
+    # Bronze checks (table, primary key)
     for table_name, pk in BRONZE:
         try:
             check_bronze(table_name, pk)
         except Exception:
-            error_message = traceback.format_exc()
             log(
                 layer="BRONZE",
                 table=table_name,
                 metric="exception",
                 value=None,
                 status=ERROR,
-                message=error_message
+                message=traceback.format_exc(),
             )
 
-    # Run Silver-layer checks - Each table is mapped to a list of required columns
+    # Silver checks (contract: required columns per table)
     for table_name, expected_cols in SILVER_CONTRACTS.items():
         try:
             check_silver_contract(table_name, expected_cols)
         except Exception:
-            error_message = traceback.format_exc()
             log(
                 layer="SILVER",
                 table=table_name,
                 metric="exception",
                 value=None,
                 status=ERROR,
-                message=error_message
+                message=traceback.format_exc(),
             )
 
-    # Run Gold-layer not-null validations
-    # Each table is paired with columns that must not contain null values
+    # Gold checks (columns that must be NOT NULL)
     for table_name, cols in GOLD_NOT_NULL.items():
         try:
             check_gold_not_null(table_name, cols)
         except Exception:
-            error_message = traceback.format_exc()
             log(
                 layer="GOLD",
                 table=table_name,
                 metric="exception",
                 value=None,
                 status=ERROR,
-                message=error_message
+                message=traceback.format_exc(),
             )
 
-    # Write all collected logs to the results table
+    # Persist logs and summarize.
     results_df = spark.createDataFrame(LOGS)
     results_df.write.mode("append").saveAsTable(RESULTS_TABLE)
 
-    # Summarize overall test results based on status counts
     failures = results_df.filter(F.col("status").isin(FAIL, ERROR)).count()
-    summary = "FAIL" if failures > 0 else "PASS"
-    print(f"\nSMOKE TEST SUMMARY: {summary}")
-
-    if failures == 0:
-        return 0
-    else:
-        return 1
-
-# When run directly, execute all tests - useful for CI/CD
-if __name__ == "__main__":
-    try:
-        exit_code = run_all_smoke_tests()
-        if exit_code != 0:
-            raise Exception("Smoke tests failed")
-    except Exception:
-        traceback.print_exc()
-        raise
+    print(f"\nSMOKE TEST SUMMARY: {'FAIL' if failures else 'PASS'}")
+    return 0 if failures == 0 else 1

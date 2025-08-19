@@ -1,18 +1,26 @@
 [project]
 name = "kflow"
-version = "0.5.1"
+version = "0.5.9"
 description = "Shared utilities for KardiaFlow ETL pipelines"
 readme = "README.md"
 requires-python = ">=3.10"
+
+# Runtime deps. Keep this lean; Databricks runtimes often already include delta-spark.
 dependencies = [
   "delta-spark>=3.0.0"
 ]
 
+
 [build-system]
-# tomli is only needed when Python < 3.11
-requires = ["setuptools>=68", "wheel", "build", "tomli; python_version < '3.11'"]
+# setuptools is the backend; tomli is needed only when the *build env* runs < 3.11.
+requires = [
+  "setuptools>=68",
+  "wheel",
+  "tomli; python_version < '3.11'"
+]
 build-backend = "setuptools.build_meta"
 
+# Package discovery (setuptools)
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["kflow*"]

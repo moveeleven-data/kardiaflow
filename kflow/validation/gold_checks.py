@@ -1,16 +1,20 @@
 # kflow/validation/gold_checks.py
-# Ensures Gold-layer columns contain no NULL values
+"""Kardiaflow validations - Gold checks.
+
+Asserts that specified columns contain no NULL values.
+"""
+
+from __future__ import annotations
 
 from pyspark.sql import SparkSession, functions as F
 
-from .config import PASS, FAIL
-from .logging_utils import log
+from kflow.validation.config import PASS, FAIL
+from kflow.validation.logging_utils import log
 
-# Create the Spark session. (needed to run via Lakeflow Jobs)
-spark = SparkSession.builder.getOrCreate()
 
-def check_gold_not_null(table, cols):
-    """Check each specified Gold column for nulls and log the result."""
+def check_gold_not_null(table: str, cols: list[str] | set[str]) -> None:
+    """Fail if any of the given columns contain NULLs."""
+    spark = SparkSession.builder.getOrCreate()
     layer = "GOLD"
     df = spark.table(table)
 

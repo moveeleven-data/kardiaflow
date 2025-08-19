@@ -1,24 +1,26 @@
 # kflow/validation/silver_checks.py
-# Ensures each Silver table adheres to its contract
-# This guards against schema drift and incomplete transformations
+"""Kardiaflow validations — Silver checks.
+
+Verifies each Silver table contains all expected columns (schema contract).
+"""
+
+from __future__ import annotations
 
 from pyspark.sql import SparkSession
 
-from .config import PASS, FAIL
-from .logging_utils import log
+from kflow.validation.config import PASS, FAIL
+from kflow.validation.logging_utils import log
 
-# Create the Spark session. (needed to run via Lakeflow Jobs)
-spark = SparkSession.builder.getOrCreate()
 
 def check_silver_contract(table, expected_cols):
-    """
-    Validate a Silver table to ensure it contains all expected columns.
+    """Validate a Silver table to ensure it contains all expected columns.
 
     Rules:
     1. Compute the set of actual columns in the table
     2. Compare against expected_cols
     3. PASS if none are missing, otherwise FAIL
     """
+    spark = SparkSession.builder.getOrCreate()
     layer = "SILVER"
 
     # Retrieve the actual columns from the table

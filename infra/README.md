@@ -89,7 +89,7 @@ ensure_sp.sh is idempotent (it reuses the existing SP by name unless it’s abse
 or you explicitly pass --rotate). So you are not accumulating many unused SPs.
 
 Creating an Azure AD application / service principal, assigning it roles
-(e.g., “Storage Blob Data Contributor”), and rotating its secret do **not** incur
+(e.g., “Storage Blob Data Contributor”), and rotating its secret do not incur
 Azure billing charges.
 
 ---
@@ -102,7 +102,7 @@ Publishes a versioned wheel and refreshes a stable requirements file at dbfs:/Sh
 bash infra/deploy/build_push_kflow.sh
 ```
 
-Ensure every task in the job has the stable requirements library:
+Every task in the job should reference the requirements library:
 
 ```json
 "libraries": [

@@ -1,15 +1,26 @@
 # kflow/validation/logging_utils.py
-# Simple logger for KardiaFlow smoke tests
-# Tracks results in memory and prints readable status lines
+"""Kardiaflow validations - in-memory logger.
 
-from .config import RUN_TS, PASS
+Accumulates structured results in LOGS and prints.
+"""
+
+from __future__ import annotations
+
+from kflow.validation.config import RUN_TS, PASS
 
 # List to hold all validation results for this run
-LOGS = []
+LOGS: list[dict] = []
 
-def log(layer, table, metric, value, status, message=None):
-    """
-    Add a test result to LOGS and print a summary line.
+
+def log(
+    layer: str,
+    table: str,
+    metric: str,
+    value,
+    status: str,
+    message: str | None = None,
+) -> None:
+    """Append a result to LOGS and print a summary line.
 
     Args:
         layer (str): Pipeline stage being tested ('BRONZE', 'SILVER', or 'GOLD')

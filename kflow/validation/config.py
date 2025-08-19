@@ -1,9 +1,10 @@
 # kflow/validation/config.py
-# Configuration for Kardiaflow smoke tests
-#
-# - Test status constants and run timestamp
-# - Table-level validation contracts for Bronze, Silver, and Gold layers
-# - Optional suppression logic for primary key duplication checks
+"""Kardiaflow validations - Configuration.
+
+Defines status constants, output table, run timestamp, table registries
+for Bronze/Silver/Gold, and duplicate-suppression rules.
+"""
+
 from datetime import datetime
 
 # Constants for test status outcomes
@@ -11,12 +12,13 @@ PASS  = "PASS"
 FAIL  = "FAIL"
 ERROR = "ERROR"
 
-# Global config for this smoke test run
-RESULTS_TABLE = "kardia_validation.smoke_results" # Output table for all test results
-RUN_TS = datetime.utcnow()  # UTC timestamp for this run (applied to all log records)
+# Output location for all validation results
+RESULTS_TABLE = "kardia_validation.smoke_results"
 
-# Bronze Layer: List of (table_name, primary_key) tuples
-# Used for row count, PK uniqueness, and null PK checks
+# Timestamp applied to all records in a given run
+RUN_TS = datetime.utcnow()
+
+# Bronze: (table_name, primary_key)
 BRONZE = [
     ("kardia_bronze.bronze_claims",     "ClaimID"),
     ("kardia_bronze.bronze_feedback",   "feedback_id"),
@@ -25,25 +27,41 @@ BRONZE = [
     ("kardia_bronze.bronze_patients",   "ID"),
 ]
 
-# Silver Layer: Expected column sets per table (schema contracts)
-# Ensures no expected columns are missing (guards against schema drift)
+# Silver: expected columns per table (schema contract)
 SILVER_CONTRACTS = {
     "kardia_silver.silver_claims": {
-        "claim_id", "patient_id", "provider_id", "claim_amount",
-        "claim_date", "diagnosis_code", "procedure_code",
-        "claim_status", "claim_type", "claim_submission_method", "_ingest_ts"
+        "claim_id",
+        "patient_id",
+        "provider_id",
+        "claim_amount",
+        "claim_date",
+        "diagnosis_code",
+        "procedure_code",
+        "claim_status",
+        "claim_type",
+        "claim_submission_method",
+        "_ingest_ts",
     },
     "kardia_silver.silver_patients": {
-        "id", "birth_year", "marital", "race", "ethnicity", "gender"
+        "id",
+        "birth_year",
+        "marital",
+        "race",
+        "ethnicity",
+        "gender",
     },
     "kardia_silver.silver_encounters": {
-        "encounter_id", "patient_id", "START_TS", "CODE", "DESCRIPTION",
-        "REASONCODE", "REASONDESCRIPTION"
+        "encounter_id",
+        "patient_id",
+        "START_TS",
+        "CODE",
+        "DESCRIPTION",
+        "REASONCODE",
+        "REASONDESCRIPTION",
     },
 }
 
-# Gold Layer: Columns that must not contain NULLs (critical for analytics)
-# Ensures output completeness and avoids downstream join or metric errors
+# Gold: columns that must never be NULL
 GOLD_NOT_NULL = {
     "kardia_gold.gold_patient_lifecycle": ["patient_id"],
     "kardia_gold.gold_feedback_satisfaction": ["provider_id"],
@@ -51,10 +69,8 @@ GOLD_NOT_NULL = {
     "kardia_gold.gold_provider_daily_spend": ["provider_id"],
 }
 
-# Duplicate Suppression:
-# Allow a Bronze table to pass the "duplicate PK" check if the downstream
-# Silver table contains no duplicates for the mapped key. Useful in cases
-# where upstream duplicates are known but resolved later in the pipeline.
+# Duplicate suppression map: if Bronze has duplicates, allow PASS if the mapped
+# Silver table has no duplicates for the corresponding key.
 SUPPRESS = {
-    "kardia_bronze.bronze_patients": ("kardia_silver.silver_patients", "id")
+    "kardia_bronze.bronze_patients": ("kardia_silver.silver_patients", "id"),
 }

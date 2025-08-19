@@ -4,10 +4,10 @@
 Kardiaflow runs on Azure Databricks for demonstration purposes and is torn down after use. The focus is on keeping things safe and simple: no secrets in git, light CI checks, least-privilege storage access, basic data-quality tests, and a clean teardown.
 
 ### Secrets
-Secrets are never committed. At deploy time, credentials go into a Databricks secret scope and are read at runtime (e.g., `kflow/auth_adls.py`).
+Secrets are never committed. Credentials live in a Databricks secret scope and are read at runtime.
 
 ### CI Checks
-A lightweight GitHub Actions workflow runs on pushes and PRs:
+A lightweight GitHub Actions workflow runs on pushes:
 - **Gitleaks** scans for leaked secrets  
 - **Checkov** scans `infra/bicep` for IaC issues
 

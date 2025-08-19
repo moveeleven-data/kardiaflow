@@ -1,18 +1,16 @@
-# tests/test_logging_utils.py
-# Unit tests for the in-memory logging system used in KardiaFlow validations.
-#
-# These tests verify that:
-# - `log()` appends a structured record with expected fields
-# - Optional messages are captured correctly
+"""Kardiaflow tests - Logging utilities
+
+Validates in-memory logging behavior and message handling.
+"""
+
+from __future__ import annotations
 
 from kflow.validation.config import PASS, FAIL
 from kflow.validation.logging_utils import log, LOGS
 
 
 def test_log_appends_expected_shape(clear_logs):
-    """
-    Verifies that `log()` appends a structured record with all required fields.
-    """
+    """Verify that `log()` appends a structured record with all required fields."""
 
     # Call the log function with a standard success case
     log(
@@ -47,9 +45,7 @@ def test_log_appends_expected_shape(clear_logs):
 
 
 def test_log_message_optional(clear_logs):
-    """
-    Verifies that `log()` records the optional message field when provided.
-    """
+    """Verify that `log()` records the optional message field when provided."""
 
     # Call the log function with a custom message
     log(
