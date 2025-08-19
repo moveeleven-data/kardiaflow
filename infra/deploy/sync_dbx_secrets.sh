@@ -1,24 +1,26 @@
 #!/usr/bin/env bash
-# sync_dbx_secrets.sh
-# Uploads Azure service principal credentials into a Databricks secret scope.
-# This script is idempotent — it will create or update secrets as needed.
+# sync_dbx_secrets.sh — Create scope if missing, upsert SP creds.
 
 set -euo pipefail
 
-# Set secret scope (if not already defined)
-: "${SCOPE:=kardia}"                           # default scope
+: "${SCOPE:?SCOPE missing}"
+: "${TENANT_ID:?TENANT_ID missing}"
+: "${CLIENT_ID:?CLIENT_ID missing}"
+: "${CLIENT_SECRET:?CLIENT_SECRET missing}"
+command -v databricks >/dev/null || { echo "ERROR: Databricks CLI not found"; exit 1; }
 
-# Verify required env vars are set
-: "${CLIENT_ID:?Set CLIENT_ID in env}"         # bare GUID
-: "${TENANT_ID:?Set TENANT_ID in env}"         # bare GUID
-: "${CLIENT_SECRET:?Set CLIENT_SECRET in env}" # raw string
+# Ensure scope (new CLI positional; fall back to old flags quietly)
+databricks secrets list-scopes -o json 2>/dev/null | grep -q "\"name\": *\"$SCOPE\"" || \
+  databricks secrets create-scope "$SCOPE" --initial-manage-principal users >/dev/null 2>&1 || \
+  databricks secrets create-scope --scope "$SCOPE" --initial-manage-principal users >/dev/null 2>&1 || true
 
-# Ensure the Databricks secret scope exists (no-op if already created)
-databricks secrets create-scope --scope "$SCOPE" --initial-manage-principal users >/dev/null 2>&1 || true
+# If still missing, fail clearly
+databricks secrets list-scopes -o json 2>/dev/null | grep -q "\"name\": *\"$SCOPE\"" || {
+  echo "ERROR: Secret scope '$SCOPE' doesn't exist and could not be created (check permissions)."
+  exit 1
+}
 
-# Upload all credentials to the secret scope
-databricks secrets put --scope "$SCOPE" --key sp_client_id     --string-value "$CLIENT_ID"
-databricks secrets put --scope "$SCOPE" --key sp_tenant_id     --string-value "$TENANT_ID"
-databricks secrets put --scope "$SCOPE" --key sp_client_secret --string-value "$CLIENT_SECRET"
-
-echo "Synced service principal credentials to Databricks scope '$SCOPE'."
+# Upsert secrets (positional SCOPE KEY)
+databricks secrets put-secret "$SCOPE" sp_tenant_id     --string-value "$TENANT_ID"     >/dev/null
+databricks secrets put-secret "$SCOPE" sp_client_id     --string-value "$CLIENT_ID"     >/dev/null
+databricks secrets put-secret "$SCOPE" sp_client_secret --string-value "$CLIENT_SECRET" >/dev/null
