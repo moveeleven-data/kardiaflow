@@ -4,6 +4,9 @@ Transforms Bronze records into clean, queryable Silver Delta tables using CDC lo
 
 Encounters tables support both batch and streaming modes, controlled via a `mode` parameter.
 
+For field definitions and entity relationships, see the 
+[Data Dictionary](../docs/data_dictionary.md) and [Source Schema](../docs/source_schema.md).
+
 ---
 
 ## Silver Tables

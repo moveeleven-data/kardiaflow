@@ -1,6 +1,6 @@
-# POSTMORTEM.md
+## Postmortem
 
-## Azure Cost Overrun (May 2025)
+#### Azure Cost Overrun (May 2025)
 
 ![Azure cost spike](assets/kflow_overage.jpg)
 
@@ -8,7 +8,7 @@
 
 ---
 
-## Summary
+### Summary
 
 In May 2025, the initial version of Kardiaflow was deployed to Azure using ADLS Gen2,
 Azure Data Factory (ADF), and Databricks. The project processed only synthetic test
@@ -16,29 +16,29 @@ files, but nonetheless generated over **$200 in charges** due to architecture ov
 
 ---
 
-## Root Causes
+### Root Causes
 
-### 1. ADLS Gen2 Transaction Costs  
+#### 1. ADLS Gen2 Transaction Costs  
 - PySpark jobs used `overwrite` mode on partitioned directories, triggering **tens of thousands of write operations**.  
 - ADLS Gen2 bills **per transaction**, not per volume.  
 - Total data size was small (~10MB), but transaction volume drove **$150+ in storage access fees**.
 
-### 2. Idle NAT Gateway from SHIR  
+#### 2. Idle NAT Gateway from SHIR  
 - Provisioning a Self-Hosted Integration Runtime (SHIR) for ADF created a **NAT Gateway** for outbound traffic.  
 - The NAT incurred **hourly charges** regardless of traffic volume.  
 - One week of idle time led to **~$10 in costs**.
 
-### 3. No Teardown Automation  
+#### 3. No Teardown Automation  
 - Resource groups, workspaces, and services remained active after short test runs.  
 - Manual cleanup was delayed, leading to continued billing.
 
-### 4. Missing Budget Alerts  
+#### 4. Missing Budget Alerts  
 - No cost thresholds or alerts were configured in the Azure subscription.  
 - Charges escalated without warning until manually reviewed.
 
 ---
 
-## Impact
+### Impact
 
 | Area             | Description                               |
 |------------------|-------------------------------------------|
@@ -48,7 +48,7 @@ files, but nonetheless generated over **$200 in charges** due to architecture ov
 
 ---
 
-## Resolution
+### Resolution
 
 - All resource groups were deleted and the Azure subscription was closed.  
 - Code and test datasets were preserved locally.  
@@ -57,7 +57,8 @@ files, but nonetheless generated over **$200 in charges** due to architecture ov
 
 ---
 
-## Redesign Highlights
+### Redesign Highlights
+
 
 | Design Constraint           | Implementation                                                        |
 |-----------------------------|------------------------------------------------------------------------|

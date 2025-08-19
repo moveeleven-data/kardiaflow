@@ -4,6 +4,9 @@ This layer ingests raw patient and encounter records into Delta tables in the
 `kardia_bronze` schema using Auto Loader with Change Data Feed (CDF) and audit
 columns enabled. Configuration paths and settings are managed via `kflow.config.bronze_paths()`.
 
+For field definitions and entity relationships, see the 
+[Data Dictionary](../../../docs/data_dictionary.md) and [Source Schema](../../../docs/source_schema.md).
+
 ---
 
 ## Ingested Datasets

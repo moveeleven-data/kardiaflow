@@ -63,4 +63,4 @@ def log(
         suffix = ""
 
     # Print a readable summary line
-    print(f"[{layer}] {table} :: {metric} = {value_str} -> {tag}{suffix}")
+    print(f"[{layer}] {table} :: {metric} = {value_str} to {tag}{suffix}")

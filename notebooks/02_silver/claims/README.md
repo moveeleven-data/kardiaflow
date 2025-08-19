@@ -2,6 +2,9 @@
 
 Transforms raw Bronze data into refined, analytics-ready Delta tables using consistent, scalable logic. Each dataset applies appropriate deduplication, slowly changing dimension (SCD), or append patterns based on update behavior.
 
+For field definitions and entity relationships, see the 
+[Data Dictionary](../docs/data_dictionary.md) and [Source Schema](../docs/source_schema.md).
+
 ---
 
 ## Transformation Logic
