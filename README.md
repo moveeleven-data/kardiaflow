@@ -1,107 +1,77 @@
-# Kardiaflow: Azure-Based Healthcare Data Pipeline
+# **Kardiaflow: Azure Databricks Healthcare Lakehouse**
+![CI](https://github.com/moveeleven-data/kardiaflow/actions/workflows/ci.yml/badge.svg)
 
-## Scenario
+*Turn raw healthcare records into protected, analytics-ready data — with streaming, PHI masking and CDC.*
 
-Kardiaflow simulates a real-world healthcare data pipeline built on Azure Databricks and Delta Lake. It demonstrates a 
-modular, streaming-capable ETL architecture that handles structured (CSV, Avro, TSV) and semi-structured (JSON) healthcare datasets using a medallion design pattern.
+## ▷ See It in Action (2-min demo)
 
-The pipeline ingests raw files into Bronze Delta tables using Auto Loader, applies data masking and CDC logic in the 
-Silver layer with Delta Change Data Feed (CDF), and materializes analytics-ready Gold views for reporting and dashboards. All data is persisted to Azure Data Lake Storage using OAuth-based authentication. 
+<a href="https://youtu.be/YPaAU44Tdvw" target="_blank">
+  <img src="https://img.youtube.com/vi/YPaAU44Tdvw/hqdefault.jpg" width="520" alt="Watch the demo on YouTube">
+</a>
 
-## Architecture Overview
+**How it works**  
+- **Ingest**: load raw patient, encounter, claims, and feedback data in bulk or streaming  
+- **Protect**: apply PHI masking and remove duplicates in the Silver layer  
+- **Track**: capture change history with Delta CDF and merge updates (SCD1/2)  
+- **Deliver**: publish Gold tables, KPIs, and dashboards for analytics
 
-The following diagram illustrates the end-to-end data flow, including ingestion, transformation, and reporting layers:
+**Get started:** [Quickstart Setup](#run-it-yourself-on-azure)  
 
-![Kardiaflow Architecture](https://raw.githubusercontent.com/matthewtripodi-data/Kardiaflow/master/docs/assets/kflow_lineage.png?v=2)
-
+---
 
 ## Key Features
 
-**Multi-Domain Simulation**  
-&nbsp;&nbsp;&nbsp;&nbsp;• *Clinical*: Patients, Encounters  
-&nbsp;&nbsp;&nbsp;&nbsp;• *Billing & Feedback*: Claims, Providers, Feedback
-
-**Multi-Format Ingestion**  
-&nbsp;&nbsp;&nbsp;&nbsp;• Structured formats (CSV, Avro, Parquet, TSV) via Auto Loader  
-&nbsp;&nbsp;&nbsp;&nbsp;• Semi-structured JSONL via COPY INTO  
-&nbsp;&nbsp;&nbsp;&nbsp;• All Bronze tables include `_ingest_ts`, `_source_file`, and enable Change Data Feed (CDF)  
-
-
-**Privacy-Aware Transformations**  
-&nbsp;&nbsp;&nbsp;&nbsp;• Deduplication, PHI masking, SCD Type 1/2  
-&nbsp;&nbsp;&nbsp;&nbsp;• Supports streaming and batch upserts  
-
-
-**Business-Ready Gold KPIs**  
-&nbsp;&nbsp;&nbsp;&nbsp;• Lifecycle metrics, spend trends, claim anomalies, feedback sentiment  
-&nbsp;&nbsp;&nbsp;&nbsp;• Materializes curated tables for analytics  
-
-
-**Automated Data Validation**  
-&nbsp;&nbsp;&nbsp;&nbsp;• `99_smoke_checks.py` tests row counts, nulls, duplicates, and schema contracts  
-&nbsp;&nbsp;&nbsp;&nbsp;• Unit tests cover kflow validation module
-&nbsp;&nbsp;&nbsp;&nbsp;• Logs results to Delta for auditing and observability  
-
-
-**Modular Notebook Design**  
-&nbsp;&nbsp;&nbsp;&nbsp;• One notebook per dataset and medallion layer  
-&nbsp;&nbsp;&nbsp;&nbsp;• Clean flow: Raw → Bronze → Silver → Gold  
-
-
-**Reproducible Infrastructure-as-Code**  
-&nbsp;&nbsp;&nbsp;&nbsp;• Declarative Bicep deployments via Azure CLI  
-&nbsp;&nbsp;&nbsp;&nbsp;• Secrets managed via Databricks CLI  
-&nbsp;&nbsp;&nbsp;&nbsp;• One-command teardown: `infra/teardown.sh`
+| Capability | What you get                                             |
+|---|----------------------------------------------------------|
+| **Streaming & batch** | Auto Loader for streams, COPY INTO for bulk |
+| **Privacy & CDC** (PHI mask, de-dup, SCD1/2) | History-aware Silver via Delta MERGE/CDF               |
+| **Gold analytics** | KPIs for Databricks SQL (lifecycle, spend, sentiment) |
+| **Quality & CI** | Smoke checks → Delta audit table; unit tests via GitHub Actions |
+| **IaC & cost** | Bicep deploy/teardown, secrets in scopes, single-node friendly |
 
 ---
 
-## 🎥 Video Walkthrough: See Kardiaflow in Action
+## Pipeline Architecture
 
-Want to see Kardiaflow in action? This end-to-end video walkthrough shows how data flows through each medallion layer and into dashboards powered by Gold tables.
+![Kardiaflow Architecture](docs/assets/kflow_lineage_3.png)
 
-📺 **Click to Watch on YouTube:**  
-<a href="https://youtu.be/YPaAU44Tdvw" target="_blank">
-  <img src="https://img.youtube.com/vi/YPaAU44Tdvw/hqdefault.jpg" alt="Watch the demo on YouTube">
-</a>
-
-> **In this demo:**  
-> • Lakeflow DAG execution (batch mode)  
-> • Gold table refresh and validation  
-> • Dashboard exploration (KPI views)  
-> • QA and business metrics tabs  
->  
-> *Streaming mode is supported but not shown here.*
+<sup>Raw patient, encounter, claims, provider, and feedback data land in **Bronze** ➜ **Silver** applies PHI masking and CDC ➜ **Gold** aggregates metrics for analytics.</sup>
 
 ---
 
-## Setting Up the Infrastructure
+## Run It Yourself on Azure
 
-Deploy the full Azure environment via:
+Kardiaflow is fully reproducible on Azure with **Bicep + CLI scripts**. In ~5–10 minutes you’ll have a Databricks workspace, ADLS Gen2, and a service principal. A teardown script is included to avoid lingering costs.
 
-🔗 [`infra/README.md`](infra/README.md) — *Infrastructure Deployment Guide*
+**Prereqs:** Azure subscription, Azure CLI, Databricks CLI, Databricks PAT.
 
+1) **Configure** — copy `.env.example` → `.env` and fill in SUB/RG/etc.  
+2) **Deploy** — create RG and deploy Databricks + ADLS with Bicep (see `infra/README.md`).  
+3) **Set up Databricks** — authenticate CLI, create a Service Principal, publish the `kflow` wheel.  
+4) **Run & clean up** — bootstrap sample data, import the “full run” job, **Run now**, then tear down to avoid cost.
 
-> **Note:** KardiaFlow’s infrastructure is deployed manually via CLI.
-
----
-
-## Job Orchestration & Dashboards
-
-This repo includes JSON definitions for batch job creation, job reset, and dashboard import via the Databricks CLI.
-
-📂 [`pipelines/`](pipelines/) — *Databricks Jobs + Dashboards*
+🔗 Full guide: [infra/README.md](infra/README.md)  
+> **Note:** Runs on a single-node Databricks cluster for just a few dollars.
 
 ---
 
-## Databricks Summit 2025: How It Shaped Kardiaflow
+## Codebase Overview
 
-In June 2025, I completed 24 hours of hands-on training across six advanced data engineering workshops at the 
-Databricks Data + AI Summit. These sessions directly influenced Kardiaflow’s design especially in areas like streaming pipeline robustness, CDC with Lakeflow Declarative Pipelines, data governance via Unity Catalog, and job orchestration with Lakeflow Jobs.
+- **[notebooks/](notebooks/)** — end-to-end workflows across Bronze, Silver, and Gold layers.
 
-You can read my full reflection on the summit and how each session impacted Kardiaflow’s architecture here:  
+  • Bronze example: [`bronze_patients_autoloader.ipynb`](notebooks/00_bronze/encounters/bronze_patients_autoloader.ipynb)  
+  • Silver example: [`silver_patients_scd1_batch.ipynb`](notebooks/01_silver/encounters/silver_patients_scd1_batch.ipynb)
 
-🔗 [`docs/summit_reflections.md`](docs/summit_reflections.md)
+- **[kflow/](kflow/)** — core library with authentication, ETL utilities, and validation helpers.
+
+- **[pipelines/](pipelines/)** — Databricks job JSON definitions and dashboard exports.
+
+- **[infra/](infra/)** — Bicep templates and CLI scripts for reproducible deployment (see [infra/README.md](infra/README.md)). 
+
+- **[docs/](docs/)** — reference materials, such as the [data_dictionary.md](docs/data_dictionary.md). 
 
 ---
 
-![CI](https://github.com/moveeleven-data/kardiaflow/actions/workflows/ci.yml/badge.svg)
+## Databricks Summit 2025
+
+Reflections from Databricks Summit workshops on streaming and governance:  [docs/summit_reflections.md](docs/summit_reflections.md).

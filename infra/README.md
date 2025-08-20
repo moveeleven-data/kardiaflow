@@ -1,18 +1,51 @@
-# KardiaFlow Infrastructure Deployment Guide
+# Kardiaflow Infrastructure Deployment Guide
 
-This folder contains the infrastructure-as-code (IaC) scripts for deploying and tearing down the KardiaFlow development environment in Azure using Bicep and the Azure CLI.
+This folder contains infrastructure-as-code scripts to deploy and tear down the Kardiaflow environment in Azure 
+using Bicep and the Azure CLI.
+
+### Prerequisites
+
+- **Azure account** with permission to create a resource group
+- **Ability to create a Service Principal**
+- **Tools (local):**
+  - Azure CLI (latest)
+  - Databricks CLI (PAT auth)
+  - Bash (macOS/Linux/WSL)
+  - Python 3.11+ and `pip` — *required only if you run* `infra/deploy/build_push_kflow.sh` *to build the* `kflow` 
+    *wheel*  
+    *(If you’re on Python 3.10, ensure the `tomli` package is installed.)*
+- **Databricks PAT** (Workspace → User Settings → Developer → *Generate new token*)
+
+---
+
+### Infrastructure Configuration (`infra/.env`)
+
+| Var              | Example                                   | Notes                                                         |
+|------------------|-------------------------------------------|---------------------------------------------------------------|
+| `SUB`            | `00000000-0000-0000-0000-000000000000`    | Azure Subscription ID (used by CLI + RBAC)                    |
+| `RG`             | `kardia-rg-dev`                           | Main resource group for Databricks + ADLS                     |
+| `DEPLOY`         | `kardiaflow`                              | Bicep deployment name (used by `build_push_kflow.sh` to read outputs) |
+| `ADLS`           | `kardiaadlsdemo`                          | ADLS Gen2 account name                                        |
+| `CONT`           | `lake`                                    | ADLS container name                                           |
+| `WORKSPACE`      | `kardia-dbx`                              | Databricks workspace name                                     |
+| `SCOPE`          | `kardia`                                  | Databricks secret scope used by `kflow` and SP creds          |
+| `DATABRICKS_PAT` | `dapi<redacted>`                          | Databricks Personal Access Token                              |
+
+---
+
+### Order of Operations (summary)
+
+1. **Deploy Azure** (RG, Databricks, ADLS via Bicep)  
+2. **Auth Databricks CLI** (`source infra/deploy/auth.sh`)  
+3. **Create/rotate SP + RBAC + secrets** (`bash infra/deploy/ensure_sp.sh --rotate`)  
+4. **Build/publish wheel** (`bash infra/deploy/build_push_kflow.sh`)  
+5. **Seed data** (`notebooks/99_utilities/bootstrap_dir.ipynb`)  
+6. **Create job** (`pipelines/jobs/full_run_batch/kardiaflow_full_run_batch.json`) → **Run now**  
+7. **Teardown** (`./infra/deploy/teardown.sh`)
 
 ---
 
 ## What It Deploys
-
-KardiaFlow is designed for use with a **Databricks Premium-tier workspace**, enabling support for dashboards and future extensibility.
-
-> **Note:**  
-> KardiaFlow does **not** use Unity Catalog or Delta Live Tables (DLT).  
-> It relies on Delta Lake, Auto Loader, and Databricks Jobs for portability and low cost.
-
----
 
 ### Resource Summary
 
@@ -140,7 +173,7 @@ Once created, you can launch this job from the Databricks Jobs UI at any time. I
 ./infra/deploy/teardown.sh
 ```
 
-The teardown script script will:
+The teardown script will:
 
 - Delete the Databricks workspace (automatically removes the managed RG)
 - Delete the main resource group (kardia-rg-dev)
@@ -178,3 +211,9 @@ az deployment group what-if \
   --template-file infra/bicep/deploy.bicep \
   --name "$DEPLOY"
 ```
+
+---
+
+> **Note:**  
+> Kardiaflow does not use Unity Catalog or Delta Live Tables (DLT).  
+> It relies on Delta Lake, Auto Loader, and Databricks Jobs for portability and low cost.

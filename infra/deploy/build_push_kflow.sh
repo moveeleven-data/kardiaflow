@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# infra/deploy/publish_kflow.sh
+# infra/deploy/build_push_kflow.sh
 # Build kflow wheel and upload to Databricks Workspace.
 # Export a pinned requirements file for Workspace jobs.
 # Requires infra/.env and a configured Databricks CLI.
 
 set -euo pipefail
+
 
 # Paths
 here="$(cd "$(dirname "$0")" && pwd)"        # infra/deploy

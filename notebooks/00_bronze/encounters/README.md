@@ -1,39 +1,43 @@
 # Bronze Ingestion: Encounters & Patients
 
-This layer ingests raw patient and encounter records into Delta tables in the
-`kardia_bronze` schema using Auto Loader with Change Data Feed (CDF) and audit
-columns enabled. Configuration paths and settings are managed via `kflow.config.bronze_paths()`.
+Ingests raw **patient** and **encounter** records into Delta tables in the
+`kardia_bronze` schema using **Auto Loader** with **Change Data Feed (CDF)**
+and audit columns. Paths and options come from `kflow.config.bronze_paths()`.
 
-For field definitions and entity relationships, see the 
+> We co-locate **patients** and **encounters** here because the primary grain for CDC and joins is **encounter-driven**.
+
+For field definitions and relationships, see the
 [Data Dictionary](../../../docs/data_dictionary.md) and [Source Schema](../../../docs/source_schema.md).
 
 ---
 
-## Ingested Datasets
+## Datasets
 
-| Dataset    | Source Location                                                | Format | Loader Type     | Bronze Table                   |
-|------------|----------------------------------------------------------------|--------|------------------|--------------------------------|
-| Patients   | `abfss://lake@<storage>.dfs.core.windows.net/patients/`   | CSV    | Auto Loader      | `kardia_bronze.bronze_patients`  |
-| Encounters | `abfss://lake@<storage>.dfs.core.windows.net/encounters/` | Avro   | Auto Loader      | `kardia_bronze.bronze_encounters` |
+| Dataset    | Source (ABFSS)                                              | Format | Loader       | Bronze Table                        |
+|-----------:|--------------------------------------------------------------|--------|--------------|-------------------------------------|
+| Patients   | `abfss://lake@<storage>.dfs.core.windows.net/patients/`     | CSV    | Auto Loader  | `kardia_bronze.bronze_patients`     |
+| Encounters | `abfss://lake@<storage>.dfs.core.windows.net/encounters/`   | Avro   | Auto Loader  | `kardia_bronze.bronze_encounters`   |
 
 ---
 
 ## Features
 
-- CDF enabled on all Bronze tables  
+- **CDF** enabled on all Bronze tables  
 - Audit columns: `_ingest_ts`, `_source_file`, `_batch_id`  
 - Config-driven schema, checkpoint, and quarantine paths  
-- Patients ingested via incremental batch (`availableNow=True`)  
-- Encounters support two streaming modes via a `mode` parameter:  
-  - `batch`: reads from source with `availableNow=True`  
-  - `stream`: runs with `trigger(processingTime="30 seconds")`
+- **Patients**: incremental batch (**Trigger.AvailableNow**)  
+- **Encounters** `mode` parameter:
+  - `batch` → AvailableNow
+  - `stream` → `trigger(processingTime="30 seconds")`
 - Explicit schema enforcement for both formats
 
 ---
 
 ## Notebooks
 
-| Notebook                      | Target Table                  | Trigger Type               |
-|-------------------------------|-------------------------------|----------------------------|
-| `01_bronze_patients_autoloader` | `bronze_patients`               | Incremental batch          |
-| `01_bronze_encounters_autoloader`| `bronze_encounters`             | (`mode=batch` or `stream`) |
+| Notebook                                   | Target Table        | Trigger / Mode         |
+|--------------------------------------------|---------------------|------------------------|
+| [`bronze_patients_autoloader.ipynb`](./bronze_patients_autoloader.ipynb)     | `bronze_patients`   | Incremental batch      |
+| [`bronze_encounters_autoloader.ipynb`](./bronze_encounters_autoloader.ipynb) | `bronze_encounters` | `mode=batch` or `stream` |
+
+> Use the `mode` widget in Databricks (`dbutils.widgets.text("mode","batch")`) or pass as a job parameter.

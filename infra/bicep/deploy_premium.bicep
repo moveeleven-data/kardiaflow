@@ -1,7 +1,7 @@
 // infra/bicep/deploy.bicep
 // KardiaFlow infra: ADLS Gen2 + Databricks (v1.6 · 2025-07-25).
 // Creates storage account/containers and a Premium Databricks workspace.
-// Demo posture keeps public access enabled; harden for production.
+// Public access enabled is demo purposes.
 
 targetScope = 'resourceGroup'
 
@@ -35,8 +35,8 @@ resource adls 'Microsoft.Storage/storageAccounts@2024-01-01' = {
     allowBlobPublicAccess: false
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
+
     // Public endpoint remains enabled for the demo.
-    // Hardened deployments should set this to 'Disabled'.
     publicNetworkAccess: 'Enabled'
   }
 }
@@ -67,7 +67,6 @@ resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' = {
     managedResourceGroupId: subscriptionResourceId('Microsoft.Resources/resourceGroups', managedRgName)
 
     // Public endpoint remains enabled for the demo.
-    // Hardened deployments should set this to 'Disabled'.
     publicNetworkAccess: 'Enabled'
 
     // Use legacy Hive metastore only (prevents Unity Catalog creation).

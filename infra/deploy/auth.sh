@@ -6,7 +6,6 @@
 set -u -o pipefail
 
 
-
 # Load environment
 here="$(cd "$(dirname "$0")" && pwd)"
 infra_root="$here/.."

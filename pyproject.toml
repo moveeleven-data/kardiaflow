@@ -10,7 +10,6 @@ dependencies = [
   "delta-spark>=3.0.0"
 ]
 
-
 [build-system]
 # setuptools is the backend; tomli is needed only when the *build env* runs < 3.11.
 requires = [

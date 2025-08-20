@@ -1,11 +1,10 @@
 ## Data Dictionary: Kardiaflow Synthetic Healthcare Dataset
 
-This document lists fields, formats, and parsing notes for each raw dataset.  
-For entity identifiers, join predicates, and normalization mapping, see the [Source Schema](./source_schema.md).
+Pairs with the [Source Schema](./source_schema.md) and describes the fields, formats, and parsing notes for each raw dataset.  
 
-### Source Files (ADLS Gen2)
+### Raw Source Files
 
-We bootstrap the raw/source folders programmatically from repo samples.
+The raw/source folders are generated programmatically from the sample data in `/data/`:  
 
 - Container root: `lake`
 - Source root: `lake/source`

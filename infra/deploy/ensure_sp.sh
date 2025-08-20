@@ -7,7 +7,6 @@
 set -euo pipefail
 
 
-
 # Env and inputs
 here="$(cd "$(dirname "$0")" && pwd)"
 
@@ -89,7 +88,6 @@ else
     echo "No rotation requested."
   fi
 fi
-
 
 
 echo "Done."

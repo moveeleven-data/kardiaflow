@@ -1,14 +1,13 @@
-## Source Schema & Relationships
+## Source Entities and How They Relate
 
-This file complements the [Data Dictionary](./data_dictionary.md) by describing
-how the raw source entities relate, which identifier columns they expose, and how
-they are joined before normalization.
+Complements the [Data Dictionary](./data_dictionary.md)
+ by showing how raw entities relate through their identifiers and joins.
 
 ---
 
-### Identifiers (raw, non-enforced)
+### Source Record Identifiers
 
-These columns are the record identifiers present in the raw files.
+These are the identifier columns from the source files that mark each record as unique, before any standardization.
 
 | Dataset    | Identifier    |
 |------------|----------------|
@@ -18,13 +17,13 @@ These columns are the record identifiers present in the raw files.
 | providers  | `ProviderID`  |
 | feedback   | `feedback_id` |
 
-Notes: date fields arrive as text (`DATE`, `ClaimDate`); `feedback.timestamp` is ISO-8601 without an explicit timezone offset.
+Notes: date fields arrive as text (`DATE`, `ClaimDate`); `feedback.timestamp` is ISO-8601 with an explicit timezone offset.
 
 ---
 
-### Reference map (raw, non-enforced)
+### How the Raw Tables Connect
 
-These are the reference columns and join predicates as they exist in raw.
+These columns show the links between tables in the raw data and how they can be joined.
 
 | From       | To         | Join on                                       | Expected |
 |------------|------------|-----------------------------------------------|----------|
@@ -33,21 +32,20 @@ These are the reference columns and join predicates as they exist in raw.
 | claims     | providers  | `claims.ProviderID = providers.ProviderID`    | m→1      |
 | feedback   | providers  | `feedback.provider_id = providers.ProviderID` | m→1      |
 
-In practice, these references are sometimes null or point to missing rows. Normalization and validation happen in Silver and Gold.
+---
+
+### Data Quality in the Raw Layer
+
+The raw layer does not guarantee uniqueness or enforce relationships between entities. As a result, orphan records are common—for example, claims referencing patients that are missing or feedback tied to absent providers. To preserve events, all fact-to-dimension joins are left joins, ensuring the event remains even without a matching reference. Stricter checks, such as non-null enforcement and duplicate suppression, are applied in the Silver and Gold layers.
 
 ---
 
-### Semantics and timing (raw)
+### Standardizing Names and Formats
 
-Patients and providers serve as relatively stable reference entities. Encounters and claims are event-like facts, each keyed by a date field (DATE, ClaimDate). Feedback is timestamped in ISO-8601 format and may reference both an encounter (visit_id) and a provider (provider_id). Because raw delivery is taken “as is,” sparsity is expected—for example, encounters missing a REASONCODE, feedback without comments, or claims pointing to patients that aren’t present.
+The raw layer reflects the source system exactly, keeping original field names and casing (e.g., ClaimID, PATIENT, 
+ProviderID). In the Silver layer, these fields are standardized for consistency: column names are converted to snake_case, dates are cast to DATE or TIMESTAMP, and categorical values are standardized.
 
----
-
-### Naming and normalization notes
-
-Raw preserves the source’s original casing and field names (ClaimID, PATIENT, ProviderID). In Silver we standardize: column names shift to snake_case, dates are promoted to proper DATE/TIMESTAMP types, and categorical fields are aligned to consistent enums. Silver is also where the canonical join logic is applied.
-
-**Key normalization mapping (raw → silver names)**
+**Field Name Mapping (raw → silver)**
 
 | Raw key         | Silver key     |
 |-----------------|----------------|
@@ -61,25 +59,21 @@ Raw preserves the source’s original casing and field names (ClaimID, PATIENT, 
 
 ---
 
-### Integrity and nullability guidance
-
-The raw layer does not enforce uniqueness or referential integrity. We routinely see orphaned facts such as claims with no matching patient or feedback tied to missing providers. To preserve events, all fact-to-dimension joins are implemented as left joins. Harder constraints—such as not-null enforcement and duplicate suppression—begin in Silver and Gold, where they are covered by the validation suite.
-
----
-
-### Join recipes
+### How to Join the Data
 
 Use these predicates when exploring Bronze or tracing lineage prior to normalization.
 
 ```sql
--- Claims → Patients (preserve all claims)
+-- Join claims to patients.
+-- Left join ensures all claims are kept even if the patient record is missing.
 SELECT c.*,
        p.ID AS patient_pk
 FROM claims c
 LEFT JOIN patients p
        ON c.PatientID = p.ID;
 
--- Claims → Providers (raw attributes are static text fields)
+-- Join claims to providers to enrich with provider details.
+-- Provider attributes are static reference fields in the raw data.
 SELECT c.*,
        pr.ProviderSpecialty,
        pr.ProviderLocation
@@ -87,7 +81,8 @@ FROM claims c
 LEFT JOIN providers pr
        ON c.ProviderID = pr.ProviderID;
 
--- Encounters → Patients (event → dimension)
+-- Join encounters to patients to connect each event with its patient.
+-- Left join keeps encounter events even when the patient record is absent.
 SELECT e.*,
        p.ID AS patient_pk
 FROM encounters e

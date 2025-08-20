@@ -19,14 +19,14 @@ files, but nonetheless generated over **$200 in charges** due to architecture ov
 ### Root Causes
 
 #### 1. ADLS Gen2 Transaction Costs  
-- PySpark jobs used `overwrite` mode on partitioned directories, triggering **tens of thousands of write operations**.  
-- ADLS Gen2 bills **per transaction**, not per volume.  
-- Total data size was small (~10MB), but transaction volume drove **$150+ in storage access fees**.
+- PySpark jobs used `overwrite` mode on partitioned directories, triggering tens of thousands of write operations.  
+- ADLS Gen2 bills per transaction, not per volume.  
+- Total data size was small (~10MB), but transaction volume drove $150+ in storage access fees.
 
 #### 2. Idle NAT Gateway from SHIR  
-- Provisioning a Self-Hosted Integration Runtime (SHIR) for ADF created a **NAT Gateway** for outbound traffic.  
-- The NAT incurred **hourly charges** regardless of traffic volume.  
-- One week of idle time led to **~$10 in costs**.
+- Provisioning a Self-Hosted Integration Runtime (SHIR) for ADF created a NAT Gateway for outbound traffic.  
+- The NAT incurred hourly charges regardless of traffic volume.  
+- One week of idle time led to ~$10 in costs.
 
 #### 3. No Teardown Automation  
 - Resource groups, workspaces, and services remained active after short test runs.  
@@ -53,7 +53,7 @@ files, but nonetheless generated over **$200 in charges** due to architecture ov
 - All resource groups were deleted and the Azure subscription was closed.  
 - Code and test datasets were preserved locally.  
 - A new subscription was created with zero preprovisioned services.  
-- Architecture was redefined around **strict teardown, cost visibility, and minimal surface area**.
+- Architecture was redefined around strict teardown and minimal surface area.
 
 ---
 
