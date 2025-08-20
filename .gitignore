@@ -52,9 +52,9 @@ data/encounters/*
 # Feedback (JSONL)
 !data/feedback/
 data/feedback/*
-!data/feedback/feedback_part_1.jsonl
-!data/feedback/feedback_part_2.jsonl
-!data/feedback/feedback_part_3.jsonl
+!data/feedback/old_feedback/feedback_part_1.jsonl
+!data/feedback/old_feedback/feedback_part_2.jsonl
+!data/feedback/old_feedback/feedback_part_3.jsonl
 
 # Patients (CSV)
 !data/patients/

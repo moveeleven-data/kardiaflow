@@ -10,7 +10,7 @@ Silver layer with Delta Change Data Feed (CDF), and materializes analytics-ready
 
 ## Architecture Overview
 
-The following diagram illustrates the end-to-end data flow, including ingestion, transformation, validation, and storage layers:
+The following diagram illustrates the end-to-end data flow, including ingestion, transformation, and reporting layers:
 
 ![Kardiaflow Architecture](https://raw.githubusercontent.com/matthewtripodi-data/Kardiaflow/master/docs/assets/kflow_lineage.png?v=2)
 

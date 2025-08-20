@@ -1,4 +1,4 @@
-# Kardiaflow Project — Changelog
+## Kardiaflow Project — Changelog
 
 ### 2025-08-01
 
@@ -40,6 +40,8 @@ Added a function in etl_utils.py in kflow to address edge case where Bronze note
 read from empty folders and prevent job from failing.
 
 ### 2025-07-30
+
+Added consistent UTC handling for the Feedback pipeline. Bronze notebooks now pin the Spark session timezone to UTC so _ingest_ts is standardized. In etl_utils.py, tag_timestamp_source marks raw timestamps as offset or naive, and parse_to_utc converts them into UTC instants. In Silver, both helpers are applied: timestamps are stored as normalized UTC values, a timestamp_source flag is kept for observability, and the requirement that all event times be offset-aware is documented.
 
 Removed duplicate calls to addauditcolumns() in Bronze Encounters notebook.
 Documented Bronze layer. Added readme to pipelines folder describing JSON job files.

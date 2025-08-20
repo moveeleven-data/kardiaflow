@@ -31,7 +31,6 @@ These are the reference columns and join predicates as they exist in raw.
 | encounters | patients   | `encounters.PATIENT = patients.ID`            | m→1      |
 | claims     | patients   | `claims.PatientID = patients.ID`              | m→1      |
 | claims     | providers  | `claims.ProviderID = providers.ProviderID`    | m→1      |
-| feedback   | encounters | `feedback.visit_id = encounters.ID`           | m→1      |
 | feedback   | providers  | `feedback.provider_id = providers.ProviderID` | m→1      |
 
 In practice, these references are sometimes null or point to missing rows. Normalization and validation happen in Silver and Gold.
@@ -58,7 +57,6 @@ Raw preserves the source’s original casing and field names (ClaimID, PATIENT, 
 | `encounters.ID` | `encounter_id` |
 | `encounters.PATIENT` | `patient_id` |
 | `feedback.feedback_id` | `feedback_id` |
-| `feedback.visit_id`    | `encounter_id` (join target) |
 | `feedback.provider_id` | `provider_id`  |
 
 ---
@@ -75,28 +73,24 @@ Use these predicates when exploring Bronze or tracing lineage prior to normaliza
 
 ```sql
 -- Claims → Patients (preserve all claims)
-SELECT c.*, p.ID AS patient_pk
+SELECT c.*,
+       p.ID AS patient_pk
 FROM claims c
 LEFT JOIN patients p
-  ON c.PatientID = p.ID;
+       ON c.PatientID = p.ID;
 
 -- Claims → Providers (raw attributes are static text fields)
-SELECT c.*, pr.ProviderSpecialty, pr.ProviderLocation
+SELECT c.*,
+       pr.ProviderSpecialty,
+       pr.ProviderLocation
 FROM claims c
 LEFT JOIN providers pr
-  ON c.ProviderID = pr.ProviderID;
-
--- Feedback → Encounters and Providers (preserve all feedback)
-SELECT f.*, e.ID AS encounter_pk, pr.ProviderSpecialty, pr.ProviderLocation
-FROM feedback f
-LEFT JOIN encounters e
-  ON f.visit_id = e.ID
-LEFT JOIN providers pr
-  ON f.provider_id = pr.ProviderID;
+       ON c.ProviderID = pr.ProviderID;
 
 -- Encounters → Patients (event → dimension)
-SELECT e.*, p.ID AS patient_pk
+SELECT e.*,
+       p.ID AS patient_pk
 FROM encounters e
 LEFT JOIN patients p
-  ON e.PATIENT = p.ID;
+       ON e.PATIENT = p.ID;
 ```
