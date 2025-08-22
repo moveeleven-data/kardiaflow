@@ -41,7 +41,7 @@
 
 ## Run It Yourself on Azure
 
-Kardiaflow is fully reproducible on Azure with **Bicep + CLI scripts**. In ~5–10 minutes you’ll have a Databricks workspace, ADLS Gen2, and a service principal. A teardown script is included to avoid lingering costs.
+Kardiaflow is fully reproducible on Azure with Bicep + CLI scripts. In ~5–10 minutes you’ll have a Databricks workspace, ADLS Gen2, and a service principal. A teardown script is included to avoid lingering costs.
 
 **Prereqs:** Azure subscription, Azure CLI, Databricks CLI, Databricks PAT.
 
