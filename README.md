@@ -1,21 +1,24 @@
-# **Kardiaflow: Azure Databricks Healthcare Lakehouse**
-![CI](https://github.com/moveeleven-data/kardiaflow/actions/workflows/ci.yml/badge.svg)
+<h1 align="center">Kardiaflow: Azure Databricks Healthcare Lakehouse</h1>
 
-*Turn raw healthcare records into protected, analytics-ready data — with streaming, PHI masking and CDC.*
+<p align="center">
+  Turn raw healthcare records into protected, analytics-ready data — with streaming, PHI masking, and CDC.
+</p>
 
-## ▷ See It in Action (2-min demo)
+<p align="center">
+  <a href="https://github.com/moveeleven-data/kardiaflow/actions/workflows/ci.yml">
+    <img src="https://github.com/moveeleven-data/kardiaflow/actions/workflows/ci.yml/badge.svg" alt="CI status"/>
+  </a>
+</p>
 
-<a href="https://youtu.be/YPaAU44Tdvw" target="_blank">
-  <img src="https://img.youtube.com/vi/YPaAU44Tdvw/hqdefault.jpg" width="520" alt="Watch the demo on YouTube">
-</a>
+---
 
-**How it works**  
-- **Ingest**: load raw patient, encounter, claims, and feedback data in bulk or streaming  
-- **Protect**: apply PHI masking and remove duplicates in the Silver layer  
-- **Track**: capture change history with Delta CDF and merge updates (SCD1/2)  
-- **Deliver**: publish Gold tables, KPIs, and dashboards for analytics
+<h3 align="center" style="font-size:1.4em;">▷ See It in Action (2-min demo)</h3>
 
-**Get started:** [Quickstart Setup](#run-it-yourself-on-azure)  
+<p align="center">
+  <a href="https://youtu.be/YPaAU44Tdvw" target="_blank">
+    <img src="https://img.youtube.com/vi/YPaAU44Tdvw/hqdefault.jpg" width="400" alt="Watch the demo on YouTube"/>
+  </a>
+</p>
 
 ---
 
