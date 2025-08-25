@@ -20,7 +20,7 @@
 | Capability | What you get                                             |
 |---|----------------------------------------------------------|
 | **Streaming** | Auto Loader for streams, COPY INTO for bulk |
-| **Privacy** (PHI mask, de-dup, SCD1/2) | History-aware Silver via Delta MERGE/CDF               |
+| **Privacy**  | History-aware Silver via Delta MERGE/CDF               |
 | **Analytics** | Gold KPIs for Databricks SQL (lifecycle, spend, sentiment) |
 | **Quality** | Smoke checks written to audit table; unit tests via GitHub Actions |
 | **IaC** | Bicep deploy/teardown, secrets in scopes, single-node friendly |
