@@ -1,6 +1,8 @@
 ## Data Dictionary: Kardiaflow Synthetic Healthcare Dataset
 
-Pairs with the [Source Schema](./source_schema.md) and describes the fields, formats, and parsing notes for each raw dataset.  
+Field definitions, formats, and parsing notes for each raw dataset.
+
+_Companion docs: [Data Model](./data_model.md) | [Naming Standards](./naming_standards.md)_
 
 ### Raw Source Files
 
@@ -37,8 +39,7 @@ The raw/source folders are generated programmatically from the sample data in `/
 
 **Notes:**
 
-- **Codes:** Diagnosis and procedure codes arrive as mixed-case alphanumerics (e.g., `yy006`, `tD052`). They are kept 
-exactly as provided, without uppercasing or padding.  
+- **Codes:** Diagnosis and procedure codes arrive as mixed-case alphanumerics (e.g., `yy006`, `tD052`).
 
 - **Amounts and dates:** Claim amounts come in as decimals (e.g., `3807.95`). Claim dates follow `YYYY-MM-DD`; if a 
 date cannot be parsed, it is stored as `NULL` while the record itself remains.  
@@ -64,9 +65,6 @@ country.
 
 - **Specialty field:** Specialties such as `Cardiology` or `Orthopedics` are free-text and unstandardized, so 
 spelling and case variations appear as distinct values.  
-
-- **Data quality:** Records missing a `ProviderID` are dropped, and malformed lines are redirected to the bad-records 
-path, so only valid rows continue downstream.  
 
 ---
 
@@ -139,10 +137,26 @@ is preserved so that patient joins are not broken.
 
 **Notes**
 
-- **Timestamps:** Each feedback record includes an ISO-8601 timestamp with an explicit offset (or Z). Bronze stores the raw string. Silver parses it to UTC (session fixed to UTC), ensuring daylight savings and offsets are applied correctly. Naïve timestamps are not permitted.
+- **Timestamps:** Each feedback record includes an ISO-8601 timestamp with an explicit offset (or Z). Bronze stores the raw string. Silver parses it to UTC, ensuring daylight savings and offsets are applied correctly.
 
 - **Comments field:** Free-text may contain sensitive details. Comments are retained only in Bronze for raw fidelity 
   and is not propagated to Silver or Gold.
 
 - **Tags and metadata:** Tags appear sparsely (e.g., `["staff"]`, `["parking"]`) and are stored as arrays of strings 
 without normalization. Metadata fields (e.g., `response_time_ms`) arrive as text and can be cast later if needed.
+
+---
+
+### Standardization Rules
+
+Field name mapping applied in the Silver layer:
+
+| Raw key               | Silver key     |
+|-----------------------|----------------|
+| `ClaimID`             | `claim_id`     |
+| `PatientID`           | `patient_id`   |
+| `ProviderID`          | `provider_id`  |
+| `encounters.ID`       | `encounter_id` |
+| `encounters.PATIENT`  | `patient_id`   |
+| `feedback.feedback_id`| `feedback_id`  |
+| `feedback.provider_id`| `provider_id`  |

@@ -1,8 +1,8 @@
 ## Kardiaflow Security Policy
 
 ### Overview
-Kardiaflow runs on Azure Databricks and is torn down after use. The focus is on keeping things safe and simple: no 
-secrets in git, light CI checks, least-privilege storage access, basic data-quality tests, and a clean teardown.
+Kardiaflow runs on Azure Databricks and is torn down after use. The focus is on keeping things simple: no 
+secrets in git, least-privilege storage access, basic data-quality tests, and a clean teardown.
 
 ### Secrets
 Secrets are never committed. Credentials live in a Databricks secret scope and are read at runtime.
