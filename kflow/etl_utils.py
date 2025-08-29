@@ -1,11 +1,10 @@
 # kflow/etl_utils.py
-"""Kardiaflow - ETL utilities.
+"""
+Kardiaflow - ETL utilities.
 
 Adds standard audit columns during ingestion: ingest timestamp, source file path,
 and batch ID.
 """
-
-from __future__ import annotations
 
 from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
@@ -24,8 +23,13 @@ def add_audit_cols(df: DataFrame) -> DataFrame:
     return df_with_audit
 
 
-def tag_timestamp_source(df: DataFrame, ts_col: str, out_col: str = "timestamp_source") -> DataFrame:
-    """Flag whether a raw timestamp string carried a timezone.
+def tag_timestamp_source(
+        df: DataFrame,
+        ts_col: str,
+        out_col: str = "timestamp_source"
+) -> DataFrame:
+    """
+    Flag whether a raw timestamp string carried a timezone.
 
     'offset' if the value ends with 'Z' or ±HH(:MM), else 'naive'.
     Preserves provenance after parsing to TIMESTAMP.

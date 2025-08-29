@@ -1,9 +1,5 @@
-"""Kardiaflow tests - Shared fixtures
-
-Provides a SparkSession and clears the in-memory log buffer between tests.
-"""
-
-from __future__ import annotations
+# Kardiaflow tests - Shared fixtures
+# Provides a SparkSession and clears the in-memory log buffer between tests.
 
 import pytest
 from pyspark.sql import SparkSession

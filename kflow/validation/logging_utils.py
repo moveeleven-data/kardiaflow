@@ -4,8 +4,6 @@
 Accumulates structured results in LOGS and prints.
 """
 
-from __future__ import annotations
-
 from kflow.validation.config import RUN_TS, PASS
 
 # List to hold all validation results for this run
@@ -20,7 +18,8 @@ def log(
     status: str,
     message: str | None = None,
 ) -> None:
-    """Append a result to LOGS and print a summary line.
+    """
+    Append a result to LOGS and print a summary line.
 
     Args:
         layer (str): Pipeline stage being tested ('BRONZE', 'SILVER', or 'GOLD')

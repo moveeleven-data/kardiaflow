@@ -4,8 +4,6 @@
 Asserts that specified columns contain no NULL values.
 """
 
-from __future__ import annotations
-
 from pyspark.sql import SparkSession, functions as F
 
 from kflow.validation.config import PASS, FAIL

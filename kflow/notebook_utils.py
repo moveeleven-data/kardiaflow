@@ -1,5 +1,6 @@
 # kflow/notebook_utils.py
-"""Kardiaflow — Notebook helpers.
+"""
+Kardiaflow — Notebook helpers.
 
 Convenience functions for use in Databricks notebooks:
 
@@ -42,10 +43,10 @@ def get_history_df(target: str, limit: int = 5) -> DataFrame:
     )
     target_ref = f"delta.`{target}`" if is_path else target
 
-    # Query full history…
+    # Query the table's full Delta history
     df = spark.sql(f"DESCRIBE HISTORY {target_ref}")
 
-    # …keep a few useful columns…
+    # Select key columns only
     df = df.select(
         "version",
         "timestamp",
@@ -53,7 +54,7 @@ def get_history_df(target: str, limit: int = 5) -> DataFrame:
         "operationParameters",
     )
 
-    # …newest first, capped.
+    # Sort by most recent and apply limit
     df = df.orderBy("version", ascending=False)
     df = df.limit(limit)
 
@@ -61,7 +62,7 @@ def get_history_df(target: str, limit: int = 5) -> DataFrame:
 
 
 def show_history(target: str, limit: int = 5) -> None:
-    """Render history in notebooks; print in Jobs as a fallback."""
+    """Show Delta history in Databricks notebooks; print in Jobs as a fallback."""
     df = get_history_df(target, limit)
     try:
         display(df)  # type: ignore[name-defined]

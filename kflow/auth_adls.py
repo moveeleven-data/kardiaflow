@@ -1,14 +1,21 @@
 # kflow/auth_adls.py
-"""Kardiaflow - ADLS Gen2 OAuth on Databricks.
+"""
+ADLS Gen2 OAuth helper for Databricks.
 
-Configures Spark to access ADLS Gen2 using a service principal (OAuth).
-This function:
-  - Reads client credentials from a Databricks secret scope
-  - Writes OAuth configuration to spark.hadoop.* (the settings ABFS/Hive read)
-  - Removes any SharedKey/SAS leftovers that might override OAuth
+Context: Small demo without Unity Catalog. This is a lightweight way to make
+ABFS use a service principal at runtime so Bronze/Silver/Gold layers all work
+the same. It fixes common auth errors but does so by changing cluster-wide settings.
+
+What it does:
+  - Pulls credentials from a Databricks secret scope
+  - Sets OAuth options in Spark and the driver so reads/writes work
+  - Clears out any leftover SharedKey or SAS settings
+
+This is a bit of a hack: it mutates global config for the whole cluster. On
+shared it has a blast radius. In those cases, we could use Unity Catalog with a
+Storage Credential and an External Location, so access is handled natively.
 """
 
-from __future__ import annotations
 from pyspark.sql import SparkSession
 
 
@@ -20,67 +27,83 @@ def ensure_adls_oauth(
     client_id_key: str = "sp_client_id",
     client_secret_key: str = "sp_client_secret",
 ) -> None:
+    # Use the active Spark session provided by Databricks
     spark = SparkSession.builder.getOrCreate()
 
-    # Load service principal credentials (tenant, client ID, secret) from a Databricks secret scope
-    try:
-        from pyspark.dbutils import DBUtils
-        dbu = DBUtils(spark)
-    except Exception:
-        dbu = globals().get("dbutils", None)
-    if dbu is None:
-        raise RuntimeError("dbutils is not available; run on a Databricks cluster.")
 
-    def _secret(k: str) -> str:
-        v = dbu.secrets.get(scope=scope, key=k)  # type: ignore[attr-defined]
-        if not v or not v.strip():
-            raise ValueError(f"Secret '{scope}/{k}' is empty or missing.")
-        return v.strip()
+    # Helper to read a service principal credential from the secret scope.
+    # Returns a trimmed string and raises if the secret is missing or blank.
+    def _secret(key: str) -> str:
+        """Return a secret value (e.g. tenant ID, client ID, client secret)."""
+        secret_value = dbutils.secrets.get(scope=scope, key=key)  # type: ignore[attr-defined]
+        if not secret_value or not secret_value.strip():
+            raise ValueError(f"Secret '{scope}/{key}' is empty or missing.")
+        return secret_value.strip()
 
+    # Load service principal credentials from secrets
     tenant_id     = _secret(tenant_key)
     client_id     = _secret(client_id_key)
     client_secret = _secret(client_secret_key)
 
-    host = f"{account}.dfs.core.windows.net"
-    base = "fs.azure.account"
+    # Build common strings used in configuration keys
+    adls_host = f"{account}.dfs.core.windows.net"
+    conf_base = "fs.azure.account"
 
-    # Also grab the live Hadoop conf (used by driver FS ops)
-    hconf = spark.sparkContext._jsc.hadoopConfiguration()
+    # Driver-side Hadoop configuration used by filesystem clients
+    hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
 
-    # 1) Write OAuth to BOTH spark.hadoop.* (what Hive/ABFS read) and live Hadoop conf
-    oauth = {
-        f"{base}.auth.type.{host}": "OAuth",
-        f"{base}.oauth.provider.type.{host}": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
-        f"{base}.oauth2.client.id.{host}": client_id,
-        f"{base}.oauth2.client.secret.{host}": client_secret,
-        f"{base}.oauth2.client.endpoint.{host}": f"https://login.microsoftonline.com/{tenant_id}/oauth2/token",
+    # Define OAuth settings for this ADLS account
+    oauth_conf = {
+        f"{conf_base}.auth.type.{adls_host}": "OAuth",
+        f"{conf_base}.oauth.provider.type.{adls_host}":
+            "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+        f"{conf_base}.oauth2.client.id.{adls_host}": client_id,
+        f"{conf_base}.oauth2.client.secret.{adls_host}": client_secret,
+        f"{conf_base}.oauth2.client.endpoint.{adls_host}":
+            f"https://login.microsoftonline.com/{tenant_id}/oauth2/token",
     }
-    for k, v in oauth.items():
-        spark.conf.set(f"spark.hadoop.{k}", v)
+
+    # Apply settings to spark.conf and driver config
+    for conf_key, conf_value in oauth_conf.items():
+        spark.conf.set(f"spark.hadoop.{conf_key}", conf_value)
         try:
-            hconf.set(k, v)
+            hadoop_conf.set(conf_key, conf_value)
         except Exception:
             pass
 
-    # 2) Remove SharedKey/SAS on both layers so nothing overrides OAuth
-    bad = (
-        f"{base}.key",
-        f"{base}.key.{host}",
-        f"{base}.sas.token.provider.type",
-        f"{base}.sas.token.provider.type.{host}",
-        f"{base}.sas.fixed.token",
-        f"{base}.sas.fixed.token.{host}",
+    # Remove SharedKey and SAS settings that could override OAuth
+    conflicting_keys = (
+        f"{conf_base}.key",
+        f"{conf_base}.key.{adls_host}",
+        f"{conf_base}.sas.token.provider.type",
+        f"{conf_base}.sas.token.provider.type.{adls_host}",
+        f"{conf_base}.sas.fixed.token",
+        f"{conf_base}.sas.fixed.token.{adls_host}",
     )
-    for k in bad:
-        for name in (k, f"spark.hadoop.{k}"):
-            try:
-                spark.conf.unset(name)
-            except Exception:
-                pass
+
+
+    def _unset_conf(conf_key: str) -> None:
+        # Remove plain key from Spark configuration
         try:
-            hconf.unset(k)
+            spark.conf.unset(conf_key)
         except Exception:
             pass
 
-    # 3) Reset cached FileSystem clients so the new config is used immediately
+        # Remove the "spark.hadoop.*" variant from Spark's configuration
+        try:
+            spark.conf.unset(f"spark.hadoop.{conf_key}")
+        except Exception:
+            pass
+
+        # Remove the key from the driver's Hadoop configuration
+        try:
+            hadoop_conf.unset(conf_key)
+        except Exception:
+            pass
+
+    # Remove all conflicting SharedKey/SAS settings
+    for conf_key in conflicting_keys:
+        _unset_conf(conf_key)
+
+    # Reset FileSystem clients so new settings take effect immediately
     spark.sparkContext._jvm.org.apache.hadoop.fs.FileSystem.closeAll()

@@ -1,5 +1,6 @@
 # kflow/config.py
-"""Kardiaflow - Core configuration.
+"""
+Kardiaflow - Core configuration.
 
 Defines database names, container URIs, masking lists, and path helpers
 used across Bronze, Silver, and Gold layers.

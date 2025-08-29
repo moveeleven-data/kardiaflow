@@ -1,5 +1,6 @@
 # kflow/display_utils.py
-"""Kardiaflow - Delta Lake history helpers.
+"""
+Kardiaflow - Delta Lake history helpers.
 
 Fetch and display recent transaction history for a Delta table or path.
 """
@@ -12,9 +13,8 @@ def get_history_df(target: str, limit: int = 5) -> DataFrame:
     """Return recent Delta transaction history as a DataFrame.
 
     Args:
-        target: Delta table name (e.g. "bronze.users")
-                or a filesystem path (e.g. "/mnt/lake/bronze/users").
-        limit:  Maximum number of history rows to return.
+        target: Table name ("bronze.users") or path ("/mnt/lake/bronze/users").
+        limit:  Max number of rows to return.
     """
     spark = SparkSession.builder.getOrCreate()
 

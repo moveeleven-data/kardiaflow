@@ -5,7 +5,7 @@ Kardiaflow runs on Azure Databricks and is torn down after use. The focus is on 
 secrets in git, least-privilege storage access, basic data-quality tests, and a clean teardown.
 
 ### Secrets
-Secrets are never committed. Credentials live in a Databricks secret scope and are read at runtime.
+Credentials live in a Databricks secret scope and are read at runtime. Secrets are never committed.
 
 ### CI Checks
 A lightweight GitHub Actions workflow runs on pushes:
@@ -18,7 +18,7 @@ Blob public access is disabled, and TLS 1.2 with HTTPS-only traffic is enforced.
 customer-managed keys) are intentionally left out to keep the setup straightforward.
 
 ### Access
-The service principal has Storage Blob Data Contributor at the container (or account if container scope isn’t available). Broad Owner/Contributor rights are not used.
+The service principal has Storage Blob Data Contributor at the container. Broad Owner/Contributor rights are not used.
 
 ### Teardown
 Resources are cleaned up with scripts under `infra/deploy/`. The environment is not intended to stay up beyond a demo run.

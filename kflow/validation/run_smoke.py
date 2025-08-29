@@ -5,8 +5,6 @@ Runs Bronze, Silver, and Gold checks, persists results to Delta, and prints a
 PASS/FAIL summary.
 """
 
-from __future__ import annotations
-
 from pyspark.sql import SparkSession, functions as F
 import traceback
 

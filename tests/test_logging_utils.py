@@ -1,9 +1,5 @@
-"""Kardiaflow tests - Logging utilities
-
-Validates in-memory logging behavior and message handling.
-"""
-
-from __future__ import annotations
+# Kardiaflow tests - Logging utilities
+# Validates in-memory logging behavior and message handling.
 
 from kflow.validation.config import PASS, FAIL
 from kflow.validation.logging_utils import log, LOGS

@@ -5,8 +5,6 @@ Validates row count, primary key uniqueness/non-null, and presence of an
 _ingest_ts. Results are recorded via kflow.validation.logging_utils.log.
 """
 
-from __future__ import annotations
-
 from pyspark.sql import SparkSession, functions as F
 import traceback
 
@@ -15,7 +13,8 @@ from kflow.validation.logging_utils import log
 
 
 def check_bronze(table, pk):
-    """Validate a Bronze table according to the following rules:
+    """
+    Validate a Bronze table according to the following rules:
 
     1. row_count > 0
     2. no duplicate primary keys

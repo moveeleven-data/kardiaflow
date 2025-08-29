@@ -4,8 +4,6 @@
 Verifies each Silver table contains all expected columns (schema contract).
 """
 
-from __future__ import annotations
-
 from pyspark.sql import SparkSession
 
 from kflow.validation.config import PASS, FAIL
@@ -13,7 +11,8 @@ from kflow.validation.logging_utils import log
 
 
 def check_silver_contract(table, expected_cols):
-    """Validate a Silver table to ensure it contains all expected columns.
+    """
+    Validate a Silver table to ensure it contains all expected columns.
 
     Rules:
     1. Compute the set of actual columns in the table
