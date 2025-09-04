@@ -18,7 +18,7 @@ The Silver-layer schema, which highlights primary keys, nullable foreign keys, a
 
 This perspective shows how entities are actually stored and connected within the lakehouse.
 
-![Physical Model](assets/erd_physical_model2.png)
+![Physical Model](assets/erd_physical_model3.png)
 
 ---
 
