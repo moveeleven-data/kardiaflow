@@ -1,6 +1,16 @@
 # Kardiaflow Databricks Notebooks
 
-This directory contains the Databricks notebooks that implement Kardiaflow’s **Bronze**, **Silver**, **Gold**, and **validation** layers (with optional streaming for Encounters).
+This directory contains the Databricks notebooks that implement Kardiaflow’s Bronze, Silver, Gold, and validation layers (with optional streaming for Encounters).
+
+In Kardiaflow, Bronze and Silver are persisted as Delta tables to support durability,
+lineage, and incremental upserts at scale. Gold is also stored as Delta tables with snapshot overwrites,
+since the datasets are small enough to rebuild fully each run.
+
+Unlike dbt’s view-heavy convention, we persist earlier since Spark pipelines deal with high velocity datasets from 
+many source systems and depend on streaming updates and complex state management, making tables the more practical
+choice for reliability and performance.
+
+---
 
 The sections below provide a dataset-by-dataset breakdown of how each notebook processes data through the medallion architecture.
 
