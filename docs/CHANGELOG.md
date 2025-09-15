@@ -1,4 +1,4 @@
-## Kardiaflow Project — Changelog
+## Kardiaflow Changelog
 
 ### 2025-08-01
 
