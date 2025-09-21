@@ -1,7 +1,7 @@
 <h1 align="center">Kardiaflow: Azure Databricks Healthcare Lakehouse</h1>
 
 <p align="center">
-  Turn raw healthcare records into protected, analytics-ready data — with streaming, PHI masking, and CDC.
+  Turn raw healthcare records into protected, analytics-ready data.
   <br/><br/>
 </p>
 
@@ -42,10 +42,10 @@ workspace, ADLS Gen2, and a service principal. A teardown script is included to 
 
 **Prereqs:** Azure subscription, Azure CLI, Databricks CLI, Databricks PAT.
 
-1) **Configure** — Copy `.env.example` → `.env` and fill in SUB/RG/etc.  
-2) **Deploy** — Create RG and deploy Databricks + ADLS with Bicep (see `infra/README.md`).  
-3) **Set up Databricks** — Authenticate CLI, create a Service Principal, publish the `kflow` wheel.  
-4) **Run & clean up** — Bootstrap sample data, import the “full run” job, **Run now**, then tear down to avoid cost.
+1) **Configure** - Copy `.env.example` → `.env` and fill in SUB/RG/etc.  
+2) **Deploy** - Create RG and deploy Databricks + ADLS with Bicep (see `infra/README.md`).  
+3) **Set up Databricks** - Authenticate CLI, create a Service Principal, publish the `kflow` wheel.  
+4) **Run & clean up** - Bootstrap sample data, import the “full run” job, **Run now**, then tear down to avoid cost.
 
 🔗 Full guide: [infra/README.md](infra/README.md)  
 > **Note:** Runs on a single-node Databricks cluster for just a few dollars.
@@ -54,18 +54,18 @@ workspace, ADLS Gen2, and a service principal. A teardown script is included to 
 
 ## Codebase Overview
 
-- **[notebooks/](notebooks/)** — End-to-end workflows across Bronze, Silver, and Gold layers.
+- **[notebooks/](notebooks/)** - End-to-end workflows across Bronze, Silver, and Gold layers.
 
   • Bronze example: [`bronze_patients_autoloader.ipynb`](notebooks/00_bronze/encounters/bronze_patients_autoloader.ipynb)  
   • Silver example: [`silver_patients_scd1_batch.ipynb`](notebooks/01_silver/encounters/silver_patients_scd1_batch.ipynb)
 
-- **[kflow/](kflow/)** — Core library with authentication, ETL utilities, and validation helpers.
+- **[kflow/](kflow/)** - Core library with authentication, ETL utilities, and validation helpers.
 
-- **[pipelines/](pipelines/)** — Databricks job JSON definitions and dashboard exports.
+- **[pipelines/](pipelines/)** - Databricks job JSON definitions and dashboard exports.
 
-- **[infra/](infra/)** — Bicep templates and CLI scripts for reproducible deployment (see [infra/README.md](infra/README.md)). 
+- **[infra/](infra/)** - Bicep templates and CLI scripts for reproducible deployment (see [infra/README.md](infra/README.md)). 
 
-- **[docs/](docs/)** — Reference materials, such as the [data_dictionary.md](docs/data_dictionary.md). 
+- **[docs/](docs/)** - Reference materials, such as the [data_dictionary.md](docs/data_dictionary.md). 
 
 
 
