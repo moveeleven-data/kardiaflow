@@ -54,18 +54,18 @@ workspace, ADLS Gen2, and a service principal. A teardown script is included to 
 
 ## Codebase Overview
 
-- **[notebooks/](notebooks/)** - End-to-end workflows across Bronze, Silver, and Gold layers.
+**[notebooks/](notebooks/)** - End-to-end workflows across Bronze, Silver, and Gold layers.
 
-  • Bronze example: [`bronze_patients_autoloader.ipynb`](notebooks/00_bronze/encounters/bronze_patients_autoloader.ipynb)  
-  • Silver example: [`silver_patients_scd1_batch.ipynb`](notebooks/01_silver/encounters/silver_patients_scd1_batch.ipynb)
+  - Bronze example: [`bronze_patients_autoloader.ipynb`](notebooks/00_bronze/encounters/bronze_patients_autoloader.ipynb)  
+  - Silver example: [`silver_patients_scd1_batch.ipynb`](notebooks/01_silver/encounters/silver_patients_scd1_batch.ipynb)
 
-- **[kflow/](kflow/)** - Core library with authentication, ETL utilities, and validation helpers.
+**[kflow/](kflow/)** - Core library with authentication, ETL utilities, and validation helpers.
 
-- **[pipelines/](pipelines/)** - Databricks job JSON definitions and dashboard exports.
+**[pipelines/](pipelines/)** - Databricks job JSON definitions and dashboard exports.
 
-- **[infra/](infra/)** - Bicep templates and CLI scripts for reproducible deployment (see [infra/README.md](infra/README.md)). 
+**[infra/](infra/)** - Bicep templates and CLI scripts for reproducible deployment (see [infra/README.md](infra/README.md)). 
 
-- **[docs/](docs/)** - Reference materials, such as the [data_dictionary.md](docs/data_dictionary.md). 
+**[docs/](docs/)** - Reference materials, such as the [data_dictionary.md](docs/data_dictionary.md). 
 
 
 
