@@ -2,7 +2,7 @@
 
 Field definitions, formats, and parsing notes for each raw dataset.
 
-_Companion doc: [Data Model](./data_model.md)
+Companion doc: [Data Model](./data_model.md)
 
 ### Raw Source Files
 
