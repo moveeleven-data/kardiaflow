@@ -31,7 +31,7 @@
 
 ![Kardiaflow Architecture](docs/assets/kflow_lineage_3.png)
 
-<sup>Raw patient, encounter, claims, provider, and feedback data land in **Bronze** ➜ **Silver** applies PHI masking and CDC ➜ **Gold** aggregates metrics for analytics.</sup>
+<sup>Raw patient, encounter, claims, provider, and feedback data land in **Bronze**, **Silver** applies PHI masking and CDC, **Gold** aggregates metrics for analytics.</sup>
 
 
 
