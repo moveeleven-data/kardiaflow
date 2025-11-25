@@ -45,7 +45,7 @@ using Bicep and the Azure CLI.
 
 ---
 
-## What It Deploys
+## What It Deploys (subject to change; last updated 08/21/25)
 
 ### Resource Summary
 
