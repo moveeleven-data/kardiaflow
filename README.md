@@ -23,7 +23,7 @@
 | **Privacy**  | History-aware Silver via Delta MERGE/CDF               |
 | **Analytics** | Gold KPIs for Databricks SQL (lifecycle, spend, sentiment) |
 | **Quality** | Smoke checks written to audit table; unit tests via GitHub Actions |
-| **IaC** | Bicep deploy/teardown, secrets in scopes, single-node friendly |
+| **IaC** | Bicep deploy/teardown, secrets in Dbx scopes, single-node friendly |
 
 
 
@@ -31,7 +31,7 @@
 
 ![Kardiaflow Architecture](docs/assets/kflow_lineage_3.png)
 
-<sup>Raw patient, encounter, claims, provider, and feedback data land in **Bronze**, **Silver** applies PHI masking and CDC, **Gold** aggregates metrics for analytics.</sup>
+<sup>Raw patient, encounter, claims, provider, and feedback data land in Bronze, Silver applies PHI masking and CDC, Gold aggregates metrics for analytics.</sup>
 
 
 
@@ -45,7 +45,7 @@ workspace, ADLS Gen2, and a service principal. A teardown script is included to 
 1) **Configure** - Copy `.env.example` → `.env` and fill in SUB/RG/etc.  
 2) **Deploy** - Create RG and deploy Databricks + ADLS with Bicep (see `infra/README.md`).  
 3) **Set up Databricks** - Authenticate CLI, create a Service Principal, publish the `kflow` wheel.  
-4) **Run & clean up** - Bootstrap sample data, import the “full run” job, **Run now**, then tear down to avoid cost.
+4) **Run & clean up** - Bootstrap sample data, import the “full run” job, Run now, then tear down to avoid cost.
 
 🔗 Full guide: [infra/README.md](infra/README.md)  
 > **Note:** Runs on a single-node Databricks cluster for just a few dollars.
